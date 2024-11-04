@@ -2,7 +2,7 @@
 name: "✨ Feature request"
 about: 기능 추가 작업
 title: "✨ [Feature] - "
-labels: ":sparkles: feature"
+labels: "✨ feature"
 assignees: ''
 
 ---
@@ -15,4 +15,4 @@ assignees: ''
 ### 📚 Etc
 
 ---
-- 
+-
