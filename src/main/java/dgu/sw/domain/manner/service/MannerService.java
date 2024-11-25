@@ -40,9 +40,36 @@ public class MannerService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid mannerId: " + mannerId));
 
         return new MannerDetailDTO(
+                manner.getCategory(),
                 manner.getTitle(),
                 manner.getContent(),
                 manner.getImageUrl()
         );
+    }
+
+    // 1. 카테고리 중 검색
+    public List<String> searchCategories(String keyword) {
+        return mannerRepository.findAll()
+                .stream()
+                .map(Manner::getCategory)
+                .filter(category -> category.toLowerCase().contains(keyword.toLowerCase()))
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    // 2. 카테고리 내 검색
+    public List<MannerListDTO> searchMannersByCategoryAndKeyword(String category, String keyword) {
+        return mannerRepository.findByCategory(category)
+                .stream()
+                .filter(manner ->
+                        manner.getTitle().toLowerCase().contains(keyword.toLowerCase()) ||
+                                manner.getContent().toLowerCase().contains(keyword.toLowerCase()))
+                .map(manner -> new MannerListDTO(
+                        manner.getCategory(),
+                        manner.getTitle(),
+                        manner.getContent().length() > 20 ? manner.getContent().substring(0, 20) + "..." : manner.getContent(),
+                        manner.getImageUrl()
+                ))
+                .collect(Collectors.toList());
     }
 }
