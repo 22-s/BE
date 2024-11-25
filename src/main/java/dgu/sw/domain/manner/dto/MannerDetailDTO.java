@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class MannerDetailDTO {
+    private String category;
     private String title;
     private String content;
     private String imageUrl;
