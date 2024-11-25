@@ -18,7 +18,6 @@ public class Quiz {
 
     private String question;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String description;
     private String answer;
