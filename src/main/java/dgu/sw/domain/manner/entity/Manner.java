@@ -18,6 +18,9 @@ public class Manner {
 
     private String category;
     private String title;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String content;
     private String imageUrl;
 
