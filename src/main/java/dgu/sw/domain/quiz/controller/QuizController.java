@@ -66,6 +66,14 @@ public class QuizController {
         return ApiResponse.onSuccess(response);
     }
 
+    @DeleteMapping("/{quizId}/review")
+    @Operation(summary = "복습 리스트 삭제", description = "복습 리스트에서 특정 퀴즈를 삭제합니다.")
+    public ApiResponse<String> removeQuizFromReview(
+            Authentication authentication,
+            @PathVariable Long quizId) {
+        quizService.removeQuizFromReview(authentication.getName(), quizId);
+        return ApiResponse.onSuccess("복습 리스트에서 삭제되었습니다.");
+    }
 
     @GetMapping("/search")
     @Operation(summary = "퀴즈 검색", description = "키워드와 카테고리를 기반으로 퀴즈를 검색합니다.")
