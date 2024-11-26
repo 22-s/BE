@@ -12,8 +12,10 @@ import dgu.sw.domain.quiz.entity.UserQuiz;
 import dgu.sw.domain.quiz.repository.QuizRepository;
 import dgu.sw.domain.quiz.repository.QuizReviewListRepository;
 import dgu.sw.domain.quiz.repository.UserQuizRepository;
+import dgu.sw.domain.user.entity.User;
 import dgu.sw.domain.user.repository.UserRepository;
 import dgu.sw.global.exception.QuizException;
+import dgu.sw.global.exception.UserException;
 import dgu.sw.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -121,6 +123,23 @@ public class QuizServiceImpl implements QuizService {
                 .quiz(quiz)
                 .build();
         quizReviewListRepository.save(reviewItem);
+    }
+
+    @Override
+    public void removeQuizFromReview(String userId, Long quizId) {
+        // 1. 유효한 퀴즈 ID인지 확인
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_FOUND));
+
+        // 2. 유효한 사용자 ID인지 확인
+        User user = userRepository.findByUserId(Long.valueOf(userId));
+
+        // 3. 복습 리스트에서 해당 퀴즈 조회
+        QuizReviewList quizReviewList = quizReviewListRepository.findByUserAndQuiz(user, quiz)
+                .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_REVIEW_NOT_FOUND));
+
+        // 4. 복습 리스트에서 퀴즈 삭제
+        quizReviewListRepository.delete(quizReviewList);
     }
 
     @Override

@@ -23,6 +23,7 @@ public enum ErrorStatus implements BaseErrorCode {
     QUIZ_LOCKED(HttpStatus.FORBIDDEN, "QUIZ4004", "잠겨있는 퀴즈입니다."),
     INVALID_QUIZ_ANSWER(HttpStatus.BAD_REQUEST, "QUIZ4005", "잘못된 퀴즈 답안입니다."),
     QUIZ_SEARCH_NO_RESULTS(HttpStatus.BAD_REQUEST, "QUIZ4006", "검색 결과가 없습니다."),
+    QUIZ_REVIEW_NOT_FOUND(HttpStatus.BAD_REQUEST, "QUIZ4004", "복습 리스트에 해당 퀴즈가 존재하지 않습니다."),
 
     // 사용자 관련 에러
     USER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "USER4001", "이미 존재하는 사용자입니다."),
