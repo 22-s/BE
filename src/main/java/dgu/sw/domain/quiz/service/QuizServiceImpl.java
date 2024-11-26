@@ -114,10 +114,36 @@ public class QuizServiceImpl implements QuizService {
         return QuizConverter.toQuizResultResponse(isCorrect);
     }
 
-
     @Override
     public void addQuizToReview(String userId, Long quizId) {
-        // 복습 리스트에 퀴즈 추가
+        // 1. 퀴즈 데이터 조회
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 퀴즈입니다."));
+
+        // 2. 사용자가 이미 복습 리스트에 추가했는지 확인
+        boolean alreadyInReview = quizReviewListRepository.existsByUser_UserIdAndQuiz_QuizId(Long.valueOf(userId), quizId);
+
+        if (alreadyInReview) {
+            throw new IllegalStateException("이미 복습 리스트에 추가된 퀴즈입니다.");
+        }
+
+        // 3. 복습 리스트에 추가
+        QuizReviewList reviewItem = QuizReviewList.builder()
+                .user(userRepository.findByUserId(Long.valueOf(userId))) // 유저 엔티티 조회
+                .quiz(quiz)
+                .build();
+        quizReviewListRepository.save(reviewItem);
+    }
+
+    @Override
+    public List<QuizDetailResponse> getReviewList(String userId) {
+        // 1. 사용자 ID로 복습 리스트 조회
+        List<QuizReviewList> reviewList = quizReviewListRepository.findByUser_UserId(Long.valueOf(userId));
+
+        // 2. QuizReviewList 데이터를 QuizDetailResponse로 변환하여 반환
+        return reviewList.stream()
+                .map(review -> QuizConverter.toQuizDetailResponse(review.getQuiz()))
+                .collect(Collectors.toList());
     }
 
     public List<QuizListResponse> searchQuizzes(String keyword) {

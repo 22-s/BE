@@ -13,4 +13,5 @@ public interface QuizService {
     QuizResultResponse submitQuizAnswer(String userId, Long quizId, SubmitQuizRequest request);
     void addQuizToReview(String userId, Long quizId);
     List<QuizListResponse> searchQuizzes(String keyword);
+    List<QuizDetailResponse> getReviewList(String userId);
 }

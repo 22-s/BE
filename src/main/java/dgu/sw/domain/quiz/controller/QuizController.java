@@ -59,6 +59,14 @@ public class QuizController {
         return ApiResponse.onSuccess("복습 리스트에 추가되었습니다.");
     }
 
+    @GetMapping("/review")
+    @Operation(summary = "복습 리스트 조회", description = "사용자의 복습 리스트를 반환합니다.")
+    public ApiResponse<List<QuizDetailResponse>> getReviewList(Authentication authentication) {
+        List<QuizDetailResponse> response = quizService.getReviewList(authentication.getName());
+        return ApiResponse.onSuccess(response);
+    }
+
+
     @GetMapping("/search")
     @Operation(summary = "퀴즈 검색", description = "키워드와 카테고리를 기반으로 퀴즈를 검색합니다.")
     public ApiResponse<List<QuizListResponse>> searchQuizzes(
