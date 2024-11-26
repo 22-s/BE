@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 public class QuizDTO {
 
     public static class QuizRequest {
@@ -17,8 +15,6 @@ public class QuizDTO {
         @NoArgsConstructor
         @AllArgsConstructor
         public static class SubmitQuizRequest {
-            @NotNull
-            private Long userId;
             @NotNull
             private String selectedAnswer;
         }
@@ -33,6 +29,7 @@ public class QuizDTO {
             private String question;
             private boolean isLocked;
             private boolean isCorrect;
+            private boolean isInReviewList;
         }
 
         @Getter
