@@ -17,6 +17,8 @@ public class Quiz {
     private Long quizId;
 
     private String question;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
     private String answer;
     private String category;

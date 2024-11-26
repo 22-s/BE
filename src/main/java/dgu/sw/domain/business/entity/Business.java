@@ -18,6 +18,7 @@ public class Business {
     private Long businessId;
 
     private String title;
+    @Column(columnDefinition = "TEXT")
     private String description;
     private LocalDateTime publishedDate;
     private String category;
