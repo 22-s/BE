@@ -70,8 +70,9 @@ public class QuizController {
     @GetMapping("/search")
     @Operation(summary = "퀴즈 검색", description = "키워드와 카테고리를 기반으로 퀴즈를 검색합니다.")
     public ApiResponse<List<QuizListResponse>> searchQuizzes(
+            Authentication authentication,
             @RequestParam(required = false) String keyword) {
-        List<QuizListResponse> response = quizService.searchQuizzes(keyword);
+        List<QuizListResponse> response = quizService.searchQuizzes(authentication.getName(), keyword);
         return ApiResponse.onSuccess(response);
     }
 }

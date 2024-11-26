@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface QuizRepository extends JpaRepository<Quiz, Long> {
     List<Quiz> findByCategory(String category);
+    List<Quiz> findByQuestionContainingOrDescriptionContaining(String questionKeyword, String descriptionKeyword);
 }

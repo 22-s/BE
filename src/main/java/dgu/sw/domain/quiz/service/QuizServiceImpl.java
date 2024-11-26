@@ -146,7 +146,22 @@ public class QuizServiceImpl implements QuizService {
                 .collect(Collectors.toList());
     }
 
-    public List<QuizListResponse> searchQuizzes(String keyword) {
-        return null;
+    @Override
+    public List<QuizListResponse> searchQuizzes(String userId, String keyword) {
+        // 1. 키워드로 퀴즈 검색
+        List<Quiz> quizzes = quizRepository.findByQuestionContainingOrDescriptionContaining(keyword, keyword);
+
+        // 2. 잠금 해제된 퀴즈만 필터링
+        return quizzes.stream()
+                .filter(quiz -> {
+                    // UserQuiz에서 잠금 여부 확인
+                    UserQuiz userQuiz = userQuizRepository.findByUser_UserIdAndQuiz_QuizId(
+                            Long.valueOf(userId), quiz.getQuizId()).orElse(null);
+
+                    // 잠금이 해제된 퀴즈만 필터링
+                    return userQuiz == null || !userQuiz.isLocked();
+                })
+                .map(quiz -> QuizConverter.toQuizListResponse(quiz, false, false)) // 잠금 해제 상태로 반환
+                .collect(Collectors.toList());
     }
 }
