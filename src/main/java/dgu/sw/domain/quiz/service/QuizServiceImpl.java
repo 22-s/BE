@@ -71,8 +71,16 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     public QuizDetailResponse getQuizDetail(String userId, Long quizId) {
-        // UserQuiz와 Quiz 데이터를 조회
-        return null;
+        // 1. 퀴즈 데이터 조회
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 퀴즈입니다."));
+
+        // 2. 사용자가 푼 UserQuiz 데이터 조회
+        UserQuiz userQuiz = userQuizRepository.findByUser_UserIdAndQuiz_QuizId(Long.valueOf(userId), quizId)
+                .orElse(null);
+
+        // 2. 상세 정보 반환
+        return QuizConverter.toQuizDetailResponse(quiz);
     }
 
     @Override
@@ -81,27 +89,31 @@ public class QuizServiceImpl implements QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 퀴즈입니다."));
 
-        // 2. 사용자가 이미 해당 퀴즈를 풀었는지 확인
-        boolean alreadySolved = userQuizRepository.existsByUser_UserIdAndQuiz_QuizId(Long.valueOf(userId), quizId);
-
-        if (alreadySolved) {
-            throw new IllegalStateException("이미 푼 퀴즈입니다.");
-        }
-
-        // 3. 정답 여부 확인
+        // 2. 정답 여부 확인
         boolean isCorrect = quiz.getAnswer().equals(request.getSelectedAnswer());
 
-        // 4. UserQuiz 엔티티 생성 및 저장
-        UserQuiz userQuiz = QuizConverter.toUserQuiz(
-                userRepository.findByUserId(Long.valueOf(userId)), // 유저 엔티티 조회
-                quiz,
-                isCorrect
-        );
-        userQuizRepository.save(userQuiz);
+        // 3. 사용자가 이미 해당 퀴즈를 풀었는지 확인
+        UserQuiz existingUserQuiz = userQuizRepository.findByUser_UserIdAndQuiz_QuizId(Long.valueOf(userId), quizId)
+                .orElse(null);
 
-        // 5. 결과 반환
+        if (existingUserQuiz != null) {
+            // 이미 푼 문제: 정답 여부 업데이트
+            existingUserQuiz.updateCorrect(isCorrect);
+            userQuizRepository.save(existingUserQuiz);
+        } else {
+            // 새로운 문제: UserQuiz 엔티티 생성 및 저장
+            UserQuiz userQuiz = QuizConverter.toUserQuiz(
+                    userRepository.findByUserId(Long.valueOf(userId)), // 유저 엔티티 조회
+                    quiz,
+                    isCorrect
+            );
+            userQuizRepository.save(userQuiz);
+        }
+
+        // 4. 결과 반환
         return QuizConverter.toQuizResultResponse(isCorrect);
     }
+
 
     @Override
     public void addQuizToReview(String userId, Long quizId) {

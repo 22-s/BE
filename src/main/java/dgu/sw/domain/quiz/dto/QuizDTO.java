@@ -39,7 +39,6 @@ public class QuizDTO {
             private String question;
             private String answer;
             private String description;
-            private boolean isCorrect;
         }
 
         @Getter

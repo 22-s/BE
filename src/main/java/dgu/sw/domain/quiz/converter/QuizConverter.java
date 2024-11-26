@@ -45,13 +45,12 @@ public class QuizConverter {
                 .build();
     }
 
-    public static QuizDetailResponse toQuizDetailResponse(Quiz quiz, UserQuiz userQuiz) {
+    public static QuizDetailResponse toQuizDetailResponse(Quiz quiz) {
         return QuizDetailResponse.builder()
                 .quizId(quiz.getQuizId())
                 .question(quiz.getQuestion())
                 .answer(quiz.getAnswer())
                 .description(quiz.getDescription())
-                .isCorrect(userQuiz.isCorrect())
                 .build();
     }
 
