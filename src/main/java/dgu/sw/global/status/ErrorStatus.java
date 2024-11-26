@@ -22,8 +22,16 @@ public enum ErrorStatus implements BaseErrorCode {
     REVIEW_ALREADY_ADDED(HttpStatus.BAD_REQUEST, "QUIZ4003", "이미 복습 리스트에 추가된 퀴즈입니다."),
     QUIZ_LOCKED(HttpStatus.FORBIDDEN, "QUIZ4004", "잠겨있는 퀴즈입니다."),
     INVALID_QUIZ_ANSWER(HttpStatus.BAD_REQUEST, "QUIZ4005", "잘못된 퀴즈 답안입니다."),
-    QUIZ_SEARCH_NO_RESULTS(HttpStatus.BAD_REQUEST, "QUIZ4006", "검색 결과가 없습니다.");
+    QUIZ_SEARCH_NO_RESULTS(HttpStatus.BAD_REQUEST, "QUIZ4006", "검색 결과가 없습니다."),
 
+    // 사용자 관련 에러
+    USER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "USER4001", "이미 존재하는 사용자입니다."),
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "USER4002", "이메일 또는 비밀번호가 올바르지 않습니다."),
+    TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "USER4003", "토큰이 존재하지 않습니다."),
+    TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "USER4004", "유효하지 않은 토큰입니다."),
+    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "USER4005", "만료된 토큰입니다."),
+    REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "USER4006", "Refresh Token이 존재하지 않습니다."),
+    USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER4007", "존재하지 않는 사용자입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

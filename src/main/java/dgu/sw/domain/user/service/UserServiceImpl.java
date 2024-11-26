@@ -5,6 +5,8 @@ import dgu.sw.domain.user.entity.User;
 import dgu.sw.domain.user.repository.UserRepository;
 import dgu.sw.global.config.redis.RedisUtil;
 import dgu.sw.global.config.util.JWTUtil;
+import dgu.sw.global.exception.UserException;
+import dgu.sw.global.status.ErrorStatus;
 import jakarta.servlet.http.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +41,7 @@ public class UserServiceImpl implements UserService {
     public SignUpResponse signUp(SignUpRequest signUpRequest) {
         // 이메일 중복 검사
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+            throw new UserException(ErrorStatus.USER_ALREADY_EXISTS);
         }
 
         // 비밀번호 암호화
@@ -56,11 +58,11 @@ public class UserServiceImpl implements UserService {
     public void signIn(HttpServletResponse response, SignInRequest signInRequest) {
         // 이메일로 사용자 조회
         User user = userRepository.findByEmail(signInRequest.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
+                .orElseThrow(() -> new UserException(ErrorStatus.INVALID_CREDENTIALS));
 
         // 비밀번호 일치 여부 확인
         if (!passwordEncoder.matches(signInRequest.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
+            throw new UserException(ErrorStatus.INVALID_CREDENTIALS);
         }
 
         // AccessToken & RefreshToken 생성
@@ -91,8 +93,11 @@ public class UserServiceImpl implements UserService {
     private void processToken(HttpServletRequest request, HttpServletResponse response) {
         // 로그아웃 or 탈퇴 처리 하고 싶은 토큰이 유효한지 확인
         String accessToken = resolveToken(request);
-        if (accessToken == null || jwtUtil.isTokenExpired(accessToken)) {
-            throw new IllegalArgumentException("유효하지 않은 또는 만료된 토큰입니다.");
+        if (accessToken == null) {
+            throw new UserException(ErrorStatus.TOKEN_NOT_FOUND);
+        }
+        if (jwtUtil.isTokenExpired(accessToken)) {
+            throw new UserException(ErrorStatus.TOKEN_EXPIRED);
         }
 
         // Redis에 해당 Refresh Token 이 있는지 여부를 확인 후에 있을 경우 삭제
