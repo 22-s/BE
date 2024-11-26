@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface UserQuizRepository extends JpaRepository<UserQuiz, Long> {
     List<UserQuiz> findByUser_UserId(Long userId);
-    Optional<UserQuiz> findByUser_UserIdAndQuiz_QuizId(Long userId, Long quizId);
+    boolean existsByUser_UserIdAndQuiz_QuizId(Long userId, Long quizId);
 }
