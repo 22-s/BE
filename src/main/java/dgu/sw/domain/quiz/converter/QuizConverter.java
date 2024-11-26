@@ -22,23 +22,35 @@ public class QuizConverter {
                 .build();
     }
 
-    public static QuizListResponse toQuizListResponse(UserQuiz userQuiz) {
+    // UserQuiz를 QuizListResponse로 변환
+    public static QuizListResponse toQuizListResponse(UserQuiz userQuiz, boolean isLocked, boolean isInReviewList) {
         Quiz quiz = userQuiz.getQuiz();
         return QuizListResponse.builder()
                 .quizId(quiz.getQuizId())
                 .question(quiz.getQuestion())
-                .isLocked(userQuiz.isLocked())
+                .isLocked(isLocked)
                 .isCorrect(userQuiz.isCorrect())
+                .isInReviewList(isInReviewList)
                 .build();
     }
 
-    public static QuizDetailResponse toQuizDetailResponse(Quiz quiz, UserQuiz userQuiz) {
+    // Quiz를 QuizListResponse로 변환 (기본 값)
+    public static QuizListResponse toQuizListResponse(Quiz quiz, boolean isLocked, boolean isInReviewList) {
+        return QuizListResponse.builder()
+                .quizId(quiz.getQuizId())
+                .question(quiz.getQuestion())
+                .isLocked(isLocked)
+                .isCorrect(false) // 기본 값: 정답 여부 없음
+                .isInReviewList(isInReviewList)
+                .build();
+    }
+
+    public static QuizDetailResponse toQuizDetailResponse(Quiz quiz) {
         return QuizDetailResponse.builder()
                 .quizId(quiz.getQuizId())
                 .question(quiz.getQuestion())
                 .answer(quiz.getAnswer())
                 .description(quiz.getDescription())
-                .isCorrect(userQuiz.isCorrect())
                 .build();
     }
 
