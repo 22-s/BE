@@ -14,7 +14,16 @@ public enum ErrorStatus implements BaseErrorCode {
     _INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON500", "서버 에러, 관리자에게 문의 바랍니다."),
     _BAD_REQUEST(HttpStatus.BAD_REQUEST,"COMMON400","잘못된 요청입니다."),
     _UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"COMMON401","인증이 필요합니다."),
-    _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다.");
+    _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다."),
+
+    // 퀴즈 관련 에러
+    QUIZ_NOT_FOUND(HttpStatus.BAD_REQUEST, "QUIZ4001", "존재하지 않는 퀴즈입니다."),
+    USER_QUIZ_ALREADY_SOLVED(HttpStatus.BAD_REQUEST, "QUIZ4002", "이미 푼 퀴즈입니다."),
+    REVIEW_ALREADY_ADDED(HttpStatus.BAD_REQUEST, "QUIZ4003", "이미 복습 리스트에 추가된 퀴즈입니다."),
+    QUIZ_LOCKED(HttpStatus.FORBIDDEN, "QUIZ4004", "잠겨있는 퀴즈입니다."),
+    INVALID_QUIZ_ANSWER(HttpStatus.BAD_REQUEST, "QUIZ4005", "잘못된 퀴즈 답안입니다."),
+    QUIZ_SEARCH_NO_RESULTS(HttpStatus.BAD_REQUEST, "QUIZ4006", "검색 결과가 없습니다.");
+
 
     private final HttpStatus httpStatus;
     private final String code;
