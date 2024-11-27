@@ -23,6 +23,9 @@ public class Quiz {
     private String answer;
     private String category;
 
+    @Column(columnDefinition = "TEXT")
+    private String questionDetail;
+
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL)
     private List<UserQuiz> userQuizzes;
 
