@@ -26,4 +26,8 @@ public class UserQuiz {
     @ManyToOne
     @JoinColumn(name = "quizId")
     private Quiz quiz;
+
+    public void updateCorrect(boolean isCorrect) {
+        this.isCorrect = isCorrect;
+    }
 }
