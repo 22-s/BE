@@ -32,7 +32,14 @@ public enum ErrorStatus implements BaseErrorCode {
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "USER4004", "유효하지 않은 토큰입니다."),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "USER4005", "만료된 토큰입니다."),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "USER4006", "Refresh Token이 존재하지 않습니다."),
-    USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER4007", "존재하지 않는 사용자입니다.");
+    USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER4007", "존재하지 않는 사용자입니다."),
+
+    // 업무 용어 관련 에러
+    VOCA_NOT_FOUND(HttpStatus.NOT_FOUND, "VOCA4041", "해당 업무 용어를 찾을 수 없습니다."),
+    VOCA_LIST_NOT_FOUND(HttpStatus.NOT_FOUND, "VOCA4042", "해당 카테고리의 업무 용어 리스트를 찾을 수 없습니다."),
+    VOCA_SEARCH_NO_RESULTS(HttpStatus.NOT_FOUND, "VOCA4043", "검색 결과가 없습니다."),
+    VOCA_ALREADY_FAVORITED(HttpStatus.BAD_REQUEST, "VOCA4001", "이미 즐겨찾기에 추가된 용어입니다."),
+    VOCA_FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "VOCA4044", "즐겨찾기에 없는 용어입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
