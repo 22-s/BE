@@ -37,6 +37,7 @@ public class QuizDTO {
         public static class QuizDetailResponse {
             private Long quizId;
             private String question;
+            private String questionDetail;
             private String answer;
             private String description;
         }
