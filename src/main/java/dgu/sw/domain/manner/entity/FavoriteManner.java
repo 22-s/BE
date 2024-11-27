@@ -22,4 +22,7 @@ public class FavoriteManner {
     @ManyToOne
     @JoinColumn(name = "mannerId")
     private Manner manner;
+
+    private String category;
+    private String content;
 }
