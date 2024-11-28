@@ -39,7 +39,15 @@ public enum ErrorStatus implements BaseErrorCode {
     VOCA_LIST_NOT_FOUND(HttpStatus.NOT_FOUND, "VOCA4042", "해당 카테고리의 업무 용어 리스트를 찾을 수 없습니다."),
     VOCA_SEARCH_NO_RESULTS(HttpStatus.NOT_FOUND, "VOCA4043", "검색 결과가 없습니다."),
     VOCA_ALREADY_FAVORITED(HttpStatus.BAD_REQUEST, "VOCA4001", "이미 즐겨찾기에 추가된 용어입니다."),
-    VOCA_FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "VOCA4044", "즐겨찾기에 없는 용어입니다.");
+    VOCA_FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "VOCA4044", "즐겨찾기에 없는 용어입니다."),
+
+    // 매너 설명서 관련 에러
+    MANNER_NOT_FOUND(HttpStatus.NOT_FOUND, "MANNER4041", "해당 매너 설명서를 찾을 수 없습니다."),
+    MANNER_LIST_NOT_FOUND(HttpStatus.NOT_FOUND, "MANNER4042", "해당 카테고리의 매너 리스트를 찾을 수 없습니다."),
+    MANNER_SEARCH_NO_RESULTS(HttpStatus.NOT_FOUND, "MANNER4043", "검색 결과가 없습니다."),
+    MANNER_ALREADY_FAVORITED(HttpStatus.BAD_REQUEST, "MANNER4001", "이미 즐겨찾기에 추가된 매너입니다."),
+    MANNER_FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "MANNER4044", "즐겨찾기에 없는 매너입니다.");
+
 
     private final HttpStatus httpStatus;
     private final String code;
