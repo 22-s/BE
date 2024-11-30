@@ -42,6 +42,7 @@ public class QuizDTO {
             private String answer;
             private String description;
             private boolean isSolved;
+            private boolean isInReviewList;
         }
 
         @Getter
