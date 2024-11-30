@@ -33,15 +33,15 @@ public class SecurityConfig {
                         .requestMatchers(
                                 new AntPathRequestMatcher("/"),
                                 new AntPathRequestMatcher("/api/user/**"),
+                                new AntPathRequestMatcher("/api/voca/**"),
+                                new AntPathRequestMatcher("/api/manners/**"),
                                 new AntPathRequestMatcher("/swagger-ui.html"),
                                 new AntPathRequestMatcher("/swagger-ui/**"),
                                 new AntPathRequestMatcher("/v3/api-docs/**"),
                                 new AntPathRequestMatcher("/api-docs/**"),
                                 new AntPathRequestMatcher("/error"),
                                 new AntPathRequestMatcher("/favicon.ico"),
-                                new AntPathRequestMatcher("/health"),
-                                new AntPathRequestMatcher("/api/v0/s3/presigned/upload"),
-                                new AntPathRequestMatcher("/chat")
+                                new AntPathRequestMatcher("/health")
                         ).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
