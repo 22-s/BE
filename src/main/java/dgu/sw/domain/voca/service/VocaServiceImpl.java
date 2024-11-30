@@ -28,32 +28,46 @@ public class VocaServiceImpl implements VocaService {
 
     @Override
     public List<VocaListResponse> getVocaList(String userId, String category) {
+        // 카테고리별 업무 용어 조회
         List<Voca> vocas = vocaRepository.findByCategory(category);
 
         if (vocas.isEmpty()) {
             throw new VocaException(ErrorStatus.VOCA_LIST_NOT_FOUND);
         }
 
-        // 사용자의 즐겨찾기 가져오기
-        User user = userRepository.findByUserId(Long.valueOf(userId));
-        List<Long> favoritedVocaIds = favoriteVocaRepository.findByUser(user).stream()
+        // 로그인 여부에 따라 즐겨찾기 처리
+        List<Long> favoritedVocaIds = (userId != null)
+                ? favoriteVocaRepository.findByUser(userRepository.findByUserId(Long.valueOf(userId))).stream()
                 .map(favorite -> favorite.getVoca().getVocaId())
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                : List.of();
 
         // 업무 용어 리스트와 즐겨찾기 여부 매핑
         return vocas.stream()
-                .map(voca -> VocaConverter.toVocaListResponse(voca, favoritedVocaIds.contains(voca.getVocaId())))
+                .map(voca -> VocaConverter.toVocaListResponse(voca,
+                        userId != null && favoritedVocaIds.contains(voca.getVocaId())))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<VocaListResponse> searchVoca(String keyword) {
+    public List<VocaListResponse> searchVoca(String userId, String keyword) {
         List<Voca> vocas = vocaRepository.findByTermContainingOrDescriptionContaining(keyword, keyword);
+
         if (vocas.isEmpty()) {
             throw new VocaException(ErrorStatus.VOCA_SEARCH_NO_RESULTS);
         }
+
+        // 로그인 여부에 따라 즐겨찾기 처리
+        List<Long> favoritedVocaIds = (userId != null)
+                ? favoriteVocaRepository.findByUser(userRepository.findByUserId(Long.valueOf(userId))).stream()
+                .map(favorite -> favorite.getVoca().getVocaId())
+                .collect(Collectors.toList())
+                : List.of();
+
+        // 업무 용어 리스트와 즐겨찾기 여부 매핑
         return vocas.stream()
-                .map(VocaConverter::toVocaListResponse)
+                .map(voca -> VocaConverter.toVocaListResponse(voca,
+                        userId != null && favoritedVocaIds.contains(voca.getVocaId())))
                 .collect(Collectors.toList());
     }
 

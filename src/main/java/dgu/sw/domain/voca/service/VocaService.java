@@ -8,7 +8,7 @@ import java.util.List;
 public interface VocaService {
     List<VocaListResponse> getVocaList(String userId, String category);
 
-    List<VocaListResponse> searchVoca(String keyword);
+    List<VocaListResponse> searchVoca(String userId, String keyword);
 
     void addFavorite(String userId, Long vocaId);
 

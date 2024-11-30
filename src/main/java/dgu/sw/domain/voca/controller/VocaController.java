@@ -25,14 +25,18 @@ public class VocaController {
     public ApiResponse<List<VocaListResponse>> getVocaList(
             @RequestParam String category,
             Authentication authentication) {
-        List<VocaListResponse> response = vocaService.getVocaList(authentication.getName(), category);
+        String userId = (authentication != null) ? authentication.getName() : null;
+        List<VocaListResponse> response = vocaService.getVocaList(userId, category);
         return ApiResponse.onSuccess(response);
     }
 
     @GetMapping("/search")
     @Operation(summary = "업무 용어 검색", description = "키워드로 업무 용어를 검색합니다.")
-    public ApiResponse<List<VocaListResponse>> searchVoca(@RequestParam String keyword) {
-        List<VocaListResponse> response = vocaService.searchVoca(keyword);
+    public ApiResponse<List<VocaListResponse>> searchVoca(
+            @RequestParam String keyword,
+            Authentication authentication) {
+        String userId = (authentication != null) ? authentication.getName() : null;
+        List<VocaListResponse> response = vocaService.searchVoca(userId, keyword);
         return ApiResponse.onSuccess(response);
     }
 
