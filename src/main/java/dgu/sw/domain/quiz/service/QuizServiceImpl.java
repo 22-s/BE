@@ -75,7 +75,10 @@ public class QuizServiceImpl implements QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_FOUND));
 
-        return QuizConverter.toQuizDetailResponse(quiz);
+        // 사용자가 해당 퀴즈를 풀었는지 확인
+        boolean isSolved = userQuizRepository.findByUser_UserIdAndQuiz_QuizId(Long.valueOf(userId), quizId).isPresent();
+
+        return QuizConverter.toQuizDetailResponse(quiz, isSolved);
     }
 
     @Override
@@ -151,7 +154,7 @@ public class QuizServiceImpl implements QuizService {
         }
 
         return reviewList.stream()
-                .map(review -> QuizConverter.toQuizDetailResponse(review.getQuiz()))
+                .map(review -> QuizConverter.toQuizDetailResponse(review.getQuiz(), true))
                 .collect(Collectors.toList());
     }
 

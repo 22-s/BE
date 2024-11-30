@@ -47,13 +47,14 @@ public class QuizConverter {
                 .build();
     }
 
-    public static QuizDetailResponse toQuizDetailResponse(Quiz quiz) {
+    public static QuizDetailResponse toQuizDetailResponse(Quiz quiz, boolean isSolved) {
         return QuizDetailResponse.builder()
                 .quizId(quiz.getQuizId())
                 .question(quiz.getQuestion())
                 .questionDetail(quiz.getQuestionDetail())
                 .answer(quiz.getAnswer())
                 .description(quiz.getDescription())
+                .isSolved(isSolved)
                 .build();
     }
 

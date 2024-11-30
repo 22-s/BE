@@ -41,6 +41,7 @@ public class QuizDTO {
             private String questionDetail;
             private String answer;
             private String description;
+            private boolean isSolved;
         }
 
         @Getter
