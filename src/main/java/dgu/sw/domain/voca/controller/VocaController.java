@@ -22,8 +22,10 @@ public class VocaController {
 
     @GetMapping
     @Operation(summary = "업무 용어 리스트 조회", description = "카테고리별 업무 용어 리스트를 반환합니다.")
-    public ApiResponse<List<VocaListResponse>> getVocaList(@RequestParam String category) {
-        List<VocaListResponse> response = vocaService.getVocaList(category);
+    public ApiResponse<List<VocaListResponse>> getVocaList(
+            @RequestParam String category,
+            Authentication authentication) {
+        List<VocaListResponse> response = vocaService.getVocaList(authentication.getName(), category);
         return ApiResponse.onSuccess(response);
     }
 
