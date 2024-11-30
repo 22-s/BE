@@ -23,12 +23,13 @@ public class QuizConverter {
     }
 
     // UserQuiz를 QuizListResponse로 변환
-    public static QuizListResponse toQuizListResponse(UserQuiz userQuiz, boolean isLocked, boolean isInReviewList) {
+    public static QuizListResponse toQuizListResponse(UserQuiz userQuiz, boolean isLocked, boolean isSolved, boolean isInReviewList) {
         Quiz quiz = userQuiz.getQuiz();
         return QuizListResponse.builder()
                 .quizId(quiz.getQuizId())
                 .question(quiz.getQuestion())
                 .isLocked(isLocked)
+                .isSolved(isSolved)
                 .isCorrect(userQuiz.isCorrect())
                 .isInReviewList(isInReviewList)
                 .build();
@@ -40,7 +41,8 @@ public class QuizConverter {
                 .quizId(quiz.getQuizId())
                 .question(quiz.getQuestion())
                 .isLocked(isLocked)
-                .isCorrect(false) // 기본 값: 정답 여부 없음
+                .isSolved(false)
+                .isCorrect(false)
                 .isInReviewList(isInReviewList)
                 .build();
     }

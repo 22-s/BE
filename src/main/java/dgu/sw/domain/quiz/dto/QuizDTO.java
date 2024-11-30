@@ -28,6 +28,7 @@ public class QuizDTO {
             private Long quizId;
             private String question;
             private boolean isLocked;
+            private boolean isSolved;
             private boolean isCorrect;
             private boolean isInReviewList;
         }

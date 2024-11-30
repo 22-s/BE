@@ -57,9 +57,12 @@ public class QuizServiceImpl implements QuizService {
                             ? !quizId.equals(quizzes.get(0).getQuizId())
                             : quizId > lastSolvedQuizId + 1;
 
+                    // 사용자가 푼 퀴즈인지 확인
+                    boolean isSolved = userQuizMap.containsKey(quizId);
+
                     UserQuiz userQuiz = userQuizMap.get(quizId);
                     if (userQuiz != null) {
-                        return QuizConverter.toQuizListResponse(userQuiz, false, false);
+                        return QuizConverter.toQuizListResponse(userQuiz, false, true, false);
                     } else {
                         return QuizConverter.toQuizListResponse(quiz, isLocked, false);
                     }
@@ -71,13 +74,6 @@ public class QuizServiceImpl implements QuizService {
     public QuizDetailResponse getQuizDetail(String userId, Long quizId) {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_FOUND));
-
-        UserQuiz userQuiz = userQuizRepository.findByUser_UserIdAndQuiz_QuizId(Long.valueOf(userId), quizId)
-                .orElse(null);
-
-        if (userQuiz == null || userQuiz.isLocked()) {
-            throw new QuizException(ErrorStatus.QUIZ_LOCKED);
-        }
 
         return QuizConverter.toQuizDetailResponse(quiz);
     }
@@ -113,6 +109,10 @@ public class QuizServiceImpl implements QuizService {
                 .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_FOUND));
 
         boolean alreadyInReview = quizReviewListRepository.existsByUser_UserIdAndQuiz_QuizId(Long.valueOf(userId), quizId);
+
+        // 사용자가 해당 퀴즈를 풀었는지 확인
+        UserQuiz userQuiz = userQuizRepository.findByUser_UserIdAndQuiz_QuizId(Long.valueOf(userId), quizId)
+                .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_SOLVED));
 
         if (alreadyInReview) {
             throw new QuizException(ErrorStatus.REVIEW_ALREADY_ADDED);
