@@ -47,7 +47,7 @@ public class QuizConverter {
                 .build();
     }
 
-    public static QuizDetailResponse toQuizDetailResponse(Quiz quiz, boolean isSolved) {
+    public static QuizDetailResponse toQuizDetailResponse(Quiz quiz, boolean isSolved, boolean isInReviewList) {
         return QuizDetailResponse.builder()
                 .quizId(quiz.getQuizId())
                 .question(quiz.getQuestion())
@@ -55,6 +55,7 @@ public class QuizConverter {
                 .answer(quiz.getAnswer())
                 .description(quiz.getDescription())
                 .isSolved(isSolved)
+                .isInReviewList(isInReviewList)
                 .build();
     }
 

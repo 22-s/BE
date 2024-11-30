@@ -78,7 +78,10 @@ public class QuizServiceImpl implements QuizService {
         // 사용자가 해당 퀴즈를 풀었는지 확인
         boolean isSolved = userQuizRepository.findByUser_UserIdAndQuiz_QuizId(Long.valueOf(userId), quizId).isPresent();
 
-        return QuizConverter.toQuizDetailResponse(quiz, isSolved);
+        // 복습 리스트에 포함 여부 확인
+        boolean isInReviewList = quizReviewListRepository.existsByUser_UserIdAndQuiz_QuizId(Long.valueOf(userId), quizId);
+
+        return QuizConverter.toQuizDetailResponse(quiz, isSolved, isInReviewList);
     }
 
     @Override
@@ -154,7 +157,7 @@ public class QuizServiceImpl implements QuizService {
         }
 
         return reviewList.stream()
-                .map(review -> QuizConverter.toQuizDetailResponse(review.getQuiz(), true))
+                .map(review -> QuizConverter.toQuizDetailResponse(review.getQuiz(), true, true))
                 .collect(Collectors.toList());
     }
 
