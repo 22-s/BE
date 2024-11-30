@@ -27,13 +27,22 @@ public class VocaServiceImpl implements VocaService {
     private final UserRepository userRepository;
 
     @Override
-    public List<VocaListResponse> getVocaList(String category) {
+    public List<VocaListResponse> getVocaList(String userId, String category) {
         List<Voca> vocas = vocaRepository.findByCategory(category);
+
         if (vocas.isEmpty()) {
             throw new VocaException(ErrorStatus.VOCA_LIST_NOT_FOUND);
         }
+
+        // 사용자의 즐겨찾기 가져오기
+        User user = userRepository.findByUserId(Long.valueOf(userId));
+        List<Long> favoritedVocaIds = favoriteVocaRepository.findByUser(user).stream()
+                .map(favorite -> favorite.getVoca().getVocaId())
+                .collect(Collectors.toList());
+
+        // 업무 용어 리스트와 즐겨찾기 여부 매핑
         return vocas.stream()
-                .map(VocaConverter::toVocaListResponse)
+                .map(voca -> VocaConverter.toVocaListResponse(voca, favoritedVocaIds.contains(voca.getVocaId())))
                 .collect(Collectors.toList());
     }
 

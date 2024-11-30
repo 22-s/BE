@@ -6,7 +6,7 @@ import dgu.sw.domain.voca.dto.VocaDTO.VocaResponse.VocaFavoriteResponse;
 import java.util.List;
 
 public interface VocaService {
-    List<VocaListResponse> getVocaList(String category);
+    List<VocaListResponse> getVocaList(String userId, String category);
 
     List<VocaListResponse> searchVoca(String keyword);
 

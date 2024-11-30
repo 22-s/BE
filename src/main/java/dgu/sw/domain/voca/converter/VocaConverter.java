@@ -5,13 +5,14 @@ import dgu.sw.domain.voca.dto.VocaDTO.VocaResponse.VocaFavoriteResponse;
 import dgu.sw.domain.voca.entity.Voca;
 
 public class VocaConverter {
-    public static VocaListResponse toVocaListResponse(Voca voca) {
+    public static VocaListResponse toVocaListResponse(Voca voca, boolean isFavorited) {
         return VocaListResponse.builder()
                 .vocaId(voca.getVocaId())
                 .category(voca.getCategory())
                 .term(voca.getTerm())
                 .description(voca.getDescription())
                 .example(voca.getExample())
+                .isFavorited(isFavorited)
                 .build();
     }
 

@@ -19,6 +19,7 @@ public class VocaDTO {
             private String term;
             private String description;
             private String example;
+            private boolean isFavorited;
         }
 
         @Getter
