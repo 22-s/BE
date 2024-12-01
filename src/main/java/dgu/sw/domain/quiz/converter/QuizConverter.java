@@ -67,11 +67,16 @@ public class QuizConverter {
                 .build();
     }
 
-    public static QuizReviewResponse toQuizReviewResponse(Quiz quiz, String feedback) {
+    public static QuizReviewResponse toQuizReviewListResponse(Quiz quiz, boolean isCorrect, boolean isSolved, boolean isInReviewList) {
         return QuizReviewResponse.builder()
                 .quizId(quiz.getQuizId())
                 .question(quiz.getQuestion())
-                .feedback(feedback)
+                .questionDetail(quiz.getQuestionDetail())
+                .answer(quiz.getAnswer())
+                .description(quiz.getDescription())
+                .isSolved(isSolved)
+                .isInReviewList(isInReviewList)
+                .isCorrect(isCorrect)
                 .build();
     }
 }
