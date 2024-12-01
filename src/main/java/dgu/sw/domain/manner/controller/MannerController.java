@@ -31,14 +31,21 @@ public class MannerController {
     // 2. 특정 카테고리의 매너 리스트 반환
     @GetMapping(params = "category")
     @Operation(summary = "카테고리 리스트 반환", description = "특정 카테고리의 매너 리스트를 반환합니다.")
-    public ApiResponse<List<MannerListResponse>> getMannersByCategory(@RequestParam String category) {
-        return ApiResponse.onSuccess(mannerService.getMannersByCategory(category));
+    public ApiResponse<List<MannerListResponse>> getMannersByCategory(
+            @RequestParam String category,
+            Authentication authentication) {
+        String userId = authentication != null ? authentication.getName() : null;
+        return ApiResponse.onSuccess(mannerService.getMannersByCategory(category, userId));
     }
 
     // 3. 특정 매너 설명서 상세 조회
     @GetMapping("/{mannerId}")
-    public ApiResponse<MannerDetailResponse> getMannerDetail(@PathVariable Long mannerId) {
-        return ApiResponse.onSuccess(mannerService.getMannerDetail(mannerId));
+    @Operation(summary = "매너 디테일 반환", description = "특정 매너 설명서의 디테일을 반환합니다.")
+    public ApiResponse<MannerDetailResponse> getMannerDetail(
+            @PathVariable Long mannerId,
+            Authentication authentication) {
+        String userId = authentication != null ? authentication.getName() : null;
+        return ApiResponse.onSuccess(mannerService.getMannerDetail(mannerId, userId));
     }
 
     // 4. 전체 검색

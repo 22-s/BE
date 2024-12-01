@@ -6,23 +6,25 @@ import dgu.sw.domain.manner.dto.MannerDTO.MannerResponse.MannerFavoriteResponse;
 import dgu.sw.domain.manner.entity.Manner;
 
 public class MannerConverter {
-    public static MannerListResponse toMannerListResponse(Manner manner) {
+    public static MannerListResponse toMannerListResponse(Manner manner, boolean isFavorited) {
         return MannerListResponse.builder()
                 .mannerId(manner.getMannerId())
                 .category(manner.getCategory())
                 .title(manner.getTitle())
                 .contentPreview(manner.getContent().length() > 20 ? manner.getContent().substring(0, 20) + "..." : manner.getContent())
                 .imageUrl(manner.getImageUrl())
+                .isFavorited(isFavorited)
                 .build();
     }
 
-    public static MannerDetailResponse toMannerDetailResponse(Manner manner) {
+    public static MannerDetailResponse toMannerDetailResponse(Manner manner, boolean isFavorited) {
         return MannerDetailResponse.builder()
                 .mannerId(manner.getMannerId())
                 .category(manner.getCategory())
                 .title(manner.getTitle())
                 .content(manner.getContent())
                 .imageUrl(manner.getImageUrl())
+                .isFavorited(isFavorited)
                 .build();
     }
 
