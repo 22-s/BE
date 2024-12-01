@@ -45,11 +45,17 @@ public class QuizServiceImpl implements QuizService {
         Map<Long, UserQuiz> userQuizMap = userQuizzes.stream()
                 .collect(Collectors.toMap(userQuiz -> userQuiz.getQuiz().getQuizId(), userQuiz -> userQuiz));
 
+        // 사용자의 복습 리스트를 가져와 Map으로 변환
+        List<QuizReviewList> reviewList = quizReviewListRepository.findByUser_UserId(Long.valueOf(userId));
+        Map<Long, QuizReviewList> reviewQuizMap = reviewList.stream()
+                .collect(Collectors.toMap(quizReview -> quizReview.getQuiz().getQuizId(), quizReview -> quizReview));
+
         Long lastSolvedQuizId = userQuizzes.stream()
                 .map(userQuiz -> userQuiz.getQuiz().getQuizId())
                 .max(Long::compareTo)
                 .orElse(null);
 
+        // 퀴즈 목록 생성
         return quizzes.stream()
                 .map(quiz -> {
                     Long quizId = quiz.getQuizId();
@@ -60,11 +66,15 @@ public class QuizServiceImpl implements QuizService {
                     // 사용자가 푼 퀴즈인지 확인
                     boolean isSolved = userQuizMap.containsKey(quizId);
 
+                    // 복습 리스트 포함 여부 확인
+                    boolean isInReviewList = reviewQuizMap.containsKey(quizId);
+
+                    // 이미 풀었는지에 따라 처리
                     UserQuiz userQuiz = userQuizMap.get(quizId);
                     if (userQuiz != null) {
-                        return QuizConverter.toQuizListResponse(userQuiz, false, true, false);
+                        return QuizConverter.toQuizListResponse(userQuiz, false, isSolved, isInReviewList);
                     } else {
-                        return QuizConverter.toQuizListResponse(quiz, isLocked, false);
+                        return QuizConverter.toQuizListResponse(quiz, isLocked, isInReviewList);
                     }
                 })
                 .collect(Collectors.toList());
