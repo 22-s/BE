@@ -1,5 +1,6 @@
 package dgu.sw.domain.quiz.controller;
 
+import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizReviewResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizListResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizDetailResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizResultResponse;
@@ -61,8 +62,8 @@ public class QuizController {
 
     @GetMapping("/review")
     @Operation(summary = "복습 리스트 조회", description = "사용자의 복습 리스트를 반환합니다.")
-    public ApiResponse<List<QuizDetailResponse>> getReviewList(Authentication authentication) {
-        List<QuizDetailResponse> response = quizService.getReviewList(authentication.getName());
+    public ApiResponse<List<QuizReviewResponse>> getReviewList(Authentication authentication) {
+        List<QuizReviewResponse> response = quizService.getReviewList(authentication.getName());
         return ApiResponse.onSuccess(response);
     }
 

@@ -1,7 +1,7 @@
 package dgu.sw.domain.quiz.service;
 
 import dgu.sw.domain.quiz.converter.QuizConverter;
-import dgu.sw.domain.quiz.dto.QuizDTO;
+import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizReviewResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizListResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizDetailResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizResultResponse;
@@ -159,15 +159,29 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public List<QuizDetailResponse> getReviewList(String userId) {
+    public List<QuizReviewResponse> getReviewList(String userId) {
         List<QuizReviewList> reviewList = quizReviewListRepository.findByUser_UserId(Long.valueOf(userId));
 
         if (reviewList.isEmpty()) {
             throw new QuizException(ErrorStatus.QUIZ_SEARCH_NO_RESULTS);
         }
 
+        // 사용자와 연결된 모든 UserQuiz를 조회
+        List<UserQuiz> userQuizzes = userQuizRepository.findByUser_UserId(Long.valueOf(userId));
+        Map<Long, Boolean> quizCorrectMap = userQuizzes.stream()
+                .collect(Collectors.toMap(userQuiz -> userQuiz.getQuiz().getQuizId(), UserQuiz::isCorrect));
+
         return reviewList.stream()
-                .map(review -> QuizConverter.toQuizDetailResponse(review.getQuiz(), true, true))
+                .map(review -> {
+                    Quiz quiz = review.getQuiz();
+                    boolean isCorrect = quizCorrectMap.getOrDefault(quiz.getQuizId(), false); // 정답 여부 가져오기
+                    return QuizConverter.toQuizReviewListResponse(
+                            quiz,
+                            isCorrect,
+                            true, // 복습 리스트 조회이므로 항상 풀린 상태
+                            true  // 복습 리스트에 있으므로 항상 true
+                    );
+                })
                 .collect(Collectors.toList());
     }
 

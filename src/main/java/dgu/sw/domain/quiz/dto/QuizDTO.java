@@ -57,7 +57,12 @@ public class QuizDTO {
         public static class QuizReviewResponse {
             private Long quizId;
             private String question;
-            private String feedback;
+            private String questionDetail;
+            private String answer;
+            private String description;
+            private boolean isSolved;
+            private boolean isInReviewList;
+            private boolean isCorrect;
         }
     }
 }
