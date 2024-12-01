@@ -18,6 +18,7 @@ public class MannerDTO {
                 private String title;
                 private String contentPreview;
                 private String imageUrl;
+                private boolean isFavorited;
             }
 
             @Getter
@@ -30,6 +31,7 @@ public class MannerDTO {
                 private String title;
                 private String content;
                 private String imageUrl;
+                private boolean isFavorited;
             }
 
             @Getter

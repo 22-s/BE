@@ -37,25 +37,39 @@ public class MannerServiceImpl implements MannerService {
     }
 
     @Override
-    public List<MannerListResponse> getMannersByCategory(String category) {
+    public List<MannerListResponse> getMannersByCategory(String category, String userId) {
         return mannerRepository.findByCategory(category)
                 .stream()
-                .map(MannerConverter::toMannerListResponse)
+                .map(manner -> {
+                    boolean isFavorited = false;
+                    if (userId != null) {
+                        User user = userRepository.findById(Long.valueOf(userId)).orElse(null);
+                        isFavorited = user != null && favoriteMannerRepository.existsByUserAndManner(user, manner);
+                    }
+                    return MannerConverter.toMannerListResponse(manner, isFavorited);
+                })
                 .collect(Collectors.toList());
     }
 
     @Override
-    public MannerDetailResponse getMannerDetail(Long mannerId) {
+    public MannerDetailResponse getMannerDetail(Long mannerId, String userId) {
         Manner manner = mannerRepository.findById(mannerId)
                 .orElseThrow(() -> new MannerException(ErrorStatus.MANNER_NOT_FOUND));
-        return MannerConverter.toMannerDetailResponse(manner);
+
+        boolean isFavorited = false;
+        if (userId != null) {
+            User user = userRepository.findById(Long.valueOf(userId)).orElse(null);
+            isFavorited = user != null && favoriteMannerRepository.existsByUserAndManner(user, manner);
+        }
+
+        return MannerConverter.toMannerDetailResponse(manner, isFavorited);
     }
 
     @Override
     public List<MannerListResponse> searchManners(String keyword) {
         return mannerRepository.findByCategoryContainingOrTitleContainingOrContentContaining(keyword, keyword, keyword)
                 .stream()
-                .map(MannerConverter::toMannerListResponse)
+                .map(manner -> MannerConverter.toMannerListResponse(manner, false))
                 .collect(Collectors.toList());
     }
 
@@ -64,13 +78,13 @@ public class MannerServiceImpl implements MannerService {
         if (keyword == null || keyword.isEmpty()) {
             return mannerRepository.findByCategory(category)
                     .stream()
-                    .map(MannerConverter::toMannerListResponse)
+                    .map(manner -> MannerConverter.toMannerListResponse(manner, false)) // 로그인 없이 항상 false
                     .collect(Collectors.toList());
         }
         return mannerRepository.findByCategoryAndTitleContainingOrCategoryAndContentContaining(
                         category, keyword, category, keyword)
                 .stream()
-                .map(MannerConverter::toMannerListResponse)
+                .map(manner -> MannerConverter.toMannerListResponse(manner, false)) // 로그인 없이 항상 false
                 .collect(Collectors.toList());
     }
 
