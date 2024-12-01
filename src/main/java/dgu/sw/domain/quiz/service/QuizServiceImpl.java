@@ -42,44 +42,45 @@ public class QuizServiceImpl implements QuizService {
             throw new QuizException(ErrorStatus.QUIZ_SEARCH_NO_RESULTS);
         }
 
+        // 사용자 관련 데이터를 조회
         List<UserQuiz> userQuizzes = userQuizRepository.findByUser_UserId(Long.valueOf(userId));
         Map<Long, UserQuiz> userQuizMap = userQuizzes.stream()
                 .collect(Collectors.toMap(userQuiz -> userQuiz.getQuiz().getQuizId(), userQuiz -> userQuiz));
 
-        // 사용자의 복습 리스트를 가져와 Map으로 변환
         List<QuizReviewList> reviewList = quizReviewListRepository.findByUser_UserId(Long.valueOf(userId));
         Map<Long, QuizReviewList> reviewQuizMap = reviewList.stream()
                 .collect(Collectors.toMap(quizReview -> quizReview.getQuiz().getQuizId(), quizReview -> quizReview));
 
-        Long lastSolvedQuizId = userQuizzes.stream()
-                .map(userQuiz -> userQuiz.getQuiz().getQuizId())
-                .max(Long::compareTo)
-                .orElse(null);
+        // 첫 번째 퀴즈 잠금 해제 처리
+        boolean[] unlockedFirstQuiz = {false};
 
-        // 퀴즈 목록 생성
         return quizzes.stream()
                 .map(quiz -> {
                     Long quizId = quiz.getQuizId();
-                    boolean isLocked = (lastSolvedQuizId == null)
-                            ? !quizId.equals(quizzes.get(0).getQuizId())
-                            : quizId > lastSolvedQuizId + 1;
 
-                    // 사용자가 푼 퀴즈인지 확인
+                    // 이미 풀었는지 확인
                     boolean isSolved = userQuizMap.containsKey(quizId);
 
                     // 복습 리스트 포함 여부 확인
                     boolean isInReviewList = reviewQuizMap.containsKey(quizId);
 
-                    // 이미 풀었는지에 따라 처리
-                    UserQuiz userQuiz = userQuizMap.get(quizId);
-                    if (userQuiz != null) {
-                        return QuizConverter.toQuizListResponse(userQuiz, false, isSolved, isInReviewList);
+                    // 정답 여부 확인
+                    boolean isCorrect = userQuizMap.containsKey(quizId) && userQuizMap.get(quizId).isCorrect();
+
+                    // 잠금 여부 처리
+                    boolean isLocked;
+                    if (!isSolved && !unlockedFirstQuiz[0]) {
+                        unlockedFirstQuiz[0] = true; // 첫 번째 잠금 해제 퀴즈를 처리
+                        isLocked = false;
                     } else {
-                        return QuizConverter.toQuizListResponse(quiz, isLocked, isInReviewList);
+                        isLocked = !isSolved;
                     }
+
+                    return QuizConverter.toQuizListResponse(quiz, isLocked, isSolved, isInReviewList, isCorrect);
                 })
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public QuizDetailResponse getQuizDetail(String userId, Long quizId) {

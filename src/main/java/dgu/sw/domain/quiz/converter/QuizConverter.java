@@ -37,14 +37,14 @@ public class QuizConverter {
     }
 
     // Quiz를 QuizListResponse로 변환 (기본 값)
-    public static QuizListResponse toQuizListResponse(Quiz quiz, boolean isLocked, boolean isInReviewList) {
+    public static QuizListResponse toQuizListResponse(Quiz quiz, boolean isLocked, boolean isSolved, boolean isInReviewList, boolean isCorrect) {
         return QuizListResponse.builder()
                 .quizId(quiz.getQuizId())
                 .question(quiz.getQuestion())
                 .isLocked(isLocked)
-                .isSolved(false)
-                .isCorrect(false)
+                .isSolved(isSolved)
                 .isInReviewList(isInReviewList)
+                .isCorrect(isCorrect)
                 .build();
     }
 
