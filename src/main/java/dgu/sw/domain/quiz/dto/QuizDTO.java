@@ -64,5 +64,16 @@ public class QuizDTO {
             private boolean isInReviewList;
             private boolean isCorrect;
         }
+
+        @Getter
+        @Builder
+        public static class QuizSearchResponse {
+            private Long quizId;
+            private String question;
+            private boolean isLocked;
+            private boolean isSolved;
+            private boolean isInReviewList;
+            private boolean isCorrect;
+        }
     }
 }

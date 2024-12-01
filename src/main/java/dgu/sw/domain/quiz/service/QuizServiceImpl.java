@@ -1,6 +1,7 @@
 package dgu.sw.domain.quiz.service;
 
 import dgu.sw.domain.quiz.converter.QuizConverter;
+import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizSearchResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizReviewResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizListResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizDetailResponse;
@@ -186,20 +187,43 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public List<QuizListResponse> searchQuizzes(String userId, String keyword) {
+    public List<QuizSearchResponse> searchQuizzes(String userId, String keyword) {
+        // 1. 퀴즈 검색
         List<Quiz> quizzes = quizRepository.findByQuestionContainingOrDescriptionContaining(keyword, keyword);
 
         if (quizzes.isEmpty()) {
             throw new QuizException(ErrorStatus.QUIZ_SEARCH_NO_RESULTS);
         }
 
+        // 2. 사용자와 관련된 데이터를 조회
+        List<UserQuiz> userQuizzes = userQuizRepository.findByUser_UserId(Long.valueOf(userId));
+        Map<Long, UserQuiz> userQuizMap = userQuizzes.stream()
+                .collect(Collectors.toMap(userQuiz -> userQuiz.getQuiz().getQuizId(), userQuiz -> userQuiz));
+
+        List<QuizReviewList> reviewList = quizReviewListRepository.findByUser_UserId(Long.valueOf(userId));
+        Map<Long, QuizReviewList> reviewQuizMap = reviewList.stream()
+                .collect(Collectors.toMap(quizReview -> quizReview.getQuiz().getQuizId(), quizReview -> quizReview));
+
+        // 3. 검색된 퀴즈를 조건에 따라 변환
         return quizzes.stream()
-                .filter(quiz -> {
-                    UserQuiz userQuiz = userQuizRepository.findByUser_UserIdAndQuiz_QuizId(
-                            Long.valueOf(userId), quiz.getQuizId()).orElse(null);
-                    return userQuiz == null || !userQuiz.isLocked();
+                .map(quiz -> {
+                    Long quizId = quiz.getQuizId();
+
+                    // 사용자가 푼 퀴즈인지 확인
+                    boolean isSolved = userQuizMap.containsKey(quizId);
+
+                    // 복습 리스트 포함 여부 확인
+                    boolean isInReviewList = reviewQuizMap.containsKey(quizId);
+
+                    // 정답 여부 확인
+                    boolean isCorrect = userQuizMap.containsKey(quizId) && userQuizMap.get(quizId).isCorrect();
+
+                    // 잠금 여부 확인 (잠금 로직 수정 가능)
+                    boolean isLocked = !isSolved && !isCorrect;
+
+                    return QuizConverter.toQuizSearchResponse(quiz, isLocked, isSolved, isInReviewList, isCorrect);
                 })
-                .map(quiz -> QuizConverter.toQuizListResponse(quiz, false, false))
                 .collect(Collectors.toList());
     }
+
 }

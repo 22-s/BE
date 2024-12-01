@@ -1,5 +1,6 @@
 package dgu.sw.domain.quiz.controller;
 
+import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizSearchResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizReviewResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizListResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizDetailResponse;
@@ -78,10 +79,10 @@ public class QuizController {
 
     @GetMapping("/search")
     @Operation(summary = "퀴즈 검색", description = "키워드와 카테고리를 기반으로 퀴즈를 검색합니다.")
-    public ApiResponse<List<QuizListResponse>> searchQuizzes(
+    public ApiResponse<List<QuizSearchResponse>> searchQuizzes(
             Authentication authentication,
             @RequestParam(required = false) String keyword) {
-        List<QuizListResponse> response = quizService.searchQuizzes(authentication.getName(), keyword);
+        List<QuizSearchResponse> response = quizService.searchQuizzes(authentication.getName(), keyword);
         return ApiResponse.onSuccess(response);
     }
 }

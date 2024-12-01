@@ -1,5 +1,6 @@
 package dgu.sw.domain.quiz.converter;
 
+import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizSearchResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizListResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizDetailResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizResultResponse;
@@ -79,4 +80,16 @@ public class QuizConverter {
                 .isCorrect(isCorrect)
                 .build();
     }
+
+    public static QuizSearchResponse toQuizSearchResponse(Quiz quiz, boolean isLocked, boolean isSolved, boolean isInReviewList, boolean isCorrect) {
+        return QuizSearchResponse.builder()
+                .quizId(quiz.getQuizId())
+                .question(quiz.getQuestion())
+                .isLocked(isLocked)
+                .isSolved(isSolved)
+                .isInReviewList(isInReviewList)
+                .isCorrect(isCorrect)
+                .build();
+    }
+
 }
