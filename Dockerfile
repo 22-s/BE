@@ -12,7 +12,6 @@ RUN apk add --no-cache \
     curl \
     wget \
     unzip \
-    nss \
     bash \
     libstdc++ \
     libx11 \
