@@ -7,7 +7,7 @@ RUN apk add --no-cache tzdata \
     && cp /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone
 
-# 필수 패키지 설치
+# 크롤링 관련 패키지 설치
 RUN apk add --no-cache \
     curl \
     wget \
