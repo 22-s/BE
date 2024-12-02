@@ -7,25 +7,28 @@ RUN apk add --no-cache tzdata \
     && cp /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone
 
-# 필수 패키지 및 라이브러리 설치
-RUN apk add --no-cache \
-    curl \
-    wget \
-    unzip \
-    bash \
-    libstdc++ \
-    libx11 \
-    libxcomposite \
-    libxdamage \
-    libxext \
-    libxrandr \
-    libxi \
-    libxcb \
-    libnss3 \
-    libglib \
-    libgobject \
-    mesa-gl \
-    dbus
+# Edge(최신) 리포지토리 활성화 및 패키지 설치
+RUN echo "https://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
+    && echo "https://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
+    && apk update \
+    && apk add --no-cache \
+        curl \
+        wget \
+        unzip \
+        bash \
+        libstdc++ \
+        libx11 \
+        libxcomposite \
+        libxdamage \
+        libxext \
+        libxrandr \
+        libxi \
+        libxcb \
+        libnss3 \
+        libglib \
+        libgobject \
+        mesa-gl \
+        dbus
 
 # Google Chrome 설치
 RUN wget -O /tmp/chrome-linux64.zip https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.85/linux64/chrome-linux64.zip \
