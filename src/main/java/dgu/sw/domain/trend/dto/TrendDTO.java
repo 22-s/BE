@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TrendDTO {
+    private String id;
     private String category;
     private String title;
     private String content;
