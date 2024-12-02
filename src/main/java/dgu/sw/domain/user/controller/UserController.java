@@ -1,5 +1,6 @@
 package dgu.sw.domain.user.controller;
 
+import dgu.sw.domain.user.dto.UserDTO.UserRequest.EmailRequest;
 import dgu.sw.domain.user.dto.UserDTO.UserRequest.SignInRequest;
 import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignUpResponse;
 import dgu.sw.domain.user.dto.UserDTO.UserRequest.SignUpRequest;
@@ -46,8 +47,8 @@ public class UserController {
 
     @PostMapping("/check-email")
     @Operation(summary = "이메일 중복 확인 API", description = "이메일 중복 여부를 확인합니다.")
-    public ApiResponse<String> checkEmailDuplicate(@RequestBody @Valid String email) {
-        userService.checkEmailDuplicate(email);
+    public ApiResponse<String> checkEmailDuplicate(@RequestBody @Valid EmailRequest emailRequest) {
+        userService.checkEmailDuplicate(emailRequest.getEmail());
         return ApiResponse.onSuccess("사용 가능한 이메일입니다.");
     }
 }
