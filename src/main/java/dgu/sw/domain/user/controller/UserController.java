@@ -43,4 +43,11 @@ public class UserController {
         userService.signOut(request, response);
         return ApiResponse.onSuccess("로그아웃 성공");
     }
+
+    @PostMapping("/check-email")
+    @Operation(summary = "이메일 중복 확인 API", description = "이메일 중복 여부를 확인합니다.")
+    public ApiResponse<String> checkEmailDuplicate(@RequestBody @Valid String email) {
+        userService.checkEmailDuplicate(email);
+        return ApiResponse.onSuccess("사용 가능한 이메일입니다.");
+    }
 }

@@ -13,4 +13,6 @@ public interface UserService {
 
     void signOut(HttpServletRequest request, HttpServletResponse response);
 
+    void checkEmailDuplicate(String email);
+
 }
