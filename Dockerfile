@@ -7,15 +7,25 @@ RUN apk add --no-cache tzdata \
     && cp /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone
 
-# Chrome 및 ChromeDriver 설치
+# 필수 패키지 설치
 RUN apk add --no-cache \
     curl \
     wget \
     unzip \
     nss \
-    wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm && \
-    rpm -i google-chrome-stable_current_x86_64.rpm && \
-    rm -f google-chrome-stable_current_x86_64.rpm
+    bash
+
+# Google Chrome 다운로드 및 설치
+RUN wget https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.85/linux64/chrome-linux64.zip \
+    && unzip chrome-linux64.zip \
+    && mv chrome-linux64 /usr/local/google-chrome \
+    && ln -s /usr/local/google-chrome/chrome /usr/bin/google-chrome
+
+# ChromeDriver 다운로드 및 설치
+RUN wget https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.85/linux64/chromedriver-linux64.zip \
+    && unzip chromedriver-linux64.zip \
+    && mv chromedriver-linux64/chromedriver /usr/bin/chromedriver \
+    && chmod +x /usr/bin/chromedriver
 
 # JAR 파일 복사
 ARG JAR_FILE=build/libs/sw-0.0.1-SNAPSHOT.jar
