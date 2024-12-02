@@ -17,4 +17,5 @@ public class TrendDTO {
     private String date;
     private String source;
     private String imageUrl;
+    private String authorProfile;
 }
