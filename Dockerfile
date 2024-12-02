@@ -13,8 +13,9 @@ RUN apk add --no-cache \
     wget \
     unzip \
     nss \
-    chromium \
-    chromium-chromedriver
+    wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm && \
+    rpm -i google-chrome-stable_current_x86_64.rpm && \
+    rm -f google-chrome-stable_current_x86_64.rpm
 
 # JAR 파일 복사
 ARG JAR_FILE=build/libs/sw-0.0.1-SNAPSHOT.jar
