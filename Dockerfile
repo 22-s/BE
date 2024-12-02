@@ -12,8 +12,7 @@ RUN apk add --no-cache \
     curl \
     wget \
     unzip \
-    libnss3 \
-    libcups \
+    nss \
     chromium \
     chromium-chromedriver
 
