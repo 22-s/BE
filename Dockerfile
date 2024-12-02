@@ -13,7 +13,21 @@ RUN apk add --no-cache \
     wget \
     unzip \
     nss \
-    bash
+    bash \
+    libstdc++ \
+    libx11 \
+    libxcomposite \
+    libxdamage \
+    libxext \
+    libxrandr \
+    libxi \
+    libatk \
+    gtk+3.0 \
+    libxcb \
+    libnss3 \
+    libglib \
+    libgobject \
+    mesa-gl \
 
 # Google Chrome 다운로드 및 설치
 RUN wget https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.85/linux64/chrome-linux64.zip \
