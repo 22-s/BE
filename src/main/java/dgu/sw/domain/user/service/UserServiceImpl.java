@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
     public void signIn(HttpServletResponse response, SignInRequest signInRequest) {
         // 이메일로 사용자 조회
         User user = userRepository.findByEmail(signInRequest.getEmail())
-                .orElseThrow(() -> new UserException(ErrorStatus.INVALID_CREDENTIALS));
+                .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
 
         // 비밀번호 일치 여부 확인
         if (!passwordEncoder.matches(signInRequest.getPassword(), user.getPassword())) {
@@ -134,5 +134,12 @@ public class UserServiceImpl implements UserService {
     private String resolveTokenFromHeader(HttpServletRequest request) {
         String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
         return (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
+    }
+
+    @Override
+    public void checkEmailDuplicate(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new UserException(ErrorStatus.USER_ALREADY_EXISTS);
+        }
     }
 }

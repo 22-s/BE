@@ -41,6 +41,13 @@ public class UserDTO {
             @Schema(description = "유저 비밀번호", example = "비밀번호")
             private String password;
         }
+
+        @Getter
+        public static class EmailRequest {
+            @NotBlank
+            @Schema(description = "유저 이메일", example = "이메일")
+            private String email;
+        }
     }
 
     public static class UserResponse {
