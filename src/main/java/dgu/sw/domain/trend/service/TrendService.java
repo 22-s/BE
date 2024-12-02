@@ -1,10 +1,12 @@
 package dgu.sw.domain.trend.service;
 
 import dgu.sw.domain.trend.dto.TrendDTO;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.stereotype.Service;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -31,21 +33,71 @@ public class TrendService {
     }
 
     // 디테일 조회
-//    public TrendDTO fetchTrendDetail(String trendId) {
-//        // 캐시된 리스트에서 ID로 데이터 조회
-//        return cachedTrends.stream()
-//                .filter(trend -> trend.getTitle().hashCode() == trendId.hashCode()) // 제목 기반의 해시 값으로 비교
-//                .findFirst()
-//                .orElse(null);
-//    }
+    public TrendDTO fetchTrendDetail(String trendId) {
+        final String targetUrl = "https://newneek.co/@newneek/article/" + trendId;
+
+        // System.setProperty("webdriver.chrome.driver", "/Users/dudtlstm/Downloads/chromedriver-mac-arm64/chromedriver");
+        // WebDriverManager로 ChromeDriver 설정
+        WebDriverManager.chromedriver().setup();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless", "--no-sandbox", "--disable-dev-shm-usage");
+
+        WebDriver driver = new ChromeDriver(options);
+
+        TrendDTO trendDetail = null;
+
+        try {
+            // 해당 기사 URL로 이동
+            driver.get(targetUrl);
+
+            // 페이지 로드 대기
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("article")));
+
+            // 데이터 크롤링
+            String imageUrl = driver.findElement(By.cssSelector("div.relative img")).getAttribute("src");
+            String title = driver.findElement(By.cssSelector("h1.mb-4.break-words.text-2xl.font-bold.text-gray-900")).getText();
+            String content = driver.findElement(By.cssSelector("main.content")).getText();
+            String author = driver.findElement(By.cssSelector("strong.line-clamp-1.text-sm.font-bold")).getText();
+            String date = driver.findElement(By.cssSelector("div.flex.items-center.gap-1.text-xs.text-gray-500 time")).getText();
+            String authorProfileUrl = driver.findElement(By.cssSelector("div.items-center img")).getAttribute("src");
+            String category = driver.findElement(By.cssSelector("a.h-7.rounded-full.bg-gray-50")).getText();
+
+            // DTO 생성
+            trendDetail = TrendDTO.builder()
+                    .id(trendId)
+                    .category(category)
+                    .title(title)
+                    .content(content)
+                    .date(date)
+                    .source(author)
+                    .imageUrl(imageUrl)
+                    .authorProfile(authorProfileUrl)
+                    .build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            driver.quit();
+        }
+
+        return trendDetail;
+    }
+
 
     // 최신 기사 크롤링
     private List<TrendDTO> fetchTrendsFromWeb() {
         final String targetUrl = "https://newneek.co/@newneek/series/89";
         List<TrendDTO> trends = new ArrayList<>();
 
-        System.setProperty("webdriver.chrome.driver", "/Users/dudtlstm/Downloads/chromedriver-mac-arm64/chromedriver");
-        WebDriver driver = new ChromeDriver();
+        // System.setProperty("webdriver.chrome.driver", "/Users/dudtlstm/Downloads/chromedriver-mac-arm64/chromedriver");
+        // WebDriver driver = new ChromeDriver();
+
+        WebDriverManager.chromedriver().setup();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless", "--no-sandbox", "--disable-dev-shm-usage");
+
+        WebDriver driver = new ChromeDriver(options);
 
         try {
             driver.get(targetUrl);
