@@ -3,6 +3,7 @@ package dgu.sw.domain.trend.service;
 import dgu.sw.domain.trend.dto.TrendDTO;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -57,8 +58,14 @@ public class TrendService {
             driver.get(targetUrl);
 
             // 페이지 로드 대기
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("article")));
+            try {
+                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+                wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("article")));
+            } catch (TimeoutException e) {
+                // 요소를 찾지 못한 경우 예외 처리
+                System.out.println("요소를 찾지 못했습니다: " + e.getMessage());
+                // 크롤링 실패 로그를 기록하거나, 기본값 반환
+            }
 
             // 데이터 크롤링
             String imageUrl = driver.findElement(By.cssSelector("div.relative img")).getAttribute("src");
@@ -113,8 +120,12 @@ public class TrendService {
         try {
             driver.get(targetUrl);
 
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("a.block.mb-4.border-b.border-gray-100.pb-4")));
+            try {
+                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+                wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("a.block.mb-4.border-b.border-gray-100.pb-4")));
+            } catch (TimeoutException e) {
+                System.out.println("요소를 찾지 못했습니다: " + e.getMessage());
+            }
 
             // 1. <a> 태그에서 href 추출 - 디테일을 위해 추출
             List<WebElement> linkElements = driver.findElements(By.cssSelector("a.block.mb-4.border-b.border-gray-100.pb-4"));
