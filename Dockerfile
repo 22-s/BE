@@ -21,8 +21,6 @@ RUN apk add --no-cache \
     libxext \
     libxrandr \
     libxi \
-    libatk \
-    gtk+3.0 \
     libxcb \
     libnss3 \
     libglib \
