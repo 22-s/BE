@@ -48,6 +48,12 @@ dependencies {
 	// Swagger
 	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.2.0'
 
+	// crolling
+	// implementation 'org.jsoup:jsoup:1.15.4'
+	implementation 'org.seleniumhq.selenium:selenium-java:4.13.0'
+	// WebDriverManager
+	implementation 'io.github.bonigarcia:webdrivermanager:5.5.3'
+
 	// Test dependencies
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
