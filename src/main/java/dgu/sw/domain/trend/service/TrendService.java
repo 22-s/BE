@@ -37,8 +37,14 @@ public class TrendService {
         final String targetUrl = "https://newneek.co/@newneek/article/" + trendId;
 
         // System.setProperty("webdriver.chrome.driver", "/Users/dudtlstm/Downloads/chromedriver-mac-arm64/chromedriver");
+
         // WebDriverManager로 ChromeDriver 설정
-        WebDriverManager.chromedriver().setup();
+        // WebDriverManager.chromedriver().setup();
+
+        // Chromedriver 경로 설정 (Docker 환경에서)
+        System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
+
+        // ChromeOptions 설정
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless", "--no-sandbox", "--disable-dev-shm-usage");
 
@@ -93,7 +99,12 @@ public class TrendService {
         // System.setProperty("webdriver.chrome.driver", "/Users/dudtlstm/Downloads/chromedriver-mac-arm64/chromedriver");
         // WebDriver driver = new ChromeDriver();
 
-        WebDriverManager.chromedriver().setup();
+        // WebDriverManager.chromedriver().setup();
+
+        // Chromedriver 경로 설정 (Docker 환경에서)
+        System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
+
+        // ChromeOptions 설정
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless", "--no-sandbox", "--disable-dev-shm-usage");
 
