@@ -34,7 +34,7 @@
 **비즈니스 매너**부터 **실질적인 업무 스킬**, **최신 트렌드** 학습까지!
 신입사UP, 당신의 직장생활을 업그레이드합니다.
 <br><br>
-<img width="800" alt="스크린샷 2024-12-04 오후 10 47 22" src="https://github.com/user-attachments/assets/489a4228-98ef-48ea-8d6b-c0c0e330a881">
+<img width="800" alt="스크린샷 2024-12-04 오후 10 47 22" src="https://github.com/user-attachments/assets/faf12069-5b4b-42be-ab19-d4fcd9037d28">
 
 
 > 매너 설명서의 내용은 모두 "효성 그룹의 [일잘러 프로젝트] 시리즈" 내용을 참고하였습니다. (출처 : https://blog.hyosung.com/5951)
