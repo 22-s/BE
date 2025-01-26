@@ -18,4 +18,4 @@ spring:
     refreshExpiration: 604800000 # 7일 (밀리초)
 
 REDIS_HOST: ${REDIS_URL}
-REDIS_PORT: 6379
+REDIS_PORT: ${REDIS_PORT}
