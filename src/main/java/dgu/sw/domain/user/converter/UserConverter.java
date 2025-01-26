@@ -2,6 +2,7 @@ package dgu.sw.domain.user.converter;
 
 import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignUpResponse;
 import dgu.sw.domain.user.dto.UserDTO.UserRequest.SignUpRequest;
+import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignInResponse;
 import dgu.sw.domain.user.entity.User;
 
 public class UserConverter {
@@ -9,6 +10,13 @@ public class UserConverter {
         return SignUpResponse.builder()
                 .nickname(user.getNickname())
                 .email(user.getEmail())
+                .build();
+    }
+
+    public static SignInResponse toSignInResponseDTO(String accessToken, String refreshToken) {
+        return SignInResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 

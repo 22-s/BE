@@ -34,6 +34,7 @@ public enum ErrorStatus implements BaseErrorCode {
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "USER4005", "만료된 토큰입니다."),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "USER4006", "Refresh Token이 존재하지 않습니다."),
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER4007", "존재하지 않는 사용자입니다."),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "USER4008", "유효하지 않은 Refresh Token입니다."),
 
     // 업무 용어 관련 에러
     VOCA_NOT_FOUND(HttpStatus.NOT_FOUND, "VOCA4041", "해당 업무 용어를 찾을 수 없습니다."),
@@ -48,6 +49,8 @@ public enum ErrorStatus implements BaseErrorCode {
     MANNER_SEARCH_NO_RESULTS(HttpStatus.NOT_FOUND, "MANNER4043", "검색 결과가 없습니다."),
     MANNER_ALREADY_FAVORITED(HttpStatus.BAD_REQUEST, "MANNER4001", "이미 즐겨찾기에 추가된 매너입니다."),
     MANNER_FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "MANNER4044", "즐겨찾기에 없는 매너입니다.");
+
+
 
 
     private final HttpStatus httpStatus;

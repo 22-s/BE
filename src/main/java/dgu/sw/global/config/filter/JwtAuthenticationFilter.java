@@ -88,22 +88,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String resolveToken(HttpServletRequest request) {
-        return getCookieValue(request, "accessToken");
+        String bearer = request.getHeader("Authorization");
+        return (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
     }
 
     private String resolveRefreshToken(HttpServletRequest request) {
-        return getCookieValue(request, "refreshToken");
-    }
-
-    private String getCookieValue(HttpServletRequest request, String cookieName) {
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if (cookieName.equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
+        String bearer = request.getHeader("Authorization-refresh");
+        return (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
     }
 
     private void validateAndSetAuthentication(String token, String userId) {

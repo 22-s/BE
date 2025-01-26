@@ -1,5 +1,6 @@
 package dgu.sw.domain.user.controller;
 
+import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignInResponse;
 import dgu.sw.domain.user.dto.UserDTO.UserRequest.EmailRequest;
 import dgu.sw.domain.user.dto.UserDTO.UserRequest.SignInRequest;
 import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignUpResponse;
@@ -33,9 +34,8 @@ public class UserController {
 
     @PostMapping("/signin")
     @Operation(summary = "로그인 API", description = "로그인 API 입니다.")
-    public ApiResponse<String> signIn(HttpServletResponse response, @RequestBody @Valid SignInRequest signInRequest) {
-        userService.signIn(response, signInRequest);
-        return ApiResponse.onSuccess("로그인 성공");
+    public ApiResponse<SignInResponse> signIn(HttpServletResponse response, @RequestBody @Valid SignInRequest signInRequest) {
+        return ApiResponse.onSuccess(userService.signIn(response, signInRequest));
     }
 
     @PostMapping("/signout")
@@ -43,6 +43,12 @@ public class UserController {
     public ApiResponse<String> signOut(HttpServletRequest request, HttpServletResponse response) {
         userService.signOut(request, response);
         return ApiResponse.onSuccess("로그아웃 성공");
+    }
+
+    @PostMapping("/refresh")
+    @Operation(summary = "토큰 갱신 API", description = "Refresh Token을 이용하여 Access Token을 갱신합니다.")
+    public ApiResponse<SignInResponse> refresh(@RequestBody String refreshToken) {
+        return ApiResponse.onSuccess(userService.refreshAccessToken(refreshToken));
     }
 
     @PostMapping("/check-email")

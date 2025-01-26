@@ -63,5 +63,17 @@ public class UserDTO {
             @Schema(description = "유저 이메일", example = "이메일")
             private String email;
         }
+
+        @Builder
+        @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class SignInResponse {
+            @Schema(description = "Access Token", example = "eyJhbGciOiJIUzI1NiIsInR...")
+            private String accessToken;
+
+            @Schema(description = "Refresh Token", example = "eyJhbGciOiJIUzI1NiIsInR...")
+            private String refreshToken;
+        }
     }
 }
