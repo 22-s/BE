@@ -5,7 +5,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
-import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -28,7 +27,7 @@ public class RedisUtil {
         return userId;
     }
 
-    public void deleteEmailVerificationCode(String email) {
-        redisTemplate.delete(email);
+    public void deleteRefreshToken(String userId) {
+        redisTemplate.delete(userId);
     }
 }
