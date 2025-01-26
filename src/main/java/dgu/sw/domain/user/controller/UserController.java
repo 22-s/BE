@@ -45,6 +45,12 @@ public class UserController {
         return ApiResponse.onSuccess("로그아웃 성공");
     }
 
+    @PostMapping("/refresh")
+    @Operation(summary = "토큰 갱신 API", description = "Refresh Token을 이용하여 Access Token을 갱신합니다.")
+    public ApiResponse<SignInResponse> refresh(@RequestBody String refreshToken) {
+        return ApiResponse.onSuccess(userService.refreshAccessToken(refreshToken));
+    }
+
     @PostMapping("/check-email")
     @Operation(summary = "이메일 중복 확인 API", description = "이메일 중복 여부를 확인합니다.")
     public ApiResponse<String> checkEmailDuplicate(@RequestBody @Valid EmailRequest emailRequest) {

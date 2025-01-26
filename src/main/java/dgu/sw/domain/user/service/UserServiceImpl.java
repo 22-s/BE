@@ -95,6 +95,20 @@ public class UserServiceImpl implements UserService {
         redisUtil.deleteRefreshToken(userId);
     }
 
+    @Override
+    public SignInResponse refreshAccessToken(String refreshToken) {
+        if (!jwtUtil.isRefreshTokenValid(refreshToken)) {
+            throw new UserException(ErrorStatus.INVALID_REFRESH_TOKEN);
+        }
+        String userId = jwtUtil.extractUserId(refreshToken);
+        String newAccessToken = jwtUtil.generateAccessToken(userId);
+        String newRefreshToken = jwtUtil.generateRefreshToken(userId);
+
+        redisUtil.saveRefreshToken(userId, newRefreshToken);
+
+        return UserConverter.toSignInResponseDTO(newAccessToken, newRefreshToken);
+    }
+
     private String resolveToken(HttpServletRequest request) {
         // 요청 헤더에서 AccessToken 추출
         String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
