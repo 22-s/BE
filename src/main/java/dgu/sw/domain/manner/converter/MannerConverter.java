@@ -11,7 +11,7 @@ public class MannerConverter {
                 .mannerId(manner.getMannerId())
                 .category(manner.getCategory())
                 .title(manner.getTitle())
-                .contentPreview(manner.getContent().length() > 20 ? manner.getContent().substring(0, 20) + "..." : manner.getContent())
+                .content(manner.getContent())
                 .imageUrl(manner.getImageUrl())
                 .isFavorited(isFavorited)
                 .build();
