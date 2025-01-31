@@ -16,7 +16,6 @@ import dgu.sw.domain.quiz.repository.UserQuizRepository;
 import dgu.sw.domain.user.entity.User;
 import dgu.sw.domain.user.repository.UserRepository;
 import dgu.sw.global.exception.QuizException;
-import dgu.sw.global.exception.UserException;
 import dgu.sw.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,8 +34,11 @@ public class QuizServiceImpl implements QuizService {
     private final UserRepository userRepository;
 
     @Override
-    public List<QuizListResponse> getQuizList(String userId, String category) {
-        List<Quiz> quizzes = quizRepository.findByCategory(category);
+    public List<QuizListResponse> getQuizList(String userId, int category) {
+        // int 카테고리를 String으로 매핑
+        String categoryName = mapCategoryToString(category);
+
+        List<Quiz> quizzes = quizRepository.findByCategory(categoryName);
 
         if (quizzes.isEmpty()) {
             throw new QuizException(ErrorStatus.QUIZ_SEARCH_NO_RESULTS);
@@ -81,6 +83,24 @@ public class QuizServiceImpl implements QuizService {
                 .collect(Collectors.toList());
     }
 
+    private String mapCategoryToString(int category) {
+        switch (category) {
+            case 1:
+                return "기본 매너";
+            case 2:
+                return "명함 공유 매너";
+            case 3:
+                return "팀장님께 메일 보내기";
+            case 4:
+                return "직장인 글쓰기 Tip";
+            case 5:
+                return "TPO에 맞는 복장";
+            case 6:
+                return "커뮤니케이션 매너";
+            default:
+                throw new IllegalArgumentException("잘못된 카테고리 번호입니다: " + category);
+        }
+    }
 
     @Override
     public QuizDetailResponse getQuizDetail(String userId, Long quizId) {

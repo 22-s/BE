@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface MannerService {
     List<String> getCategories();
-    List<MannerListResponse> getMannersByCategory(String category, String userId);
+    List<MannerListResponse> getMannersByCategory(int category, String userId);
     MannerDetailResponse getMannerDetail(Long mannerId, String userId);
     List<MannerListResponse> searchManners(String keyword);
     List<MannerListResponse> searchMannersByCategory(String category, String keyword);

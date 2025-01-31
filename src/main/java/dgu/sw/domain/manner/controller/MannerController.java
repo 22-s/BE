@@ -32,7 +32,7 @@ public class MannerController {
     @GetMapping(params = "category")
     @Operation(summary = "카테고리 리스트 반환", description = "특정 카테고리의 매너 리스트를 반환합니다.")
     public ApiResponse<List<MannerListResponse>> getMannersByCategory(
-            @RequestParam String category,
+            @RequestParam int category,
             Authentication authentication) {
         String userId = authentication != null ? authentication.getName() : null;
         return ApiResponse.onSuccess(mannerService.getMannersByCategory(category, userId));
