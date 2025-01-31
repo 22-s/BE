@@ -28,7 +28,7 @@ public class QuizController {
     @Operation(summary = "퀴즈 목록 조회", description = "카테고리별 퀴즈 리스트를 반환합니다.")
     public ApiResponse<List<QuizListResponse>> getQuizList(
             Authentication authentication,
-            @RequestParam String category) {
+            @RequestParam int category) {
         List<QuizListResponse> response = quizService.getQuizList(authentication.getName(), category);
         return ApiResponse.onSuccess(response);
     }

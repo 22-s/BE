@@ -37,8 +37,11 @@ public class MannerServiceImpl implements MannerService {
     }
 
     @Override
-    public List<MannerListResponse> getMannersByCategory(String category, String userId) {
-        return mannerRepository.findByCategory(category)
+    public List<MannerListResponse> getMannersByCategory(int category, String userId) {
+        // int 카테고리를 String으로 매핑
+        String categoryName = mapCategoryToString(category);
+
+        return mannerRepository.findByCategory(categoryName)
                 .stream()
                 .map(manner -> {
                     boolean isFavorited = false;
@@ -49,6 +52,25 @@ public class MannerServiceImpl implements MannerService {
                     return MannerConverter.toMannerListResponse(manner, isFavorited);
                 })
                 .collect(Collectors.toList());
+    }
+
+    private String mapCategoryToString(int category) {
+        switch (category) {
+            case 1:
+                return "기본 매너";
+            case 2:
+                return "명함 공유 매너";
+            case 3:
+                return "팀장님께 메일 보내기";
+            case 4:
+                return "직장인 글쓰기 Tip";
+            case 5:
+                return "TPO에 맞는 복장";
+            case 6:
+                return "커뮤니케이션 매너";
+            default:
+                throw new IllegalArgumentException("잘못된 카테고리 번호입니다: " + category);
+        }
     }
 
     @Override
