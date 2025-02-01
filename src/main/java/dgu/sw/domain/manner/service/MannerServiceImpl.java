@@ -28,15 +28,6 @@ public class MannerServiceImpl implements MannerService {
     private final UserRepository userRepository;
 
     @Override
-    public List<String> getCategories() {
-        return mannerRepository.findAll()
-                .stream()
-                .map(Manner::getCategory)
-                .distinct()
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<MannerListResponse> getMannersByCategory(int category, String userId) {
         // int 카테고리를 String으로 매핑
         String categoryName = mapCategoryToString(category);

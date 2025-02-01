@@ -21,14 +21,7 @@ import java.util.List;
 public class MannerController {
     private final MannerService mannerService;
 
-    // 1. 모든 카테고리 조회
-    @GetMapping
-    @Operation(summary = "모든 카테고리 반환", description = "매너 설명서의 모든 카테고리를 반환합니다.")
-    public ApiResponse<List<String>> getCategories() {
-        return ApiResponse.onSuccess(mannerService.getCategories());
-    }
-
-    // 2. 특정 카테고리의 매너 리스트 반환
+    // 1. 특정 카테고리의 매너 리스트 반환
     @GetMapping(params = "category")
     @Operation(summary = "카테고리 리스트 반환", description = "특정 카테고리의 매너 리스트를 반환합니다.")
     public ApiResponse<List<MannerListResponse>> getMannersByCategory(
@@ -38,7 +31,7 @@ public class MannerController {
         return ApiResponse.onSuccess(mannerService.getMannersByCategory(category, userId));
     }
 
-    // 3. 특정 매너 설명서 상세 조회
+    // 2. 특정 매너 설명서 상세 조회
     @GetMapping("/{mannerId}")
     @Operation(summary = "매너 디테일 반환", description = "특정 매너 설명서의 디테일을 반환합니다.")
     public ApiResponse<MannerDetailResponse> getMannerDetail(
@@ -48,14 +41,14 @@ public class MannerController {
         return ApiResponse.onSuccess(mannerService.getMannerDetail(mannerId, userId));
     }
 
-    // 4. 전체 검색
+    // 3. 전체 검색
     @GetMapping("/search")
     @Operation(summary = "전체 검색", description = "전체 매너 설명서를 기반으로 검색합니다.")
     public ApiResponse<List<MannerListResponse>> searchManners(@RequestParam String keyword) {
         return ApiResponse.onSuccess(mannerService.searchManners(keyword));
     }
 
-    // 5. 선택된 카테고리 내 검색
+    // 4. 선택된 카테고리 내 검색
     @GetMapping(value = "/search/category")
     @Operation(summary = "카테고리 내 검색", description = "특정 카테고리 내에서 매너 설명서를 검색합니다.")
     public ApiResponse<List<MannerListResponse>> searchMannersByCategory(
@@ -64,7 +57,7 @@ public class MannerController {
         return ApiResponse.onSuccess(mannerService.searchMannersByCategory(category, keyword));
     }
 
-    // 6. 즐겨찾기 추가
+    // 5. 즐겨찾기 추가
     @PostMapping("/likes/{mannerId}")
     @Operation(summary = "즐겨찾기 추가", description = "즐겨찾기 리스트에 추가합니다.")
     public ApiResponse<String> addFavorite(@PathVariable Long mannerId, Authentication authentication) {
@@ -72,7 +65,7 @@ public class MannerController {
         return ApiResponse.onSuccess("즐겨찾기에 추가되었습니다.");
     }
 
-    // 7. 즐겨찾기 삭제
+    // 6. 즐겨찾기 삭제
     @DeleteMapping("/likes/{mannerId}")
     @Operation(summary = "즐겨찾기 삭제", description = "즐겨찾기 리스트에서 삭제합니다.")
     public ApiResponse<String> removeFavorite(@PathVariable Long mannerId, Authentication authentication) {
@@ -80,7 +73,7 @@ public class MannerController {
         return ApiResponse.onSuccess("즐겨찾기에서 삭제되었습니다.");
     }
 
-    // 8. 즐겨찾기 조회
+    // 7. 즐겨찾기 조회
     @GetMapping("/likes")
     @Operation(summary = "즐겨찾기 조회", description = "로그인한 사용자의 즐겨찾기 리스트를 조회합니다.")
     public ApiResponse<List<MannerFavoriteResponse>> getFavorites(Authentication authentication) {
