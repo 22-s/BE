@@ -30,4 +30,8 @@ public class RedisUtil {
     public void deleteRefreshToken(String userId) {
         redisTemplate.delete(userId);
     }
+
+    public void addTokenToBlacklist(String accessToken, long expiration) {
+        redisTemplate.opsForValue().set(accessToken, "BLACKLIST", expiration, TimeUnit.MILLISECONDS);
+    }
 }

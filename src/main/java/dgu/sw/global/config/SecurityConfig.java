@@ -1,10 +1,13 @@
 package dgu.sw.global.config;
 
-import dgu.sw.domain.user.service.UserService;
-import dgu.sw.global.config.filter.JwtAuthenticationFilter;
+import dgu.sw.global.security.JwtAuthenticationFilter;
+import dgu.sw.global.security.JwtAuthenticationProvider;
+import dgu.sw.global.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -15,21 +18,42 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationProvider jwtAuthenticationProvider;
+    private final JwtUtil jwtUtil;
 
+    // PasswordEncoder 빈 등록
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    // AuthenticationManager를 직접 빈으로 등록 (ProviderManager 사용)
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        return new ProviderManager(List.of(jwtAuthenticationProvider));
+    }
+
+    // JwtAuthenticationFilter를 직접 생성하여 빈으로 등록
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+        return new JwtAuthenticationFilter(jwtUtil, authenticationManager);
+    }
+
+    // SecurityFilterChain 설정
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement((session) ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
+                .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 new AntPathRequestMatcher("/"),
                                 new AntPathRequestMatcher("/api/user/**"),
@@ -46,10 +70,5 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }
