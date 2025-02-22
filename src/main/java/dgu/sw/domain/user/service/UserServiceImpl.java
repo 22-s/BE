@@ -4,14 +4,13 @@ import dgu.sw.domain.user.converter.UserConverter;
 import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignInResponse;
 import dgu.sw.domain.user.entity.User;
 import dgu.sw.domain.user.repository.UserRepository;
+import dgu.sw.global.security.JwtTokenProvider;
+import dgu.sw.global.security.JwtUtil;
 import dgu.sw.global.config.redis.RedisUtil;
-import dgu.sw.global.config.util.JWTUtil;
 import dgu.sw.global.exception.UserException;
 import dgu.sw.global.status.ErrorStatus;
-import jakarta.servlet.http.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ import dgu.sw.domain.user.dto.UserDTO.UserRequest.SignInRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -32,12 +30,15 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final JWTUtil jwtUtil;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtUtil jwtUtil;
     private final RedisUtil redisUtil;
-    private final RedisTemplate<String, String> redisTemplate;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * 회원가입
+     */
     @Override
     public SignUpResponse signUp(SignUpRequest signUpRequest) {
         // 이메일 중복 검사
@@ -45,80 +46,96 @@ public class UserServiceImpl implements UserService {
             throw new UserException(ErrorStatus.USER_ALREADY_EXISTS);
         }
 
-        // 비밀번호 암호화
+        // 비밀번호 암호화 후 저장
         String encryptedPassword = passwordEncoder.encode(signUpRequest.getPassword());
-
-        // 사용자 생성
         User user = UserConverter.toUser(signUpRequest, encryptedPassword);
         userRepository.save(user);
 
         return UserConverter.toSignUpResponseDTO(user);
     }
 
+    /**
+     * 로그인
+     */
     @Override
     public SignInResponse signIn(HttpServletResponse response, SignInRequest signInRequest) {
         // 이메일로 사용자 조회
         User user = userRepository.findByEmail(signInRequest.getEmail())
                 .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
 
-        // 비밀번호 일치 여부 확인
+        // 비밀번호 확인
         if (!passwordEncoder.matches(signInRequest.getPassword(), user.getPassword())) {
             throw new UserException(ErrorStatus.INVALID_CREDENTIALS);
         }
 
         // AccessToken & RefreshToken 생성
-        String accessToken = jwtUtil.generateAccessToken(String.valueOf(user.getUserId()));
-        String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(user.getUserId()));
+        String accessToken = jwtTokenProvider.generateAccessToken(user);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user);
 
         // Redis에 RefreshToken 저장
-        redisUtil.saveRefreshToken(String.valueOf(user.getUserId()), refreshToken);
+        redisUtil.saveRefreshToken(user.getUserId().toString(), refreshToken);
 
         return UserConverter.toSignInResponseDTO(accessToken, refreshToken);
     }
 
+    /**
+     * 로그아웃
+     */
     @Override
     public void signOut(HttpServletRequest request, HttpServletResponse response) {
-        // AccessToken 해제 처리
+        // 요청에서 AccessToken 추출
         String accessToken = resolveToken(request);
-
         if (accessToken == null) {
             throw new UserException(ErrorStatus.TOKEN_NOT_FOUND);
         }
+
         // AccessToken 만료 시간 가져오기
         Long expiration = jwtUtil.getExpiration(accessToken);
 
-        // Redis에 AccessToken을 블랙리스트로 등록
-        redisTemplate.opsForValue().set(accessToken, "logoutUser", expiration, TimeUnit.MILLISECONDS);
+        // Redis에 AccessToken을 블랙리스트로 등록 (로그아웃 처리)
+        redisUtil.addTokenToBlacklist(accessToken, expiration);
 
         // Redis에서 RefreshToken 삭제
-        String userId = jwtUtil.extractUserId(accessToken);
+        String userId = String.valueOf(jwtUtil.extractUserId(accessToken));
         redisUtil.deleteRefreshToken(userId);
     }
 
+    /**
+     * AccessToken 갱신
+     */
     @Override
     public SignInResponse refreshAccessToken(String refreshToken) {
-        if (!jwtUtil.isRefreshTokenValid(refreshToken)) {
+        if (!jwtUtil.validateToken(refreshToken)) {
             throw new UserException(ErrorStatus.INVALID_REFRESH_TOKEN);
         }
-        String userId = jwtUtil.extractUserId(refreshToken);
-        String newAccessToken = jwtUtil.generateAccessToken(userId);
-        String newRefreshToken = jwtUtil.generateRefreshToken(userId);
+
+        String userId = String.valueOf(jwtUtil.extractUserId(refreshToken));
+        String newAccessToken = jwtTokenProvider.generateAccessToken(userRepository.findByEmail(userId)
+                .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND)));
+
+        String newRefreshToken = jwtTokenProvider.generateRefreshToken(userRepository.findByEmail(userId)
+                .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND)));
 
         redisUtil.saveRefreshToken(userId, newRefreshToken);
 
         return UserConverter.toSignInResponseDTO(newAccessToken, newRefreshToken);
     }
 
-    private String resolveToken(HttpServletRequest request) {
-        // 요청 헤더에서 AccessToken 추출
-        String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
-        return (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
-    }
-
+    /**
+     * 이메일 중복 확인
+     */
     @Override
     public void checkEmailDuplicate(String email) {
         if (userRepository.existsByEmail(email)) {
             throw new UserException(ErrorStatus.USER_ALREADY_EXISTS);
         }
+    }
+
+    /**
+     * 요청에서 JWT 토큰 추출
+     */
+    private String resolveToken(HttpServletRequest request) {
+        String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
+        return (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
     }
 }
