@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
@@ -30,53 +31,66 @@ public class JwtUtil {
         this.secretKey = Keys.hmacShaKeyFor(secretKeyString.getBytes(StandardCharsets.UTF_8));
     }
 
-    /**
-     * JWT 토큰에서 이메일(사용자 정보) 추출
-     */
-    public String extractEmail(String token) {
+    // JWT에서 userId 추출
+    public Long extractUserId(String token) {
         try {
-            return Jwts.parserBuilder()
+            String subject = Jwts.parserBuilder()
                     .setSigningKey(secretKey)
                     .build()
                     .parseClaimsJws(token)
                     .getBody()
                     .getSubject();
+
+            // subject가 숫자인지 확인
+            if (!subject.matches("\\d+")) {
+                throw new NumberFormatException("Invalid userId format in JWT: " + subject);
+            }
+
+            return Long.parseLong(subject);
+        } catch (NumberFormatException e) {
+            LOGGER.warning("Invalid userId format in JWT: " + e.getMessage());
+            return null;
         } catch (Exception e) {
-            LOGGER.warning("Failed to extract email from token: " + e.getMessage());
+            LOGGER.warning("Failed to extract userId from token: " + e.getMessage());
             return null;
         }
     }
 
-    /**
-     * JWT 토큰 유효성 검사
-     */
+    // JWT 유효성 검사
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
             return true;
-        } catch (ExpiredJwtException e) {
-            LOGGER.warning("Token expired: " + e.getMessage());
-        } catch (MalformedJwtException e) {
-            LOGGER.warning("Invalid JWT token: " + e.getMessage());
-        } catch (SignatureException e) {
-            LOGGER.warning("Invalid JWT signature: " + e.getMessage());
         } catch (JwtException e) {
-            LOGGER.warning("JWT Exception: " + e.getMessage());
+            LOGGER.warning("Invalid JWT Token: " + e.getMessage());
         }
         return false;
     }
 
-    /**
-     * HTTP 요청에서 Authorization 헤더에서 JWT 토큰 추출
-     */
+    // HTTP 요청에서 Authorization 헤더에서 JWT 토큰 추출
     public String resolveToken(HttpServletRequest request) {
         String bearer = request.getHeader("Authorization");
         return (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
     }
 
-    /**
-     * 쿠키 설정
-     */
+    // JWT 만료 시간 반환 (밀리초 단위)
+    public Long getExpiration(String token) {
+        try {
+            Date expiration = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getExpiration();
+
+            return expiration.getTime() - System.currentTimeMillis();
+        } catch (JwtException e) {
+            LOGGER.warning("Failed to get expiration time: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // 쿠키 설정
     public void setCookie(HttpServletResponse response, String name, String value, int maxAge) {
         ResponseCookie cookie = ResponseCookie.from(name, value)
                 .path("/")
