@@ -1,17 +1,13 @@
-package dgu.sw.global.security.jwt;
+package dgu.sw.global.security;
 
 import dgu.sw.domain.user.entity.User;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -33,8 +29,6 @@ public class JwtTokenProvider {
     private long jwtRefreshExpirationInMs;
 
     private SecretKey secretKey;
-
-    private final UserDetailsService userDetailsService;
     private final RedisTemplate<String, String> redisTemplate;
 
     @PostConstruct
@@ -42,41 +36,26 @@ public class JwtTokenProvider {
         this.secretKey = Keys.hmacShaKeyFor(secretKeyString.getBytes(StandardCharsets.UTF_8));
     }
 
+    // AccessToken 생성 (userId를 Subject로 설정)
     public String generateAccessToken(User user) {
-        return createToken(user.getEmail(), jwtExpirationInMs);
+        return createToken(user.getUserId(), user.getEmail(), jwtExpirationInMs);
     }
 
+    // RefreshToken 생성 및 Redis 저장
     public String generateRefreshToken(User user) {
-        String token = createToken(user.getEmail(), jwtRefreshExpirationInMs);
-        redisTemplate.opsForValue().set(user.getEmail(), token, jwtRefreshExpirationInMs, TimeUnit.MILLISECONDS);
+        String token = createToken(user.getUserId(), user.getEmail(), jwtRefreshExpirationInMs);
+        redisTemplate.opsForValue().set(String.valueOf(user.getUserId()), token, jwtRefreshExpirationInMs, TimeUnit.MILLISECONDS);
         return token;
     }
 
-    private String createToken(String email, long expirationMs) {
+    // JWT 생성 로직 (userId를 Subject로 설정)
+    private String createToken(Long userId, String email, long expirationMs) {
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(String.valueOf(userId)) // userId를 Subject로 저장
+                .claim("email", email) // email을 claims로 저장
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(secretKey, SignatureAlgorithm.HS512)
                 .compact();
-    }
-
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
-            return true;
-        } catch (ExpiredJwtException | MalformedJwtException | SignatureException e) {
-            return false;
-        }
-    }
-
-    public String extractEmail(String token) {
-        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody().getSubject();
-    }
-
-    public Authentication getAuthentication(String token) {
-        String email = extractEmail(token);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-        return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
     }
 }
