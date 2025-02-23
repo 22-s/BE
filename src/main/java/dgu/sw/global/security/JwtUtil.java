@@ -15,6 +15,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.logging.Logger;
 
+/**
+ * JWT 관련 유틸리티 클래스
+ * - JWT 검증 및 추출, 파싱 기능 제공
+ * - JWT를 HTTP 요청 및 응답에서 다룰 수 있도록 지원
+ */
 @Component
 @RequiredArgsConstructor
 public class JwtUtil {

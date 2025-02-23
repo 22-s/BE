@@ -15,6 +15,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * JWT 토큰을 생성 및 관리하는 클래스
+ * - AccessToken 및 RefreshToken을 생성
+ * - RefreshToken을 Redis에 저장하여 관리
+ */
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider {
