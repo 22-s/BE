@@ -17,5 +17,10 @@ spring:
     expiration: 3600000 # 1시간 (밀리초)
     refreshExpiration: 604800000 # 7일 (밀리초)
 
+oauth:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID}
+    redirect-uri: ${KAKAO_REDIRECT_URI}
+
 REDIS_HOST: ${REDIS_URL}
 REDIS_PORT: ${REDIS_PORT}
