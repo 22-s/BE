@@ -4,6 +4,7 @@ import dgu.sw.domain.manner.entity.FavoriteManner;
 import dgu.sw.domain.quiz.entity.QuizReviewList;
 import dgu.sw.domain.quiz.entity.UserQuiz;
 import dgu.sw.domain.voca.entity.FavoriteVoca;
+import dgu.sw.global.security.OAuthProvider;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,6 +26,9 @@ public class User {
     private String email;
     private String password;
     private LocalDate joinDate;
+    private String profileImage;
+    @Enumerated(EnumType.STRING)
+    private OAuthProvider provider;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserQuiz> userQuizzes;

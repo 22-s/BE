@@ -48,8 +48,13 @@ public enum ErrorStatus implements BaseErrorCode {
     MANNER_LIST_NOT_FOUND(HttpStatus.NOT_FOUND, "MANNER4042", "해당 카테고리의 매너 리스트를 찾을 수 없습니다."),
     MANNER_SEARCH_NO_RESULTS(HttpStatus.NOT_FOUND, "MANNER4043", "검색 결과가 없습니다."),
     MANNER_ALREADY_FAVORITED(HttpStatus.BAD_REQUEST, "MANNER4001", "이미 즐겨찾기에 추가된 매너입니다."),
-    MANNER_FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "MANNER4044", "즐겨찾기에 없는 매너입니다.");
+    MANNER_FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "MANNER4044", "즐겨찾기에 없는 매너입니다."),
 
+    // OAuth 관련 에러
+    OAUTH_REQUEST_FAILED(HttpStatus.BAD_REQUEST, "OAUTH4001", "OAuth 요청 처리 중 에러가 발생했습니다."),
+    OAUTH_UNSUPPORTED_PROVIDER(HttpStatus.BAD_REQUEST, "OAUTH4002", "지원하지 않는 소셜 로그인 방식입니다."),
+    OAUTH_JSON_PARSE_ERROR(HttpStatus.BAD_REQUEST, "OAUTH4003", "OAuth 응답 파싱에 실패했습니다."),
+    OAUTH_ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "OAUTH4004", "OAuth 인증에 실패했습니다.");
 
 
 
