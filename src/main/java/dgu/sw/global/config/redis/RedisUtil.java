@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -25,6 +26,11 @@ public class RedisUtil {
     // userId로 키 생성
     private String generateKey(String userId) {
         return userId;
+    }
+
+    // RefreshToken 가져오기 (Optional로 감싸서 Null 체크)
+    public Optional<String> getRefreshToken(String userId) {
+        return Optional.ofNullable(redisTemplate.opsForValue().get(userId));
     }
 
     public void deleteRefreshToken(String userId) {
