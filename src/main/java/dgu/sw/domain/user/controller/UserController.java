@@ -13,10 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -47,8 +44,8 @@ public class UserController {
 
     @PostMapping("/refresh")
     @Operation(summary = "토큰 갱신 API", description = "Refresh Token을 이용하여 Access Token을 갱신합니다.")
-    public ApiResponse<SignInResponse> refresh(@RequestBody String refreshToken) {
-        return ApiResponse.onSuccess(userService.refreshAccessToken(refreshToken));
+    public ApiResponse<SignInResponse> refresh(@RequestHeader("refreshToken") String refreshToken, HttpServletResponse response) {
+        return ApiResponse.onSuccess(userService.refreshAccessToken(refreshToken, response));
     }
 
     @PostMapping("/check-email")

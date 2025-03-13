@@ -104,18 +104,29 @@ public class UserServiceImpl implements UserService {
      * AccessToken 갱신
      */
     @Override
-    public SignInResponse refreshAccessToken(String refreshToken) {
-        if (!jwtUtil.validateToken(refreshToken)) {
+    public SignInResponse refreshAccessToken(String refreshToken, HttpServletResponse response) {
+        Long extractedUserId = jwtUtil.extractUserId(refreshToken);
+        if (extractedUserId == null) {
             throw new UserException(ErrorStatus.INVALID_REFRESH_TOKEN);
         }
 
-        String userId = String.valueOf(jwtUtil.extractUserId(refreshToken));
-        String newAccessToken = jwtTokenProvider.generateAccessToken(userRepository.findByEmail(userId)
-                .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND)));
+        String userId = String.valueOf(extractedUserId);
 
-        String newRefreshToken = jwtTokenProvider.generateRefreshToken(userRepository.findByEmail(userId)
-                .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND)));
+        // Redis에 저장된 RefreshToken과 비교
+        String storedRefreshToken = redisUtil.getRefreshToken(userId)
+                .orElseThrow(() -> new UserException(ErrorStatus.REFRESH_TOKEN_NOT_FOUND));
 
+        if (!storedRefreshToken.equals(refreshToken)) {
+            throw new UserException(ErrorStatus.INVALID_REFRESH_TOKEN);
+        }
+
+        User user = userRepository.findById(Long.parseLong(userId))
+                .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
+
+        String newAccessToken = jwtTokenProvider.generateAccessToken(user);
+        String newRefreshToken = jwtTokenProvider.generateRefreshToken(user);
+
+        redisUtil.deleteRefreshToken(userId);
         redisUtil.saveRefreshToken(userId, newRefreshToken);
 
         return UserConverter.toSignInResponseDTO(newAccessToken, newRefreshToken);
