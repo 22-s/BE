@@ -26,4 +26,7 @@ public interface UserQuizRepository extends JpaRepository<UserQuiz, Long> {
     List<Quiz> findTop5MostWrongOnDate(@Param("date") LocalDate date);
 
     boolean existsByUser_UserIdAndQuiz_QuizIdAndSolvedDate(Long userId, Long quizId, LocalDate solvedDate);
+
+    List<UserQuiz> findByUser_UserIdAndSolvedDate(Long userId, LocalDate solvedDate);
+
 }

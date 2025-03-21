@@ -1,5 +1,6 @@
 package dgu.sw.domain.quiz.service;
 
+import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.YesterdayQuizResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizMainPageResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizReviewResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizRequest.SubmitQuizRequest;
@@ -19,4 +20,5 @@ public interface QuizService {
     List<QuizSearchResponse> searchQuizzes(String userId, String keyword);
     List<QuizReviewResponse> getReviewList(String userId);
     QuizMainPageResponse getQuizMainPageData(String userId);
+    List<YesterdayQuizResponse> getYesterdaySolvedQuizzes(String userId);
 }
