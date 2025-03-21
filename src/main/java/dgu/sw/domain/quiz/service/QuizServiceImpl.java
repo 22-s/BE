@@ -1,6 +1,7 @@
 package dgu.sw.domain.quiz.service;
 
 import dgu.sw.domain.quiz.converter.QuizConverter;
+import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.YesterdayQuizResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizMainPageResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizSearchResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizReviewResponse;
@@ -133,7 +134,6 @@ public class QuizServiceImpl implements QuizService {
 
         if (existingUserQuiz != null) {
             existingUserQuiz.updateCorrect(isCorrect);
-            existingUserQuiz.updateSolvedDate(LocalDate.now());
 
             // retriedToday 체크
             boolean solvedYesterday = userQuizRepository.existsByUser_UserIdAndQuiz_QuizIdAndSolvedDate(
@@ -146,9 +146,6 @@ public class QuizServiceImpl implements QuizService {
         else {
             User user = userRepository.findByUserId(Long.valueOf(userId));
             UserQuiz userQuiz = QuizConverter.toUserQuiz(user, quiz, isCorrect);
-
-            userQuiz.updateSolvedDate(LocalDate.now());
-            userQuiz.updateRetriedToday(false); // retriedToday 기본값 false
 
             userQuizRepository.save(userQuiz);
         }
@@ -295,5 +292,27 @@ public class QuizServiceImpl implements QuizService {
                 .topPercentile(topPercentile)
                 .top5WrongQuizzes(top5Responses)
                 .build();
+    }
+
+    @Override
+    public List<YesterdayQuizResponse> getYesterdaySolvedQuizzes(String userId) {
+        Long uid = Long.valueOf(userId);
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+
+        List<UserQuiz> solvedQuizzes = userQuizRepository.findByUser_UserIdAndSolvedDate(uid, yesterday);
+
+        if (solvedQuizzes.isEmpty()) {
+            throw new QuizException(ErrorStatus.QUIZ_SEARCH_NO_RESULTS);
+        }
+
+        return solvedQuizzes.stream()
+                .map(userQuiz -> {
+                    Quiz quiz = userQuiz.getQuiz();
+                    boolean isInReviewList = quizReviewListRepository.existsByUser_UserIdAndQuiz_QuizId(uid, quiz.getQuizId());
+                    boolean retriedToday = Boolean.TRUE.equals(userQuiz.getRetriedToday());
+
+                    return QuizConverter.toYesterdayQuizResponse(quiz, isInReviewList, retriedToday);
+                })
+                .collect(Collectors.toList());
     }
 }

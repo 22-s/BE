@@ -87,5 +87,14 @@ public class QuizDTO {
             private Double topPercentile;
             private List<QuizListResponse> top5WrongQuizzes;
         }
+
+        @Getter
+        @Builder
+        public static class YesterdayQuizResponse {
+            private Long quizId;
+            private String question;
+            private boolean isInReviewList;
+            private boolean retriedToday;
+        }
     }
 }
