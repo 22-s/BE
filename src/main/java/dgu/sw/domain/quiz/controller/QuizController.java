@@ -1,5 +1,6 @@
 package dgu.sw.domain.quiz.controller;
 
+import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizMainPageResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizSearchResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizReviewResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizListResponse;
@@ -83,6 +84,13 @@ public class QuizController {
             Authentication authentication,
             @RequestParam(required = false) String keyword) {
         List<QuizSearchResponse> response = quizService.searchQuizzes(authentication.getName(), keyword);
+        return ApiResponse.onSuccess(response);
+    }
+
+    @GetMapping("/main")
+    @Operation(summary = "퀴즈 메인 정보 조회", description = "어제 푼 퀴즈 수, 진척도, 모의고사 점수, Top5 오답 퀴즈 등 메인 페이지 데이터를 반환합니다.")
+    public ApiResponse<QuizMainPageResponse> getQuizMainInfo(Authentication authentication) {
+        QuizMainPageResponse response = quizService.getQuizMainPageData(authentication.getName());
         return ApiResponse.onSuccess(response);
     }
 }

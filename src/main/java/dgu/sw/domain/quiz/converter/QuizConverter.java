@@ -9,6 +9,7 @@ import dgu.sw.domain.quiz.entity.Quiz;
 import dgu.sw.domain.quiz.entity.UserQuiz;
 import dgu.sw.domain.user.entity.User;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class QuizConverter {
@@ -20,6 +21,7 @@ public class QuizConverter {
                 .isCorrect(isCorrect)
                 .isLocked(false)
                 .isReviewed(false)
+                .solvedDate(LocalDate.now())
                 .build();
     }
 
