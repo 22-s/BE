@@ -96,13 +96,13 @@ public class QuizServiceImpl implements QuizService {
             case 2:
                 return "명함 공유 매너";
             case 3:
-                return "팀장님께 메일 보내기";
-            case 4:
                 return "직장인 글쓰기 Tip";
+            case 4:
+                return "팀장님께 메일 보내기";
             case 5:
-                return "TPO에 맞는 복장";
-            case 6:
                 return "커뮤니케이션 매너";
+            case 6:
+                return "TPO에 맞는 복장";
             default:
                 throw new IllegalArgumentException("잘못된 카테고리 번호입니다: " + category);
         }
@@ -127,6 +127,23 @@ public class QuizServiceImpl implements QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_FOUND));
 
+        Long uid = Long.valueOf(userId);
+        String category = quiz.getCategory();
+
+        // 해당 카테고리에서 가장 먼저 풀어야 하는 퀴즈 ID 찾기
+        Long firstQuizId = quizRepository.findFirstQuizIdByCategory(category);
+
+        // 사용자가 풀려는 퀴즈의 바로 이전 퀴즈 찾기
+        Long previousQuizId = quizRepository.findPreviousQuizId(category, quizId);
+
+        // 이전 퀴즈를 풀었는지 확인 (첫 퀴즈가 아닐 경우만 체크)
+        if (!quizId.equals(firstQuizId)) {
+            boolean previousSolved = userQuizRepository.existsByUser_UserIdAndQuiz_QuizId(uid, previousQuizId);
+            if (!previousSolved) {
+                throw new QuizException(ErrorStatus.QUIZ_LOCKED);
+            }
+        }
+
         boolean isCorrect = quiz.getAnswer().equals(request.getSelectedAnswer());
 
         UserQuiz existingUserQuiz = userQuizRepository.findByUser_UserIdAndQuiz_QuizId(Long.valueOf(userId), quizId)
@@ -149,7 +166,6 @@ public class QuizServiceImpl implements QuizService {
 
             userQuizRepository.save(userQuiz);
         }
-
 
         return QuizConverter.toQuizResultResponse(isCorrect);
     }
