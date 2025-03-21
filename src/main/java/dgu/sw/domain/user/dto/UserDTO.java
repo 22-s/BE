@@ -48,6 +48,51 @@ public class UserDTO {
             @Schema(description = "유저 이메일", example = "이메일")
             private String email;
         }
+
+        // 비밀번호 변경 - 이메일 유효성 검사
+        // Controller에서 클라이언트 요청을 받을 때 사용되는 요청 DTO
+        @Getter
+        public static class PasswordEmailRequest {
+            @NotBlank
+            @Schema(description = "비밀번호 변경 요청 이메일", example = "hihi@gmail.com")
+            private String email;
+        }
+
+        // 이메일이 유효하다면, 해당 이메일로 인증코드 발송
+        @Getter
+        public static class EmailSendRequest {
+            @NotBlank
+            @Schema(description = "인증코드 전송 대상 이메일", example = "hihi@gmail.com")
+            private String email;
+        }
+
+        // 인증코드 검증
+        @Getter
+        public static class CodeVerificationRequest {
+            @NotBlank
+            @Schema(description = "인증코드 검증 대상 이메일", example = "hihi@gmail.com")
+            private String email;
+
+            @NotBlank
+            @Schema(description = "사용자가 입력한 인증코드", example = "123456")
+            private String code;
+        }
+
+        // 새 비밀번호 입력, 새 비밀번호 확인
+        @Getter
+        public static class PasswordResetRequest {
+            @NotBlank
+            @Schema(description = "비밀번호 변경 대상 이메일", example = "hihi@gmail.com")
+            private String email;
+
+            @NotBlank
+            @Schema(description = "새 비밀번호", example = "newpassword123")
+            private String newPassword;
+
+            @NotBlank
+            @Schema(description = "새 비밀번호 확인", example = "newpassword123")
+            private String confirmPassword;
+        }
     }
 
     public static class UserResponse {

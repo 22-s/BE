@@ -9,6 +9,7 @@ import dgu.sw.global.security.JwtUtil;
 import dgu.sw.global.config.redis.RedisUtil;
 import dgu.sw.global.exception.UserException;
 import dgu.sw.global.status.ErrorStatus;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -19,8 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignUpResponse;
 import dgu.sw.domain.user.dto.UserDTO.UserRequest.SignUpRequest;
 import dgu.sw.domain.user.dto.UserDTO.UserRequest.SignInRequest;
+import dgu.sw.domain.user.dto.UserDTO.UserRequest.PasswordResetRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import dgu.sw.global.config.util.EmailService;
 
 import java.util.concurrent.TimeUnit;
 
@@ -35,6 +39,8 @@ public class UserServiceImpl implements UserService {
     private final RedisUtil redisUtil;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    private final EmailService emailService;
 
     /**
      * 회원가입
@@ -148,5 +154,79 @@ public class UserServiceImpl implements UserService {
     private String resolveToken(HttpServletRequest request) {
         String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
         return (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
+    }
+
+    // 비밀번호 변경
+    // 이메일 유효성 검사
+    @Override
+    public void verifyEmailForPasswordReset(String email) {
+        boolean exists = userRepository.existsByEmail(email);
+        if (!exists) {
+            throw new UserException(ErrorStatus.USER_NOT_FOUND);
+        }
+    }
+
+    // 이메일이 유효하다면, 해당 이메일로 인증코드 발송
+    @Override
+    public void sendVerificationCode(String email) {
+        // 1. 이메일 존재 여부 확인
+        if (!userRepository.existsByEmail(email)) {
+            throw new UserException(ErrorStatus.USER_NOT_FOUND);
+        }
+
+        // 2. 인증코드 생성 (6자리 숫자) - 랜덤
+        String verificationCode = generateRandomCode();
+
+        // 3. Redis에 저장 (3분 유효)
+        redisUtil.setDataExpire("password_code:" + email, verificationCode, 180); // 180초 = 3분
+
+        // 4. 이메일 전송
+        String subject = "[신입사UP] 비밀번호 변경 인증코드 안내";
+        String text = "인증코드는 [" + verificationCode + "] 입니다. 다시 신입사UP으로 돌아가서 인증코드를 정확히 입력해주세요. 유효시간은 3분입니다.";
+
+        // 실제 이메일 발송 Util (아래는 임시로 console 출력 예시)
+        // System.out.println("[TEST] 인증코드 발송됨: " + email + verificationCode);
+        // 아래는 진짜 이메일 전송 - 실제는 추후 연결
+        emailService.sendEmail(email, subject, text);
+    }
+
+    private String generateRandomCode() {
+        int code = (int) (Math.random() * 900000) + 100000; // 100000~999999
+        return String.valueOf(code);
+    }
+
+    // 인증코드 검증
+    @Override
+    public void verifyVerificationCode(String email, String code) {
+        String redisKey = "password_code:" + email;
+        String storedCode = redisUtil.getData(redisKey).orElseThrow(() -> new UserException(ErrorStatus.CODE_EXPIRED));
+        // orElseThrow()를 통해 값이 없을 경우(null일 경우) 예외를 발생시킴
+
+        if (!storedCode.equals(code)) {
+            throw new UserException(ErrorStatus.CODE_MISMATCH); // 인증코드가 다르면 예외 발생
+        }
+
+        redisUtil.deleteKey(redisKey); // 인증 성공 시 삭제
+    }
+
+    // 비밀번호 변경, 확인
+    @Override
+    public void resetPassword(PasswordResetRequest request) {
+        String email = request.getEmail();
+
+        // 1. 사용자 존재 확인
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
+
+        // 2. 새 비밀번호, 확인 일치 여부 체크
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new UserException(ErrorStatus.PASSWORD_NOT_MATCH);
+        }
+
+        // 3. 비밀번호 암호화 후 저장
+        String encryptedPassword = passwordEncoder.encode(request.getNewPassword());
+        user.updatePassword(encryptedPassword);
+
+        // 4. 저장 (JPA는 변경 감지로 자동 반영되지만 명시적으로 저장해도 좋음)
+        userRepository.save(user);
     }
 }

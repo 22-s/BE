@@ -1,10 +1,7 @@
 package dgu.sw.domain.user.controller;
 
-import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignInResponse;
-import dgu.sw.domain.user.dto.UserDTO.UserRequest.EmailRequest;
-import dgu.sw.domain.user.dto.UserDTO.UserRequest.SignInRequest;
-import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignUpResponse;
-import dgu.sw.domain.user.dto.UserDTO.UserRequest.SignUpRequest;
+import dgu.sw.domain.user.dto.UserDTO.UserResponse.*;
+import dgu.sw.domain.user.dto.UserDTO.UserRequest.*;
 import dgu.sw.domain.user.service.UserService;
 import dgu.sw.global.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,5 +50,38 @@ public class UserController {
     public ApiResponse<String> checkEmailDuplicate(@RequestBody @Valid EmailRequest emailRequest) {
         userService.checkEmailDuplicate(emailRequest.getEmail());
         return ApiResponse.onSuccess("사용 가능한 이메일입니다.");
+    }
+
+    // 비밀번호 변경하기
+    // 이메일 유효성 검사
+    @PostMapping("/password/verify-email")
+    @Operation(summary = "비밀번호 변경 - 이메일 유효성 확인", description = "입력한 이메일이 회원가입된 이메일인지 확인합니다.")
+    public ApiResponse<String> verifyEmailForPasswordReset(@RequestBody @Valid PasswordEmailRequest request) {
+        userService.verifyEmailForPasswordReset(request.getEmail());
+        return ApiResponse.onSuccess("해당 이메일은 존재하는 회원입니다.");
+    }
+
+    // 이메일이 유효하다면, 해당 이메일로 인증코드 발송
+    @PostMapping("/password/send-code")
+    @Operation(summary = "비밀번호 변경 - 인증코드 이메일 발송", description = "이메일로 인증코드를 발송합니다.")
+    public ApiResponse<String> sendVerificationCode(@RequestBody @Valid EmailSendRequest request) {
+        userService.sendVerificationCode(request.getEmail());
+        return ApiResponse.onSuccess("인증코드가 이메일로 발송되었습니다.");
+    }
+
+    // 인증코드 검증 : 사용자가 인증코드 입력 시, 발송한 인증코드와 일치하는지 확인
+    @PostMapping("/password/verify-code")
+    @Operation(summary = "비밀번호 변경 - 인증코드 검증", description = "사용자가 입력한 인증코드를 검증합니다.")
+    public ApiResponse<String> verifyCode(@RequestBody @Valid CodeVerificationRequest request) {
+        userService.verifyVerificationCode(request.getEmail(), request.getCode());
+        return ApiResponse.onSuccess("인증 성공");
+    }
+
+    // 새 비밀번호 입력, 새 비밀번호 확인
+    @PostMapping("/password/reset")
+    @Operation(summary = "비밀번호 변경", description = "새 비밀번호로 변경합니다.")
+    public ApiResponse<String> resetPassword(@RequestBody @Valid PasswordResetRequest request) {
+        userService.resetPassword(request);
+        return ApiResponse.onSuccess("비밀번호가 성공적으로 변경되었습니다.");
     }
 }

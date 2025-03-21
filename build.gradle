@@ -54,6 +54,9 @@ dependencies {
 	// WebDriverManager
 	implementation 'io.github.bonigarcia:webdrivermanager:5.5.3'
 
+	// 인증코드 전송 - JavaMailSender를 자동으로 Bean으로 등록하기 위함
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
 	// Test dependencies
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'

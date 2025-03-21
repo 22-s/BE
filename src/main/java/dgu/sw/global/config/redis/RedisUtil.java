@@ -40,4 +40,20 @@ public class RedisUtil {
     public void addTokenToBlacklist(String accessToken, long expiration) {
         redisTemplate.opsForValue().set(accessToken, "BLACKLIST", expiration, TimeUnit.MILLISECONDS);
     }
+
+    // 인증코드 관련
+    // 유효시간 확인
+    public void setDataExpire(String key, String value, long expireTimeSec) {
+        redisTemplate.opsForValue().set(key, value, expireTimeSec, TimeUnit.SECONDS);
+    }
+
+    // 인증코드 조회
+    public Optional<String> getData(String key) {
+        return Optional.ofNullable(redisTemplate.opsForValue().get(key));
+    }
+
+    // 인증코드 인증 시 삭제
+    public void deleteKey(String key) {
+        redisTemplate.delete(key);
+    }
 }

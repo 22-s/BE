@@ -41,4 +41,8 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<QuizReviewList> quizReviewLists;
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
 }
