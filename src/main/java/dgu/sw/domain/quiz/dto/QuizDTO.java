@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 public class QuizDTO {
 
     public static class QuizRequest {
@@ -74,6 +76,16 @@ public class QuizDTO {
             private boolean isSolved;
             private boolean isInReviewList;
             private boolean isCorrect;
+        }
+
+        @Getter
+        @Builder
+        public static class QuizMainPageResponse {
+            private int yesterdaySolvedCount;
+            private double progressRate;
+            private Integer latestMockExamScore;
+            private Double topPercentile;
+            private List<QuizListResponse> top5WrongQuizzes;
         }
     }
 }

@@ -37,4 +37,12 @@ public class UserQuiz {
     public void updateCorrect(boolean isCorrect) {
         this.isCorrect = isCorrect;
     }
+
+    public void updateSolvedDate(LocalDate solvedDate) {
+        this.solvedDate = solvedDate;
+    }
+
+    public void updateRetriedToday(boolean retriedToday) {
+        this.retriedToday = retriedToday;
+    }
 }
