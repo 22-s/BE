@@ -20,4 +20,7 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
     // 현재 풀려는 퀴즈보다 작은 ID 중에서 가장 큰 ID(즉, 바로 이전 퀴즈) 찾기
     @Query("SELECT MAX(q.quizId) FROM Quiz q WHERE q.category = :category AND q.quizId < :quizId")
     Long findPreviousQuizId(@Param("category") String category, @Param("quizId") Long quizId);
+
+    @Query(value = "SELECT * FROM quiz ORDER BY RAND() LIMIT :limit", nativeQuery = true)
+    List<Quiz> findRandomQuizzes(@Param("limit") int limit);
 }

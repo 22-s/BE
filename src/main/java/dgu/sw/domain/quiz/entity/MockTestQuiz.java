@@ -23,5 +23,9 @@ public class MockTestQuiz {
     private Quiz quiz;
 
     private boolean isCorrect;
+
+    public void updateCorrect(boolean isCorrect) {
+        this.isCorrect = isCorrect;
+    }
 }
 
