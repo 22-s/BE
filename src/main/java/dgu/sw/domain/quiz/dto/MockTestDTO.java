@@ -54,6 +54,21 @@ public class MockTestDTO {
             private String question;
         }
 
+        @Getter
+        @Builder
+        public static class SubmitMockTestResponse {
+            private Long mockTestId;
+            private int correctCount;
+            private List<SubmittedQuizResult> results;
+        }
 
+        @Getter
+        @Builder
+        public static class SubmittedQuizResult {
+            private Long quizId;
+            private String question;
+            private String selectedAnswer;
+            private boolean isCorrect;
+        }
     }
 }
