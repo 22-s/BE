@@ -4,6 +4,8 @@ import dgu.sw.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @Builder
@@ -18,6 +20,11 @@ public class UserQuiz {
     private boolean isLocked;
     private boolean isCorrect;
     private boolean isReviewed;
+
+    @Temporal(TemporalType.DATE)
+    private LocalDate solvedDate;
+
+    private Boolean retriedToday; // 오늘 다시 풀었는지 여부
 
     @ManyToOne
     @JoinColumn(name = "userId")
