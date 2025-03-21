@@ -30,5 +30,10 @@ public class MockTest {
 
     @OneToMany(mappedBy = "mockTest", cascade = CascadeType.ALL)
     private List<MockTestQuiz> mockTestQuizzes;
+
+    public void updateCompleted(boolean isCorrect, int correctCount) {
+        this.isCompleted = isCorrect;
+        this.correctCount = correctCount;
+    }
 }
 

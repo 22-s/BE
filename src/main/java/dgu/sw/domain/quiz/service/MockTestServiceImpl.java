@@ -1,6 +1,7 @@
 package dgu.sw.domain.quiz.service;
 
 import dgu.sw.domain.quiz.converter.MockTestConverter;
+import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestRequest.SubmitMockTestRequest;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.CreateMockTestResponse;
 import dgu.sw.domain.quiz.entity.MockTest;
 import dgu.sw.domain.quiz.entity.MockTestQuiz;
@@ -10,6 +11,8 @@ import dgu.sw.domain.quiz.repository.MockTestRepository;
 import dgu.sw.domain.quiz.repository.QuizRepository;
 import dgu.sw.domain.user.entity.User;
 import dgu.sw.domain.user.repository.UserRepository;
+import dgu.sw.global.exception.QuizException;
+import dgu.sw.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +56,35 @@ public class MockTestServiceImpl implements MockTestService {
                 .collect(Collectors.toList());
 
         mockTestQuizRepository.saveAll(mockTestQuizzes);
+
+        return MockTestConverter.toCreateMockTestResponse(mockTest, mockTestQuizzes);
+    }
+
+    @Override
+    @Transactional
+    public CreateMockTestResponse submitMockTest(Long mockTestId, SubmitMockTestRequest request) {
+        MockTest mockTest = mockTestRepository.findById(mockTestId)
+                .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_FOUND));
+
+        List<MockTestQuiz> mockTestQuizzes = mockTestQuizRepository.findByMockTest_MockTestId(mockTestId);
+
+        // 정답 개수 업데이트
+        int correctCount = 0;
+        for (SubmitMockTestRequest.Answer answer : request.getAnswers()) {
+            MockTestQuiz quizRecord = mockTestQuizzes.stream()
+                    .filter(mtq -> mtq.getQuiz().getQuizId().equals(answer.getQuizId()))
+                    .findFirst()
+                    .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_FOUND));
+
+            boolean isCorrect = quizRecord.getQuiz().getAnswer().equals(answer.getSelectedAnswer());
+            quizRecord.updateCorrect(isCorrect);
+
+            if (isCorrect) correctCount++;
+        }
+
+        // 모의고사 완료 상태 업데이트
+        mockTest.updateCompleted(true, correctCount);
+        mockTestRepository.save(mockTest);
 
         return MockTestConverter.toCreateMockTestResponse(mockTest, mockTestQuizzes);
     }

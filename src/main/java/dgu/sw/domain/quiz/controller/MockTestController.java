@@ -1,5 +1,6 @@
 package dgu.sw.domain.quiz.controller;
 
+import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestRequest.SubmitMockTestRequest;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.CreateMockTestResponse;
 import dgu.sw.domain.quiz.service.MockTestService;
 import dgu.sw.global.ApiResponse;
@@ -21,6 +22,15 @@ public class MockTestController {
     @Operation(summary = "모의고사 시작", description = "랜덤한 10개의 퀴즈로 모의고사를 시작합니다.")
     public ApiResponse<CreateMockTestResponse> startMockTest(Authentication authentication) {
         CreateMockTestResponse response = mockTestService.startMockTest(authentication.getName());
+        return ApiResponse.onSuccess(response);
+    }
+
+    @PostMapping("/{mockTestId}/submit")
+    @Operation(summary = "모의고사 제출", description = "사용자가 선택한 답안을 제출하고 결과를 반환합니다.")
+    public ApiResponse<CreateMockTestResponse> submitMockTest(
+            @PathVariable Long mockTestId,
+            @RequestBody SubmitMockTestRequest request) {
+        CreateMockTestResponse response = mockTestService.submitMockTest(mockTestId, request);
         return ApiResponse.onSuccess(response);
     }
 }
