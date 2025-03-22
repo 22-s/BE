@@ -70,5 +70,36 @@ public class MockTestDTO {
             private String selectedAnswer;
             private boolean isCorrect;
         }
+
+        @Getter
+        @Builder
+        public static class MockTestResultResponse {
+            private Long mockTestId;
+            private int attemptCount; // 몇 번째 모의고사인지
+            private int score; // 100점 만점 기준
+            private int scoreChange; // 이전 모의고사 대비 상승/하락 점수
+            private double topPercentile; // 상위 % 위치
+            private double topPercentileChange; // 이전 모의고사 대비 등락률
+
+            private List<CategoryResult> categoryResults; // 카테고리별 정답 수
+            private List<MockTestQuestionResult> questionResults; // 전체 문제 목록
+
+            @Getter
+            @Builder
+            public static class CategoryResult {
+                private String category;
+                private int correctCount;
+                private int totalCount;
+            }
+
+            @Getter
+            @Builder
+            public static class MockTestQuestionResult {
+                private Long quizId;
+                private String category;
+                private String question;
+                private boolean isCorrect;
+            }
+        }
     }
 }
