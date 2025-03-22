@@ -28,12 +28,15 @@ public class MockTest {
 
     private int correctCount;
 
+    private double topPercentile;
+
     @OneToMany(mappedBy = "mockTest", cascade = CascadeType.ALL)
     private List<MockTestQuiz> mockTestQuizzes;
 
-    public void updateCompleted(boolean isCorrect, int correctCount) {
+    public void updateCompleted(boolean isCorrect, int correctCount, double topPercentile) {
         this.isCompleted = isCorrect;
         this.correctCount = correctCount;
+        this.topPercentile = topPercentile;
     }
 }
 

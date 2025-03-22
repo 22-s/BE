@@ -86,7 +86,32 @@ public class MockTestServiceImpl implements MockTestService {
             if (isCorrect) correctCount++;
         }
 
-        mockTest.updateCompleted(true, correctCount);
+        // 현재 사용자 기준 이전까지 본 모의고사 평균 점수 계산
+        Long userId = mockTest.getUser().getUserId();
+        List<MockTest> userTests = mockTestRepository.findByUser_UserIdAndMockTestIdLessThan(userId, mockTestId);
+        double myAverage = userTests.stream()
+                .mapToDouble(mt -> ((double) mt.getCorrectCount() / mt.getMockTestQuizzes().size()) * 100)
+                .average().orElse(0.0);
+
+        // 전체 사용자들의 평균 점수 계산
+        List<MockTest> completedTests = mockTestRepository.findAllByIsCompletedTrue();
+        List<Double> allUserAverageScores = completedTests.stream()
+                .filter(mt -> mt.getMockTestId() < mockTestId)
+                .collect(Collectors.groupingBy(MockTest::getUser, Collectors.averagingDouble(
+                        mt -> ((double) mt.getCorrectCount() / mt.getMockTestQuizzes().size()) * 100)))
+                .values()
+                .stream()
+                .collect(Collectors.toList());
+
+        // 내 평균 점수 포함 후 정렬
+        allUserAverageScores.add(myAverage);
+        allUserAverageScores.sort(Comparator.reverseOrder());
+
+        int myRank = allUserAverageScores.indexOf(myAverage) + 1;
+        double topPercentile = allUserAverageScores.size() > 0 ? ((double) myRank / allUserAverageScores.size()) * 100 : 0.0;
+
+        // 완료 및 저장
+        mockTest.updateCompleted(true, correctCount, topPercentile);
         mockTestRepository.save(mockTest);
 
         return MockTestConverter.toSubmitMockTestResponse(mockTest, mockTestQuizzes, request.getAnswers());
@@ -184,7 +209,7 @@ public class MockTestServiceImpl implements MockTestService {
             scoreChange = score - previousScore;
 
             // 이전 상위 퍼센트 계산 (이전 평균 점수를 기준으로 다시 계산해도 됨. 여기선 현재와 동일하게 처리)
-            previousTopPercentile = ((double) (allUserAverageScores.indexOf(myAverageScore) + 1) / totalParticipants * 100);
+            previousTopPercentile = previousMockTestOpt.map(MockTest::getTopPercentile).orElse(topPercentile);
         }
 
         double topPercentileChange = previousTopPercentile - topPercentile;
