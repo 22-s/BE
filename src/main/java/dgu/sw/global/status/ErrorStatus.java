@@ -57,7 +57,8 @@ public enum ErrorStatus implements BaseErrorCode {
     OAUTH_ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "OAUTH4004", "OAuth 인증에 실패했습니다."),
 
     // 모의고사 관련 에러
-    MOCK_TEST_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "MOCK4001", "아직 제출되지 않은 모의고사입니다.");
+    MOCK_TEST_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "MOCK4001", "아직 제출되지 않은 모의고사입니다."),
+    MOCK_TEST_NOT_FOUND(HttpStatus.NOT_FOUND, "MOCK4002", "해당 모의고사를 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

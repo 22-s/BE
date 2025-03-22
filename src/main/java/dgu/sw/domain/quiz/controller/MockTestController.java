@@ -42,4 +42,11 @@ public class MockTestController {
         MockTestResultResponse response = mockTestService.getMockTestResult(mockTestId);
         return ApiResponse.onSuccess(response);
     }
+
+    @GetMapping("/previous/result")
+    @Operation(summary = "이전 모의고사 결과 조회", description = "가장 최근에 완료한 이전 모의고사 결과를 조회합니다.")
+    public ApiResponse<MockTestResultResponse> getPreviousMockTestResult(Authentication authentication) {
+        MockTestResultResponse response = mockTestService.getPreviousMockTestResult(authentication.getName());
+        return ApiResponse.onSuccess(response);
+    }
 }
