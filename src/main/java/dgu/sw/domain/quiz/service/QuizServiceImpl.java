@@ -284,7 +284,7 @@ public class QuizServiceImpl implements QuizService {
         long totalQuizCount = quizRepository.count();
         long userSolvedCount = userQuizRepository.countDistinctByUserId(uid);
 
-        double progressRate = (double) userSolvedCount / totalQuizCount;
+        double progressRate = (double) userSolvedCount / totalQuizCount * 100;
 
         // 최근 모의고사 점수
         MockTest recentExam = mockTestRepository.findTopByUser_UserIdOrderByCreatedDateDesc(uid);
