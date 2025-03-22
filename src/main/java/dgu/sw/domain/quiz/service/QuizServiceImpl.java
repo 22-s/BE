@@ -291,10 +291,7 @@ public class QuizServiceImpl implements QuizService {
         Integer recentScore = recentExam != null ? recentExam.getCorrectCount() * 10 : null;
 
         // 상위 % 계산
-        long totalParticipants = mockTestRepository.countCompletedExams();
-        long betterThan = recentScore != null ? mockTestRepository.countByCorrectCountGreaterThan(recentScore) : 0;
-        double topPercentile = totalParticipants > 0 ? (double) betterThan / totalParticipants : 1.0;
-
+        Double topPercentile = recentExam != null ? recentExam.getTopPercentile() : null;
         // 어제 많이 틀린 Top5 퀴즈
         List<Quiz> top5Wrong = userQuizRepository.findTop5MostWrongOnDate(LocalDate.now().minusDays(1));
         List<QuizListResponse> top5Responses = top5Wrong.stream()
