@@ -288,7 +288,7 @@ public class QuizServiceImpl implements QuizService {
 
         // 최근 모의고사 점수
         MockTest recentExam = mockTestRepository.findTopByUser_UserIdOrderByCreatedDateDesc(uid);
-        Integer recentScore = recentExam != null ? recentExam.getCorrectCount() : null;
+        Integer recentScore = recentExam != null ? recentExam.getCorrectCount() * 10 : null;
 
         // 상위 % 계산
         long totalParticipants = mockTestRepository.countCompletedExams();
