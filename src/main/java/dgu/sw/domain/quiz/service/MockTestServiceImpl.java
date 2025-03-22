@@ -197,4 +197,19 @@ public class MockTestServiceImpl implements MockTestService {
                 .questionResults(questionResults)
                 .build();
     }
+
+    @Override
+    public MockTestResultResponse getPreviousMockTestResult(String userId) {
+        Long uid = Long.valueOf(userId);
+
+        // 유저가 푼 가장 최근(제일 마지막) 이전 모의고사
+        Optional<MockTest> previousMockTestOpt = mockTestRepository
+                .findTopByUser_UserIdAndIsCompletedTrueOrderByCreatedDateDesc(uid);
+
+        MockTest mockTest = previousMockTestOpt
+                .orElseThrow(() -> new QuizException(ErrorStatus.MOCK_TEST_NOT_FOUND));
+
+        return getMockTestResult(mockTest.getMockTestId());
+    }
+
 }
