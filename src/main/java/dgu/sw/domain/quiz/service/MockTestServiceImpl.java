@@ -1,6 +1,8 @@
 package dgu.sw.domain.quiz.service;
 
 import dgu.sw.domain.quiz.converter.MockTestConverter;
+import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.MockTestResultResponse;
+import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.MockTestResultResponse.MockTestQuestionResult;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.SubmitMockTestResponse;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestRequest.SubmitMockTestRequest;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.CreateMockTestResponse;
@@ -19,7 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,9 +86,115 @@ public class MockTestServiceImpl implements MockTestService {
             if (isCorrect) correctCount++;
         }
 
-        mockTest.updateCompleted(true, correctCount);
+        // 현재 사용자 기준 이전까지 본 모의고사 평균 점수 계산
+        Long userId = mockTest.getUser().getUserId();
+        List<MockTest> userTests = mockTestRepository.findByUser_UserIdAndMockTestIdLessThan(userId, mockTestId);
+        double myAverage = userTests.stream()
+                .mapToDouble(mt -> ((double) mt.getCorrectCount() / mt.getMockTestQuizzes().size()) * 100)
+                .average().orElse(0.0);
+
+        // 전체 사용자들의 평균 점수 계산
+        List<MockTest> completedTests = mockTestRepository.findAllByIsCompletedTrue();
+        List<Double> allUserAverageScores = completedTests.stream()
+                .filter(mt -> mt.getMockTestId() < mockTestId)
+                .collect(Collectors.groupingBy(MockTest::getUser, Collectors.averagingDouble(
+                        mt -> ((double) mt.getCorrectCount() / mt.getMockTestQuizzes().size()) * 100)))
+                .values()
+                .stream()
+                .collect(Collectors.toList());
+
+        // 내 평균 점수 포함 후 정렬
+        allUserAverageScores.add(myAverage);
+        allUserAverageScores.sort(Comparator.reverseOrder());
+
+        int myRank = allUserAverageScores.indexOf(myAverage) + 1;
+        double topPercentile = allUserAverageScores.size() > 0 ? ((double) myRank / allUserAverageScores.size()) * 100 : 0.0;
+
+        // 완료 및 저장
+        mockTest.updateCompleted(true, correctCount, topPercentile);
         mockTestRepository.save(mockTest);
 
         return MockTestConverter.toSubmitMockTestResponse(mockTest, mockTestQuizzes, request.getAnswers());
+    }
+
+    @Override
+    public MockTestResultResponse getMockTestResult(Long mockTestId) {
+        // 1. 모의고사 정보 가져오기
+        MockTest mockTest = mockTestRepository.findById(mockTestId)
+                .orElseThrow(() -> new QuizException(ErrorStatus.MOCK_TEST_NOT_COMPLETED));
+
+        List<MockTestQuiz> mockTestQuizzes = mockTestQuizRepository.findByMockTest_MockTestId(mockTestId);
+
+        // 2. 전체 문제 정보 가공
+        List<MockTestQuestionResult> questionResults = mockTestQuizzes.stream()
+                .map(mtq -> MockTestResultResponse.MockTestQuestionResult.builder()
+                        .quizId(mtq.getQuiz().getQuizId())
+                        .category(mtq.getQuiz().getCategory())
+                        .question(mtq.getQuiz().getQuestion())
+                        .isCorrect(mtq.isCorrect())
+                        .build())
+                .collect(Collectors.toList());
+
+        // 3. 카테고리별 정답 개수 계산
+        Map<String, Long> totalQuestionsByCategory = mockTestQuizzes.stream()
+                .collect(Collectors.groupingBy(mtq -> mtq.getQuiz().getCategory(), Collectors.counting()));
+
+        Map<String, Long> correctQuestionsByCategory = mockTestQuizzes.stream()
+                .filter(MockTestQuiz::isCorrect)
+                .collect(Collectors.groupingBy(mtq -> mtq.getQuiz().getCategory(), Collectors.counting()));
+
+        List<MockTestResultResponse.CategoryResult> categoryResults = totalQuestionsByCategory.entrySet().stream()
+                .map(entry -> MockTestResultResponse.CategoryResult.builder()
+                        .category(entry.getKey())
+                        .correctCount(correctQuestionsByCategory.getOrDefault(entry.getKey(), 0L).intValue())
+                        .totalCount(entry.getValue().intValue())
+                        .build())
+                .collect(Collectors.toList());
+
+        // 4. 해당 모의고사가 몇 번째인지 계산
+        List<MockTest> userMockTests = mockTestRepository.findByUser_UserIdOrderByCreatedDateAsc(mockTest.getUser().getUserId());
+        int attemptCount = userMockTests.indexOf(mockTest) + 1; // 1부터 시작하는 순서
+
+        // 현재 점수 계산
+        int score = (int) ((double) mockTest.getCorrectCount() / mockTestQuizzes.size() * 100);
+
+        // 현재 모의고사 정보
+        Long currentMockTestId = mockTest.getMockTestId();
+        Long userId = mockTest.getUser().getUserId();
+
+        // 현재 모의고사를 푼 유저가 푼 mockTestId 중 현재 mockTestId보다 작은 것들 중 가장 큰 것
+        Optional<MockTest> previousMockTestOpt = mockTestRepository.findTopByUser_UserIdAndMockTestIdLessThanOrderByMockTestIdDesc(userId, currentMockTestId);
+
+        // 이전 모의고사 점수 계산
+        int scoreChange = 0;
+
+        if (previousMockTestOpt.isPresent()) {
+            MockTest previousMockTest = previousMockTestOpt.get();
+            List<MockTestQuiz> previousQuizzes = mockTestQuizRepository.findByMockTest_MockTestId(previousMockTest.getMockTestId());
+            int previousScore = previousQuizzes.size() > 0
+                    ? (int) ((double) previousMockTest.getCorrectCount() / previousQuizzes.size() * 100)
+                    : 0;
+            scoreChange = score - previousScore;
+        }
+
+        // 상위 퍼센트 계산 (점수가 높을수록 0에 가까워짐)
+        double topPercentile = mockTest.getTopPercentile();
+        double previousTopPercentile = previousMockTestOpt
+                .map(MockTest::getTopPercentile)
+                .orElse(topPercentile);
+
+        double topPercentileChange = previousTopPercentile - topPercentile;
+
+        // 7. 최종 결과 반환
+        return MockTestResultResponse.builder()
+                .mockTestId(mockTestId)
+                .score(score)
+                .attemptCount(attemptCount)
+                .scoreChange(scoreChange)
+                .topPercentile(topPercentile)
+                .topPercentileChange(topPercentileChange)
+                .categoryResults(categoryResults)
+                .questionResults(questionResults)
+                .build();
     }
 }

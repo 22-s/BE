@@ -44,6 +44,7 @@ public class MockTestConverter {
         return SubmitMockTestResponse.builder()
                 .mockTestId(mockTest.getMockTestId())
                 .correctCount(mockTest.getCorrectCount())
+                .topPercentile(mockTest.getTopPercentile())
                 .results(results)
                 .build();
     }

@@ -54,9 +54,10 @@ public enum ErrorStatus implements BaseErrorCode {
     OAUTH_REQUEST_FAILED(HttpStatus.BAD_REQUEST, "OAUTH4001", "OAuth 요청 처리 중 에러가 발생했습니다."),
     OAUTH_UNSUPPORTED_PROVIDER(HttpStatus.BAD_REQUEST, "OAUTH4002", "지원하지 않는 소셜 로그인 방식입니다."),
     OAUTH_JSON_PARSE_ERROR(HttpStatus.BAD_REQUEST, "OAUTH4003", "OAuth 응답 파싱에 실패했습니다."),
-    OAUTH_ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "OAUTH4004", "OAuth 인증에 실패했습니다.");
+    OAUTH_ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "OAUTH4004", "OAuth 인증에 실패했습니다."),
 
-
+    // 모의고사 관련 에러
+    MOCK_TEST_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "MOCK4001", "아직 제출되지 않은 모의고사입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

@@ -1,5 +1,6 @@
 package dgu.sw.domain.quiz.controller;
 
+import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.MockTestResultResponse;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.SubmitMockTestResponse;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestRequest.SubmitMockTestRequest;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.CreateMockTestResponse;
@@ -32,6 +33,13 @@ public class MockTestController {
             @PathVariable Long mockTestId,
             @RequestBody SubmitMockTestRequest request) {
         SubmitMockTestResponse response = mockTestService.submitMockTest(mockTestId, request);
+        return ApiResponse.onSuccess(response);
+    }
+
+    @GetMapping("/{mockTestId}/result")
+    @Operation(summary = "모의고사 결과 조회", description = "모의고사 결과를 반환합니다.")
+    public ApiResponse<MockTestResultResponse> getMockTestResult(@PathVariable Long mockTestId) {
+        MockTestResultResponse response = mockTestService.getMockTestResult(mockTestId);
         return ApiResponse.onSuccess(response);
     }
 }
