@@ -59,6 +59,7 @@ public class MockTestDTO {
         public static class SubmitMockTestResponse {
             private Long mockTestId;
             private int correctCount;
+            private double topPercentile;
             private List<SubmittedQuizResult> results;
         }
 
