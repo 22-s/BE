@@ -155,34 +155,6 @@ public class MockTestServiceImpl implements MockTestService {
         List<MockTest> userMockTests = mockTestRepository.findByUser_UserIdOrderByCreatedDateAsc(mockTest.getUser().getUserId());
         int attemptCount = userMockTests.indexOf(mockTest) + 1; // 1부터 시작하는 순서
 
-        // 현재 모의고사까지 포함한 내 평균 점수 계산
-        double myAverageScore = userMockTests.stream()
-                .filter(mt -> mt.getMockTestId() <= mockTestId) // 이 모의고사 이전 데이터만 사용
-                .mapToDouble(mt -> ((double) mt.getCorrectCount() / mt.getMockTestQuizzes().size()) * 100)
-                .average()
-                .orElse(0.0);
-
-        // 다른 사용자들의 평균 점수를 `mockTestId` 이전 모의고사 기준으로 계산
-        List<MockTest> completedTests = mockTestRepository.findAllByIsCompletedTrue();
-        List<Double> allUserAverageScores = completedTests.stream()
-                .filter(mt -> mt.getMockTestId() <= mockTestId) // 이 모의고사 이전 데이터만 사용
-                .collect(Collectors.groupingBy(MockTest::getUser, Collectors.averagingDouble(
-                        mt -> ((double) mt.getCorrectCount() / mt.getMockTestQuizzes().size()) * 100)))
-                .values()
-                .stream()
-                .collect(Collectors.toList());
-
-        // 내 평균 점수를 포함
-        allUserAverageScores.add(myAverageScore);
-
-        // 내림차순 정렬 (점수가 높은 사람이 1등)
-        allUserAverageScores.sort(Comparator.reverseOrder());
-
-        long totalParticipants = allUserAverageScores.size();
-
-        // 내 평균 점수 기준으로 등수 계산 (내 점수가 포함된 상태에서)
-        int myRank = allUserAverageScores.indexOf(myAverageScore) + 1; // 등수는 1부터 시작
-
         // 현재 점수 계산
         int score = (int) ((double) mockTest.getCorrectCount() / mockTestQuizzes.size() * 100);
 
@@ -193,12 +165,8 @@ public class MockTestServiceImpl implements MockTestService {
         // 현재 모의고사를 푼 유저가 푼 mockTestId 중 현재 mockTestId보다 작은 것들 중 가장 큰 것
         Optional<MockTest> previousMockTestOpt = mockTestRepository.findTopByUser_UserIdAndMockTestIdLessThanOrderByMockTestIdDesc(userId, currentMockTestId);
 
-        // 이전 점수 및 변화량 계산
+        // 이전 모의고사 점수 계산
         int scoreChange = 0;
-
-        // 상위 퍼센트 계산 (점수가 높을수록 0에 가까워짐)
-        double topPercentile = totalParticipants > 0 ? ((double) myRank / totalParticipants * 100) : 0.0;
-        double previousTopPercentile = topPercentile;
 
         if (previousMockTestOpt.isPresent()) {
             MockTest previousMockTest = previousMockTestOpt.get();
@@ -207,10 +175,13 @@ public class MockTestServiceImpl implements MockTestService {
                     ? (int) ((double) previousMockTest.getCorrectCount() / previousQuizzes.size() * 100)
                     : 0;
             scoreChange = score - previousScore;
-
-            // 이전 상위 퍼센트 계산 (이전 평균 점수를 기준으로 다시 계산해도 됨. 여기선 현재와 동일하게 처리)
-            previousTopPercentile = previousMockTestOpt.map(MockTest::getTopPercentile).orElse(topPercentile);
         }
+
+        // 상위 퍼센트 계산 (점수가 높을수록 0에 가까워짐)
+        double topPercentile = mockTest.getTopPercentile();
+        double previousTopPercentile = previousMockTestOpt
+                .map(MockTest::getTopPercentile)
+                .orElse(topPercentile);
 
         double topPercentileChange = previousTopPercentile - topPercentile;
 
