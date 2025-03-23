@@ -182,12 +182,29 @@ public class UserServiceImpl implements UserService {
 
         // 4. 이메일 전송
         String subject = "[신입사UP] 비밀번호 변경 인증코드 안내";
-        String text = "인증코드는 [" + verificationCode + "] 입니다. 다시 신입사UP으로 돌아가서 인증코드를 정확히 입력해주세요. 유효시간은 3분입니다.";
+        String htmlContent = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;'>"
+                + "<h2 style='color: #4CAF50;'>🔐 비밀번호 변경 인증코드</h2>"
+                + "<p>안녕하세요, <strong>신입사UP</strong>입니다.</p>"
+                + "<p>비밀번호 변경을 위한 인증코드가 요청되었습니다.</p>"
+                + "<p style='font-size: 18px; margin-top: 20px;'>"
+                + "👉 <strong style='font-size: 24px; letter-spacing: 2px;'>" + verificationCode + "</strong>"
+                + "</p>"
+                + "<p>아래 단계에 따라 인증을 완료해 주세요:</p>"
+                + "<ol>"
+                + "<li>신입사UP 앱 또는 웹사이트로 돌아가기</li>"
+                + "<li>인증코드 입력란에 위 코드를 정확히 입력</li>"
+                + "<li>비밀번호 변경 절차 진행</li>"
+                + "</ol>"
+                + "<p style='color: #999;'>⏰ 유효 시간: 3분</p>"
+                + "<hr style='margin-top: 30px;'>"
+                + "<p style='font-size: 12px; color: #888;'>본 메일은 발신 전용입니다. 인증을 요청하지 않았다면 이 메일을 무시해 주세요.</p>"
+                + "<p style='font-size: 12px; color: #888;'>© 2025 신입사UP. All rights reserved.</p>"
+                + "</div>";
 
         // 실제 이메일 발송 Util (아래는 임시로 console 출력 예시)
         // System.out.println("[TEST] 인증코드 발송됨: " + email + verificationCode);
         // 아래는 진짜 이메일 전송 - 실제는 추후 연결
-        emailService.sendEmail(email, subject, text);
+        emailService.sendEmail(email, subject, htmlContent, true);
     }
 
     // 인증코드 발송 - 동시에 여러 사용자가 요청해도 중복 안 되도록 설정
