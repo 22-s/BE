@@ -176,7 +176,7 @@ public class UserServiceImpl implements UserService {
 
         // 2. 인증코드 생성 (6자리 숫자) - 랜덤
         String verificationCode = generateUniqueCode();
-      
+
         // 3. Redis에 저장 (3분 유효)
         redisUtil.setDataExpire("password_code:" + email, verificationCode, 180); // 180초 = 3분
 
@@ -189,10 +189,6 @@ public class UserServiceImpl implements UserService {
         // 아래는 진짜 이메일 전송 - 실제는 추후 연결
         emailService.sendEmail(email, subject, text);
     }
-
-    private String generateRandomCode() {
-        int code = (int) (Math.random() * 900000) + 100000; // 100000~999999
-        return String.valueOf(code);
 
     // 인증코드 발송 - 동시에 여러 사용자가 요청해도 중복 안 되도록 설정
     private String generateUniqueCode() {
