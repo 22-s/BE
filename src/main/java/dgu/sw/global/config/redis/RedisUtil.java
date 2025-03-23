@@ -47,9 +47,25 @@ public class RedisUtil {
         redisTemplate.opsForValue().set(key, value, expireTimeSec, TimeUnit.SECONDS);
     }
 
+    // 랜덤 인증코드 생성
+    public String generateRandomCode() {
+        int code = (int) (Math.random() * 900000) + 100000; // 100000~999999
+        return String.valueOf(code);
+    }
+
     // 인증코드 조회
     public Optional<String> getData(String key) {
         return Optional.ofNullable(redisTemplate.opsForValue().get(key));
+    }
+
+    // 인증코드 사용 여부 확인
+    public boolean isCodeUsed(String code) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey("CODE_USED:" + code));
+    }
+
+    // 인증코드 사용된 것으로 마킹
+    public void markCodeAsUsed(String code, long ttlSeconds) {
+        redisTemplate.opsForValue().set("CODE_USED:" + code, "USED", ttlSeconds, TimeUnit.SECONDS);
     }
 
     // 인증코드 인증 시 삭제
