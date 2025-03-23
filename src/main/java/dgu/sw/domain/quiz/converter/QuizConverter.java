@@ -1,5 +1,6 @@
 package dgu.sw.domain.quiz.converter;
 
+import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.YesterdayQuizResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizSearchResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizListResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizDetailResponse;
@@ -9,6 +10,7 @@ import dgu.sw.domain.quiz.entity.Quiz;
 import dgu.sw.domain.quiz.entity.UserQuiz;
 import dgu.sw.domain.user.entity.User;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class QuizConverter {
@@ -20,6 +22,8 @@ public class QuizConverter {
                 .isCorrect(isCorrect)
                 .isLocked(false)
                 .isReviewed(false)
+                .solvedDate(LocalDate.now())
+                .retriedToday(false)
                 .build();
     }
 
@@ -92,4 +96,16 @@ public class QuizConverter {
                 .build();
     }
 
+    public static YesterdayQuizResponse toYesterdayQuizResponse(
+            Quiz quiz,
+            boolean isInReviewList,
+            boolean retriedToday
+    ) {
+        return YesterdayQuizResponse.builder()
+                .quizId(quiz.getQuizId())
+                .question(quiz.getQuestion())
+                .isInReviewList(isInReviewList)
+                .retriedToday(retriedToday)
+                .build();
+    }
 }

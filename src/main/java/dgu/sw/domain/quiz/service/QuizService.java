@@ -1,5 +1,7 @@
 package dgu.sw.domain.quiz.service;
 
+import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.YesterdayQuizResponse;
+import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizMainPageResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizReviewResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizRequest.SubmitQuizRequest;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizListResponse;
@@ -17,4 +19,6 @@ public interface QuizService {
     void removeQuizFromReview(String userId, Long quizId);
     List<QuizSearchResponse> searchQuizzes(String userId, String keyword);
     List<QuizReviewResponse> getReviewList(String userId);
+    QuizMainPageResponse getQuizMainPageData(String userId);
+    List<YesterdayQuizResponse> getYesterdaySolvedQuizzes(String userId);
 }

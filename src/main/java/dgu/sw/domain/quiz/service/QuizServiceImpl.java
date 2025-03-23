@@ -1,15 +1,19 @@
 package dgu.sw.domain.quiz.service;
 
 import dgu.sw.domain.quiz.converter.QuizConverter;
+import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.YesterdayQuizResponse;
+import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizMainPageResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizSearchResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizReviewResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizListResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizDetailResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizResultResponse;
 import dgu.sw.domain.quiz.dto.QuizDTO.QuizRequest.SubmitQuizRequest;
+import dgu.sw.domain.quiz.entity.MockTest;
 import dgu.sw.domain.quiz.entity.Quiz;
 import dgu.sw.domain.quiz.entity.QuizReviewList;
 import dgu.sw.domain.quiz.entity.UserQuiz;
+import dgu.sw.domain.quiz.repository.MockTestRepository;
 import dgu.sw.domain.quiz.repository.QuizRepository;
 import dgu.sw.domain.quiz.repository.QuizReviewListRepository;
 import dgu.sw.domain.quiz.repository.UserQuizRepository;
@@ -20,7 +24,8 @@ import dgu.sw.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
- import java.util.List;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -32,6 +37,7 @@ public class QuizServiceImpl implements QuizService {
     private final UserQuizRepository userQuizRepository;
     private final QuizReviewListRepository quizReviewListRepository;
     private final UserRepository userRepository;
+    private final MockTestRepository mockTestRepository;
 
     @Override
     public List<QuizListResponse> getQuizList(String userId, int category) {
@@ -90,13 +96,13 @@ public class QuizServiceImpl implements QuizService {
             case 2:
                 return "명함 공유 매너";
             case 3:
-                return "팀장님께 메일 보내기";
-            case 4:
                 return "직장인 글쓰기 Tip";
+            case 4:
+                return "팀장님께 메일 보내기";
             case 5:
-                return "TPO에 맞는 복장";
-            case 6:
                 return "커뮤니케이션 매너";
+            case 6:
+                return "TPO에 맞는 복장";
             default:
                 throw new IllegalArgumentException("잘못된 카테고리 번호입니다: " + category);
         }
@@ -121,6 +127,23 @@ public class QuizServiceImpl implements QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_FOUND));
 
+        Long uid = Long.valueOf(userId);
+        String category = quiz.getCategory();
+
+        // 해당 카테고리에서 가장 먼저 풀어야 하는 퀴즈 ID 찾기
+        Long firstQuizId = quizRepository.findFirstQuizIdByCategory(category);
+
+        // 사용자가 풀려는 퀴즈의 바로 이전 퀴즈 찾기
+        Long previousQuizId = quizRepository.findPreviousQuizId(category, quizId);
+
+        // 이전 퀴즈를 풀었는지 확인 (첫 퀴즈가 아닐 경우만 체크)
+        if (!quizId.equals(firstQuizId)) {
+            boolean previousSolved = userQuizRepository.existsByUser_UserIdAndQuiz_QuizId(uid, previousQuizId);
+            if (!previousSolved) {
+                throw new QuizException(ErrorStatus.QUIZ_LOCKED);
+            }
+        }
+
         boolean isCorrect = quiz.getAnswer().equals(request.getSelectedAnswer());
 
         UserQuiz existingUserQuiz = userQuizRepository.findByUser_UserIdAndQuiz_QuizId(Long.valueOf(userId), quizId)
@@ -128,13 +151,19 @@ public class QuizServiceImpl implements QuizService {
 
         if (existingUserQuiz != null) {
             existingUserQuiz.updateCorrect(isCorrect);
-            userQuizRepository.save(existingUserQuiz);
-        } else {
-            UserQuiz userQuiz = QuizConverter.toUserQuiz(
-                    userRepository.findByUserId(Long.valueOf(userId)),
-                    quiz,
-                    isCorrect
+
+            // retriedToday 체크
+            boolean solvedYesterday = userQuizRepository.existsByUser_UserIdAndQuiz_QuizIdAndSolvedDate(
+                    Long.valueOf(userId), quizId, LocalDate.now().minusDays(1)
             );
+            existingUserQuiz.updateRetriedToday(solvedYesterday);
+
+            userQuizRepository.save(existingUserQuiz);
+        }
+        else {
+            User user = userRepository.findByUserId(Long.valueOf(userId));
+            UserQuiz userQuiz = QuizConverter.toUserQuiz(user, quiz, isCorrect);
+
             userQuizRepository.save(userQuiz);
         }
 
@@ -247,4 +276,56 @@ public class QuizServiceImpl implements QuizService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public QuizMainPageResponse getQuizMainPageData(String userId) {
+        Long uid = Long.valueOf(userId);
+
+        int yesterdayCount = userQuizRepository.countByUserIdAndSolvedDate(uid, LocalDate.now().minusDays(1));
+        long totalQuizCount = quizRepository.count();
+        long userSolvedCount = userQuizRepository.countDistinctByUserId(uid);
+
+        double progressRate = (double) userSolvedCount / totalQuizCount * 100;
+
+        // 최근 모의고사 점수
+        MockTest recentExam = mockTestRepository.findTopByUser_UserIdOrderByCreatedDateDesc(uid);
+        Integer recentScore = recentExam != null ? recentExam.getCorrectCount() * 10 : null;
+
+        // 상위 % 계산
+        Double topPercentile = recentExam != null ? recentExam.getTopPercentile() : null;
+        // 어제 많이 틀린 Top5 퀴즈
+        List<Quiz> top5Wrong = userQuizRepository.findTop5MostWrongOnDate(LocalDate.now().minusDays(1));
+        List<QuizListResponse> top5Responses = top5Wrong.stream()
+                .map(quiz -> QuizConverter.toQuizListResponse(quiz, false, false, false, false))
+                .toList();
+
+        return QuizMainPageResponse.builder()
+                .yesterdaySolvedCount(yesterdayCount)
+                .progressRate(progressRate)
+                .latestMockExamScore(recentScore)
+                .topPercentile(topPercentile)
+                .top5WrongQuizzes(top5Responses)
+                .build();
+    }
+
+    @Override
+    public List<YesterdayQuizResponse> getYesterdaySolvedQuizzes(String userId) {
+        Long uid = Long.valueOf(userId);
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+
+        List<UserQuiz> solvedQuizzes = userQuizRepository.findByUser_UserIdAndSolvedDate(uid, yesterday);
+
+        if (solvedQuizzes.isEmpty()) {
+            throw new QuizException(ErrorStatus.QUIZ_SEARCH_NO_RESULTS);
+        }
+
+        return solvedQuizzes.stream()
+                .map(userQuiz -> {
+                    Quiz quiz = userQuiz.getQuiz();
+                    boolean isInReviewList = quizReviewListRepository.existsByUser_UserIdAndQuiz_QuizId(uid, quiz.getQuizId());
+                    boolean retriedToday = Boolean.TRUE.equals(userQuiz.getRetriedToday());
+
+                    return QuizConverter.toYesterdayQuizResponse(quiz, isInReviewList, retriedToday);
+                })
+                .collect(Collectors.toList());
+    }
 }
