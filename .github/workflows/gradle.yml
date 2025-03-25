@@ -1,10 +1,8 @@
 name: Java CI with Gradle
 
-# 동작 조건 설정 : main 브랜치에 push 혹은 pull request가 발생할 경우 동작한다.
+# 동작 조건 설정 : main 브랜치에 push가 발생할 경우 동작한다.
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
     branches: [ "main" ]
 
 permissions:
