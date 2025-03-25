@@ -13,6 +13,12 @@ public class AuthDTO {
         public static class AuthInfoRequest{
             private String email;
         }
+
+        @Getter
+        @NoArgsConstructor
+        public static class KakaoLoginRequest {
+            private String accessToken;
+        }
     }
 
     public static class AuthResponse {
@@ -77,6 +83,7 @@ public class AuthDTO {
             private String profileImage;
             private String accessToken;
             private String refreshToken;
+            private boolean isNew; // 신규 가입 여부
         }
     }
 }
