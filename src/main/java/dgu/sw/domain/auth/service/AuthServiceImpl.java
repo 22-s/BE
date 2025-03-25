@@ -27,34 +27,52 @@ public class AuthServiceImpl implements AuthService {
 
     /**
      * 카카오 로그인 처리
-     * - OAuth 인가 코드로 사용자 정보 조회
-     * - 기존 회원이면 로그인, 아니면 회원가입 후 JWT 발급
      */
     @Override
     public AuthUserResponse kakaoLoginWithAccessToken(String accessToken) {
-        // 1. 카카오 사용자 정보 요청
-        AuthUserProfile userProfile = oAuthUtil.requestUserProfile(OAuthProvider.KAKAO, accessToken);
+        return handleSocialLogin(OAuthProvider.KAKAO, accessToken);
+    }
 
-        // 2. DB에서 기존 사용자 조회 또는 신규 회원가입
+    /**
+     * 네이버 로그인 처리
+     */
+    @Override
+    public AuthUserResponse naverLoginWithAccessToken(String accessToken) {
+        return handleSocialLogin(OAuthProvider.NAVER, accessToken);
+    }
+
+    /**
+     * 공통 소셜 로그인 처리
+     * - 소셜 access token으로 사용자 정보 조회
+     * - DB에 기존 회원 존재 여부 확인
+     * - 신규 회원이면 회원가입
+     * - JWT 발급 + RefreshToken 저장
+     * - 응답 DTO로 변환하여 반환
+     */
+    private AuthUserResponse handleSocialLogin(OAuthProvider provider, String accessToken) {
+        // 1. 소셜 사용자 프로필 조회 (provider 기반)
+        AuthUserProfile userProfile = oAuthUtil.requestUserProfile(provider, accessToken);
+
+        // 2. 기존 회원 여부 확인
         Optional<User> existingUser = userRepository.findByEmail(userProfile.getEmail());
         boolean isNewUser = existingUser.isEmpty();
 
+        // 3. 신규 회원이면 회원가입
         User user = existingUser.orElseGet(() -> registerNewUser(userProfile));
 
-        // 3. JWT 발급
+        // 4. JWT Access & Refresh Token 발급
         String jwtAccessToken = jwtTokenProvider.generateAccessToken(user);
         String jwtRefreshToken = jwtTokenProvider.generateRefreshToken(user);
 
-        // Redis에 RefreshToken 저장
+        // 5. Redis에 RefreshToken 저장
         redisUtil.saveRefreshToken(user.getUserId().toString(), jwtRefreshToken);
 
-        // 4. 응답 DTO 변환 후 반환
+        // 6. 응답 객체로 변환 후 반환
         return AuthConverter.toAuthUserResponse(user, jwtAccessToken, jwtRefreshToken, isNewUser);
     }
 
-
     /**
-     * 카카오 신규 회원가입
+     * 신규 회원 DB 등록
      */
     private User registerNewUser(AuthUserProfile profile) {
         User newUser = AuthConverter.toUser(profile);

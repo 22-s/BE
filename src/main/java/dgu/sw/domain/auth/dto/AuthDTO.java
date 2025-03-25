@@ -16,7 +16,7 @@ public class AuthDTO {
 
         @Getter
         @NoArgsConstructor
-        public static class KakaoLoginRequest {
+        public static class SocialLoginRequest {
             private String accessToken;
         }
     }
