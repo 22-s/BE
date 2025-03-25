@@ -16,14 +16,15 @@ public class AuthConverter {
                 .build();
     }
 
-    public static AuthUserResponse toAuthUserResponse(User user, String accessToken, String refreshToken) {
-        return new AuthUserResponse(
-                user.getProvider().name(),
-                user.getEmail(),
-                user.getNickname(),
-                user.getProfileImage(),
-                accessToken,
-                refreshToken
-        );
+    public static AuthUserResponse toAuthUserResponse(User user, String accessToken, String refreshToken, boolean isNew) {
+        return AuthUserResponse.builder()
+                .provider(user.getProvider().name())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .profileImage(user.getProfileImage())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .isNew(isNew)
+                .build();
     }
 }
