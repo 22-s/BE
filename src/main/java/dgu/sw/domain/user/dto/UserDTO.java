@@ -134,10 +134,16 @@ public class UserDTO {
         @NoArgsConstructor
         @AllArgsConstructor
         public static class MyPageResponse {
+            @Schema(description = "유저 이름", example = "김동국")
             private String nickname;
+
+            @Schema(description = "유저 이메일", example = "2025123456@dgu.ac.kr")
             private String email;
+
+            @Schema(description = "입사일", example = "2025-03-14")
             private LocalDate joinDate;
         }
+
 
         @Getter
         @Builder
