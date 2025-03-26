@@ -26,8 +26,14 @@ public class OAuthUtil {
     @Value("${oauth.kakao.redirect-uri}")
     private String kakaoRedirectUri;
 
-    public String requestAccessToken(OAuthProvider provider, String code) {
+    @Value("${oauth.naver.client-id}")
+    private String naverClientId;
 
+    @Value("${oauth.naver.client-secret}")
+    private String naverClientSecret;
+
+    public String requestAccessToken(OAuthProvider provider, String code) {
+        // 보통 SDK 방식에서는 호출되지 않음
         if (provider != OAuthProvider.KAKAO) {
             throw new OAuthException(ErrorStatus.OAUTH_UNSUPPORTED_PROVIDER);
         }
@@ -57,18 +63,27 @@ public class OAuthUtil {
     }
 
     public AuthUserProfile requestUserProfile(OAuthProvider provider, String accessToken) {
-        if (provider != OAuthProvider.KAKAO) {
-            throw new OAuthException(ErrorStatus.OAUTH_UNSUPPORTED_PROVIDER);
-        }
+        return switch (provider) {
+            case KAKAO -> requestKakaoUserProfile(accessToken);
+            case NAVER -> requestNaverUserProfile(accessToken);
+//            case GOOGLE -> requestGoogleUserProfile(accessToken);
+//            case APPLE -> requestAppleUserProfile(accessToken);
+            default -> throw new OAuthException(ErrorStatus.OAUTH_UNSUPPORTED_PROVIDER);
+        };
+    }
 
+    private AuthUserProfile requestKakaoUserProfile(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
-
         HttpEntity<String> request = new HttpEntity<>(headers);
-        ResponseEntity<String> response = restTemplate.exchange(OAuthConstants.KAKAO_PROFILE_URL, HttpMethod.GET, request, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(
+                OAuthConstants.KAKAO_PROFILE_URL,
+                HttpMethod.GET,
+                request,
+                String.class
+        );
 
         if (response.getStatusCode() != HttpStatus.OK) {
-            System.out.println("카카오 프로필 응답 오류: " + response.getBody());
             throw new OAuthException(ErrorStatus.OAUTH_REQUEST_FAILED);
         }
 
@@ -76,16 +91,44 @@ public class OAuthUtil {
             JsonNode jsonNode = objectMapper.readTree(response.getBody());
             JsonNode kakaoAccount = jsonNode.get("kakao_account");
 
-            if (kakaoAccount == null || !kakaoAccount.has("email") || !kakaoAccount.has("profile")) {
-                throw new OAuthException(ErrorStatus.OAUTH_JSON_PARSE_ERROR);
-            }
-
             String email = kakaoAccount.get("email").asText();
             String nickname = kakaoAccount.get("profile").get("nickname").asText();
             String profileImage = kakaoAccount.get("profile").get("thumbnail_image_url").asText();
 
             return AuthUserProfile.builder()
                     .provider(OAuthProvider.KAKAO)
+                    .email(email)
+                    .nickname(nickname)
+                    .profileImage(profileImage)
+                    .build();
+        } catch (Exception e) {
+            throw new OAuthException(ErrorStatus.OAUTH_JSON_PARSE_ERROR);
+        }
+    }
+
+    private AuthUserProfile requestNaverUserProfile(String accessToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                OAuthConstants.NAVER_PROFILE_URL,
+                HttpMethod.GET,
+                request,
+                String.class
+        );
+
+        if (response.getStatusCode() != HttpStatus.OK) {
+            throw new OAuthException(ErrorStatus.OAUTH_REQUEST_FAILED);
+        }
+
+        try {
+            JsonNode jsonNode = objectMapper.readTree(response.getBody()).get("response");
+            String email = jsonNode.get("email").asText();
+            String nickname = jsonNode.get("name").asText();
+            String profileImage = jsonNode.get("profile_image").asText();
+
+            return AuthUserProfile.builder()
+                    .provider(OAuthProvider.NAVER)
                     .email(email)
                     .nickname(nickname)
                     .profileImage(profileImage)
