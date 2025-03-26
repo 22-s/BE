@@ -39,10 +39,5 @@ oauth:
     client-id: ${NAVER_CLIENT_ID}
     client-secret: ${NAVER_CLIENT_SECRET}
 
-  naver:
-    client-id: ${NAVER_CLIENT_ID}
-    client-secret: ${NAVER_CLIENT_SECRET}
-    profile-url: https://openapi.naver.com/v1/nid/me
-
 REDIS_HOST: ${REDIS_URL}
 REDIS_PORT: ${REDIS_PORT}
