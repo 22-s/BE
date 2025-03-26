@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -83,5 +84,11 @@ public class UserController {
     public ApiResponse<String> resetPassword(@RequestBody @Valid PasswordResetRequest request) {
         userService.resetPassword(request);
         return ApiResponse.onSuccess("비밀번호가 성공적으로 변경되었습니다.");
+    }
+
+    @GetMapping("/mypage")
+    @Operation(summary = "마이페이지 조회", description = "유저의 마이페이지 정보를 반환합니다.")
+    public ApiResponse<MyPageResponse> getMyPage(Authentication authentication) {
+        return ApiResponse.onSuccess(userService.getMyPage(authentication.getName()));
     }
 }

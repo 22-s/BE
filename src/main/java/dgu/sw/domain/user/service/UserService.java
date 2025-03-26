@@ -28,4 +28,6 @@ public interface UserService {
 
     // 비밀번호 변경, 확인
     void resetPassword(PasswordResetRequest request);
+
+    MyPageResponse getMyPage(String userId);
 }
