@@ -124,7 +124,7 @@ public class OAuthUtil {
         try {
             JsonNode jsonNode = objectMapper.readTree(response.getBody()).get("response");
             String email = jsonNode.get("email").asText();
-            String nickname = jsonNode.get("nickname").asText();
+            String nickname = jsonNode.get("name").asText();
             String profileImage = jsonNode.get("profile_image").asText();
 
             return AuthUserProfile.builder()

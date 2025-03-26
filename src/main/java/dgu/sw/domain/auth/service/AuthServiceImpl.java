@@ -53,6 +53,7 @@ public class AuthServiceImpl implements AuthService {
         // 1. 소셜 사용자 프로필 조회 (provider 기반)
         AuthUserProfile userProfile = oAuthUtil.requestUserProfile(provider, accessToken);
 
+
         // 2. 기존 회원 여부 확인
         Optional<User> existingUser = userRepository.findByEmail(userProfile.getEmail());
         boolean isNewUser = existingUser.isEmpty();
@@ -76,6 +77,7 @@ public class AuthServiceImpl implements AuthService {
      */
     private User registerNewUser(AuthUserProfile profile) {
         User newUser = AuthConverter.toUser(profile);
+        System.out.println(newUser.getProvider());
         return userRepository.save(newUser);
     }
 }
