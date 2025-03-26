@@ -120,5 +120,15 @@ public class UserDTO {
             @Schema(description = "Refresh Token", example = "eyJhbGciOiJIUzI1NiIsInR...")
             private String refreshToken;
         }
+
+        @Getter
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class MyPageResponse {
+            private String nickname;
+            private String email;
+            private LocalDate joinDate;
+        }
     }
 }

@@ -1,6 +1,7 @@
 package dgu.sw.domain.user.service;
 
 import dgu.sw.domain.user.converter.UserConverter;
+import dgu.sw.domain.user.dto.UserDTO.UserResponse.MyPageResponse;
 import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignInResponse;
 import dgu.sw.domain.user.entity.User;
 import dgu.sw.domain.user.repository.UserRepository;
@@ -9,7 +10,6 @@ import dgu.sw.global.security.JwtUtil;
 import dgu.sw.global.config.redis.RedisUtil;
 import dgu.sw.global.exception.UserException;
 import dgu.sw.global.status.ErrorStatus;
-import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -25,8 +25,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import dgu.sw.global.config.util.EmailService;
-
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -257,5 +255,11 @@ public class UserServiceImpl implements UserService {
 
         // 4. 저장 (JPA는 변경 감지로 자동 반영되지만 명시적으로 저장해도 좋음)
         userRepository.save(user);
+    }
+
+    @Override
+    public MyPageResponse getMyPage(String userId) {
+        User user = userRepository.findByUserId(Long.valueOf(userId));
+        return UserConverter.toMyPageResponse(user);
     }
 }

@@ -1,5 +1,6 @@
 package dgu.sw.domain.user.converter;
 
+import dgu.sw.domain.user.dto.UserDTO.UserResponse.MyPageResponse;
 import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignUpResponse;
 import dgu.sw.domain.user.dto.UserDTO.UserRequest.SignUpRequest;
 import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignInResponse;
@@ -26,6 +27,14 @@ public class UserConverter {
                 .email(signUpRequest.getEmail())
                 .password(password)
                 .joinDate(signUpRequest.getJoinDate())
+                .build();
+    }
+
+    public static MyPageResponse toMyPageResponse(User user) {
+        return MyPageResponse.builder()
+                .nickname(user.getNickname())
+                .email(user.getEmail())
+                .joinDate(user.getJoinDate())
                 .build();
     }
 }
