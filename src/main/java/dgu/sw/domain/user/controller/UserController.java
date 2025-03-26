@@ -91,4 +91,14 @@ public class UserController {
     public ApiResponse<MyPageResponse> getMyPage(Authentication authentication) {
         return ApiResponse.onSuccess(userService.getMyPage(authentication.getName()));
     }
+
+    @PatchMapping("/join-date")
+    @Operation(summary = "입사일 변경 API", description = "사용자의 입사일을 수정합니다.")
+    public ApiResponse<UpdateJoinDateResponse> updateJoinDate(
+            Authentication authentication,
+            @RequestBody @Valid UpdateJoinDateRequest request
+    ) {
+        UpdateJoinDateResponse response = userService.updateJoinDate(authentication.getName(), request.getJoinDate());
+        return ApiResponse.onSuccess(response);
+    }
 }

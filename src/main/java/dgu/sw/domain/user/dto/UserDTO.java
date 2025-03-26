@@ -93,6 +93,14 @@ public class UserDTO {
             @Schema(description = "새 비밀번호 확인", example = "newpassword123")
             private String confirmPassword;
         }
+
+
+        @Getter
+        public static class UpdateJoinDateRequest {
+            @NotNull
+            @Schema(description = "변경할 입사일", example = "2025-03-14")
+            private LocalDate joinDate;
+        }
     }
 
     public static class UserResponse {
@@ -129,6 +137,15 @@ public class UserDTO {
             private String nickname;
             private String email;
             private LocalDate joinDate;
+        }
+
+        @Getter
+        @Builder
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class UpdateJoinDateResponse {
+            @Schema(description = "변경된 입사일", example = "2025-03-14")
+            private LocalDate updatedJoinDate;
         }
     }
 }

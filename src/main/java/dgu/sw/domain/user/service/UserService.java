@@ -5,6 +5,8 @@ import dgu.sw.domain.user.dto.UserDTO.UserRequest.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.time.LocalDate;
+
 public interface UserService {
     SignUpResponse signUp(SignUpRequest request);
 
@@ -30,4 +32,6 @@ public interface UserService {
     void resetPassword(PasswordResetRequest request);
 
     MyPageResponse getMyPage(String userId);
+
+    UpdateJoinDateResponse updateJoinDate(String userId, LocalDate joinDate);
 }

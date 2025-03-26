@@ -1,6 +1,7 @@
 package dgu.sw.domain.user.service;
 
 import dgu.sw.domain.user.converter.UserConverter;
+import dgu.sw.domain.user.dto.UserDTO.UserResponse.UpdateJoinDateResponse;
 import dgu.sw.domain.user.dto.UserDTO.UserResponse.MyPageResponse;
 import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignInResponse;
 import dgu.sw.domain.user.entity.User;
@@ -25,6 +26,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import dgu.sw.global.config.util.EmailService;
+
+import java.time.LocalDate;
 
 @Slf4j
 @Service
@@ -261,5 +264,18 @@ public class UserServiceImpl implements UserService {
     public MyPageResponse getMyPage(String userId) {
         User user = userRepository.findByUserId(Long.valueOf(userId));
         return UserConverter.toMyPageResponse(user);
+    }
+
+    @Override
+    public UpdateJoinDateResponse updateJoinDate(String userId, LocalDate joinDate) {
+        User user = userRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
+
+        user.updateJoinDate(joinDate);
+        userRepository.save(user);
+
+        return UpdateJoinDateResponse.builder()
+                .updatedJoinDate(user.getJoinDate())
+                .build();
     }
 }
