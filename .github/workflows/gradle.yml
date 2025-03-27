@@ -63,4 +63,4 @@ jobs:
 
       # 4. 최신 이미지를 컨테이너화하여 실행시킵니다
       - name: docker run new container
-        run: sudo docker run --name github-actions-demo --rm -d -p 8080:8080 --env-file /home/app/.env ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo
+        run: sudo docker run --name github-actions-demo --rm -d -p 8080:8080 --env-file /home/app/.env --network private ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo
