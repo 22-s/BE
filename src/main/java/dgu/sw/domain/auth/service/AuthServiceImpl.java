@@ -85,7 +85,6 @@ public class AuthServiceImpl implements AuthService {
      */
     private User registerNewUser(AuthUserProfile profile) {
         User newUser = AuthConverter.toUser(profile);
-        System.out.println(newUser.getProvider());
         return userRepository.save(newUser);
     }
 }
