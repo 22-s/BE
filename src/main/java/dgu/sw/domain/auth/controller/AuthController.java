@@ -28,4 +28,10 @@ public class AuthController {
     public ApiResponse<AuthUserResponse> naverLogin(@RequestBody SocialLoginRequest request) {
         return ApiResponse.onSuccess(authService.naverLoginWithAccessToken(request.getAccessToken()));
     }
+
+    @PostMapping("/google/login")
+    @Operation(summary = "구글 로그인 API", description = "구글 access token 기반 로그인 API")
+    public ApiResponse<AuthUserResponse> googleLogin(@RequestBody SocialLoginRequest request) {
+        return ApiResponse.onSuccess(authService.googleLoginWithAccessToken(request.getAccessToken()));
+    }
 }

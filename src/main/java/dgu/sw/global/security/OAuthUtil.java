@@ -66,7 +66,7 @@ public class OAuthUtil {
         return switch (provider) {
             case KAKAO -> requestKakaoUserProfile(accessToken);
             case NAVER -> requestNaverUserProfile(accessToken);
-//            case GOOGLE -> requestGoogleUserProfile(accessToken);
+            case GOOGLE -> requestGoogleUserProfile(accessToken);
 //            case APPLE -> requestAppleUserProfile(accessToken);
             default -> throw new OAuthException(ErrorStatus.OAUTH_UNSUPPORTED_PROVIDER);
         };
@@ -129,6 +129,39 @@ public class OAuthUtil {
 
             return AuthUserProfile.builder()
                     .provider(OAuthProvider.NAVER)
+                    .email(email)
+                    .nickname(nickname)
+                    .profileImage(profileImage)
+                    .build();
+        } catch (Exception e) {
+            throw new OAuthException(ErrorStatus.OAUTH_JSON_PARSE_ERROR);
+        }
+    }
+
+    private AuthUserProfile requestGoogleUserProfile(String accessToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        HttpEntity<String> request = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                OAuthConstants.GOOGLE_PROFILE_URL,
+                HttpMethod.GET,
+                request,
+                String.class
+        );
+
+        if (response.getStatusCode() != HttpStatus.OK) {
+            throw new OAuthException(ErrorStatus.OAUTH_REQUEST_FAILED);
+        }
+
+        try {
+            JsonNode jsonNode = objectMapper.readTree(response.getBody());
+            String email = jsonNode.get("email").asText();
+            String nickname = jsonNode.get("name").asText();
+            String profileImage = jsonNode.get("picture").asText();
+
+            return AuthUserProfile.builder()
+                    .provider(OAuthProvider.GOOGLE)
                     .email(email)
                     .nickname(nickname)
                     .profileImage(profileImage)
