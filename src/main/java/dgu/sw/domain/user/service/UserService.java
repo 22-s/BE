@@ -34,4 +34,6 @@ public interface UserService {
     MyPageResponse getMyPage(String userId);
 
     UpdateJoinDateResponse updateJoinDate(String userId, LocalDate joinDate);
+
+    void withdraw(HttpServletRequest request);
 }

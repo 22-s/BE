@@ -137,4 +137,21 @@ public class OAuthUtil {
             throw new OAuthException(ErrorStatus.OAUTH_JSON_PARSE_ERROR);
         }
     }
+
+    public void logoutFromProvider(OAuthProvider provider) {
+        switch (provider) {
+            case KAKAO -> logoutFromKakao();
+            case NAVER -> logoutFromNaver();
+            default -> throw new OAuthException(ErrorStatus.OAUTH_UNSUPPORTED_PROVIDER);
+        }
+    }
+
+    private void logoutFromKakao() {
+        // 실제 구현 시 사용자 accessToken 등을 활용하여 로그아웃 API 호출 가능
+        System.out.println("👉 카카오 로그아웃 요청 완료 (추후 SDK 연동 필요)");
+    }
+
+    private void logoutFromNaver() {
+        System.out.println("👉 네이버 로그아웃 요청 완료 (추후 SDK 연동 필요)");
+    }
 }

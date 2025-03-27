@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping("/signout")
-    @Operation(summary = "로그아웃 API", description = "로그아웃 API 입니다.")
+    @Operation(summary = "로그아웃 API", description = "일반 및 소셜 통합 로그아웃 API입니다.")
     public ApiResponse<String> signOut(HttpServletRequest request, HttpServletResponse response) {
         userService.signOut(request, response);
         return ApiResponse.onSuccess("로그아웃 성공");
@@ -100,5 +100,12 @@ public class UserController {
     ) {
         UpdateJoinDateResponse response = userService.updateJoinDate(authentication.getName(), request.getJoinDate());
         return ApiResponse.onSuccess(response);
+    }
+
+    @DeleteMapping("/withdraw")
+    @Operation(summary = "회원탈퇴 API", description = "일반 및 소셜 통합 회원탈퇴 API입니다.")
+    public ApiResponse<String> withdraw(HttpServletRequest request) {
+        userService.withdraw(request);
+        return ApiResponse.onSuccess("회원탈퇴 완료");
     }
 }
