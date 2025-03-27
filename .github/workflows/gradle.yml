@@ -57,10 +57,10 @@ jobs:
       - name: docker stop container
         run: sudo docker stop $(sudo docker ps -q -f "name=github-actions-demo") 2>/dev/null || true
 
-      # 3. 최신 이미지를 컨테이너화하여 실행시킵니다
-      - name: docker run new container
-        run: sudo docker run --name github-actions-demo --rm -d -p 8080:8080 --env-file /home/app/.env ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo
-
-      # 4. 미사용 이미지를 정리합니다
+      # 3. 미사용 이미지를 정리합니다
       - name: delete old docker image
         run: sudo docker system prune -f
+
+      # 4. 최신 이미지를 컨테이너화하여 실행시킵니다
+      - name: docker run new container
+        run: sudo docker run --name github-actions-demo --rm -d -p 8080:8080 --env-file /home/app/.env ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo
