@@ -6,9 +6,11 @@ import dgu.sw.domain.auth.dto.AuthUserProfile;
 import dgu.sw.domain.user.entity.User;
 import dgu.sw.domain.user.repository.UserRepository;
 import dgu.sw.global.config.redis.RedisUtil;
+import dgu.sw.global.exception.OAuthException;
 import dgu.sw.global.security.JwtTokenProvider;
 import dgu.sw.global.security.OAuthProvider;
 import dgu.sw.global.security.OAuthUtil;
+import dgu.sw.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,25 +52,31 @@ public class AuthServiceImpl implements AuthService {
      * - 응답 DTO로 변환하여 반환
      */
     private AuthUserResponse handleSocialLogin(OAuthProvider provider, String accessToken) {
-        // 1. 소셜 사용자 프로필 조회 (provider 기반)
+        // 1. 소셜 사용자 프로필 조회
         AuthUserProfile userProfile = oAuthUtil.requestUserProfile(provider, accessToken);
 
+        // 2. 이메일로 기존 회원 조회
+        Optional<User> existingUserOpt = userRepository.findByEmail(userProfile.getEmail());
 
-        // 2. 기존 회원 여부 확인
-        Optional<User> existingUser = userRepository.findByEmail(userProfile.getEmail());
-        boolean isNewUser = existingUser.isEmpty();
+        // 3. 이미 다른 provider로 가입된 경우 에러
+        if (existingUserOpt.isPresent()) {
+            User existingUser = existingUserOpt.get();
+            if (!existingUser.getProvider().equals(provider)) {
+                throw new OAuthException(ErrorStatus.SOCIAL_PROVIDER_CONFLICT);
+            }
+        }
 
-        // 3. 신규 회원이면 회원가입
-        User user = existingUser.orElseGet(() -> registerNewUser(userProfile));
+        // 4. 신규 회원이면 회원가입 또는 기존 유저 반환
+        User user = existingUserOpt.orElseGet(() -> registerNewUser(userProfile));
 
-        // 4. JWT Access & Refresh Token 발급
+        // 5. JWT 발급
         String jwtAccessToken = jwtTokenProvider.generateAccessToken(user);
         String jwtRefreshToken = jwtTokenProvider.generateRefreshToken(user);
 
         // 5. Redis에 RefreshToken 저장
         redisUtil.saveRefreshToken(user.getUserId().toString(), jwtRefreshToken);
 
-        // 6. 응답 객체로 변환 후 반환
+        boolean isNewUser = existingUserOpt.isEmpty();
         return AuthConverter.toAuthUserResponse(user, jwtAccessToken, jwtRefreshToken, isNewUser);
     }
 
