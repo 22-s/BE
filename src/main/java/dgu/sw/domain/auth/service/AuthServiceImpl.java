@@ -44,6 +44,14 @@ public class AuthServiceImpl implements AuthService {
     }
 
     /**
+     * 구글 로그인 처리
+     */
+    @Override
+    public AuthUserResponse googleLoginWithAccessToken(String accessToken) {
+        return handleSocialLogin(OAuthProvider.GOOGLE, accessToken);
+    }
+
+    /**
      * 공통 소셜 로그인 처리
      * - 소셜 access token으로 사용자 정보 조회
      * - DB에 기존 회원 존재 여부 확인
