@@ -22,8 +22,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_USERNAME} # 신입사UP 이메일 생성 후 작성
-    password: ${MAIL_PASSWORD} # 이메일 앱 비밀번호
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -38,6 +38,10 @@ spring:
     naver:
       client-id: ${NAVER_CLIENT_ID}
       client-secret: ${NAVER_CLIENT_SECRET}
+  ##  google:
+  ##    client-id: ${GOOGLE_CLIENT_ID}
+  ##    client-secret: ${GOOGLE_CLIENT_SECRET}
+  ##    redirect-uri: ${GOOGLE_REDIRECT_URI}
 
 REDIS_HOST: ${REDIS_URL}
 REDIS_PORT: ${REDIS_PORT}
