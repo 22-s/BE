@@ -12,7 +12,7 @@ public class AuthConverter {
                 .email(profile.getEmail())
                 .nickname(profile.getNickname())
                 .profileImage(profile.getProfileImage())
-                .provider(OAuthProvider.KAKAO) // 카카오 로그인
+                .provider(profile.getProvider())
                 .build();
     }
 

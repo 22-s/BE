@@ -31,13 +31,13 @@ spring:
           starttls:
             enable: true
 
-oauth:
-  kakao:
-    client-id: ${KAKAO_CLIENT_ID}
-    redirect-uri: ${KAKAO_REDIRECT_URI}
-  naver:
-    client-id: ${NAVER_CLIENT_ID}
-    client-secret: ${NAVER_CLIENT_SECRET}
+  oauth:
+    kakao:
+      client-id: ${KAKAO_CLIENT_ID}
+      redirect-uri: ${KAKAO_REDIRECT_URI}
+    naver:
+      client-id: ${NAVER_CLIENT_ID}
+      client-secret: ${NAVER_CLIENT_SECRET}
 
 REDIS_HOST: ${REDIS_URL}
 REDIS_PORT: ${REDIS_PORT}

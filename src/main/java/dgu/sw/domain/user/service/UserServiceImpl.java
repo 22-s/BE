@@ -1,6 +1,8 @@
 package dgu.sw.domain.user.service;
 
 import dgu.sw.domain.user.converter.UserConverter;
+import dgu.sw.domain.user.dto.UserDTO.UserResponse.UpdateJoinDateResponse;
+import dgu.sw.domain.user.dto.UserDTO.UserResponse.MyPageResponse;
 import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignInResponse;
 import dgu.sw.domain.user.entity.User;
 import dgu.sw.domain.user.repository.UserRepository;
@@ -8,8 +10,8 @@ import dgu.sw.global.security.JwtTokenProvider;
 import dgu.sw.global.security.JwtUtil;
 import dgu.sw.global.config.redis.RedisUtil;
 import dgu.sw.global.exception.UserException;
+import dgu.sw.global.security.OAuthUtil;
 import dgu.sw.global.status.ErrorStatus;
-import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -26,7 +28,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import dgu.sw.global.config.util.EmailService;
 
-import java.util.concurrent.TimeUnit;
+import java.time.LocalDate;
 
 @Slf4j
 @Service
@@ -39,8 +41,8 @@ public class UserServiceImpl implements UserService {
     private final RedisUtil redisUtil;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
     private final EmailService emailService;
+    private final OAuthUtil oAuthUtil;
 
     /**
      * 회원가입
@@ -104,6 +106,14 @@ public class UserServiceImpl implements UserService {
         // Redis에서 RefreshToken 삭제
         String userId = String.valueOf(jwtUtil.extractUserId(accessToken));
         redisUtil.deleteRefreshToken(userId);
+
+        User user = userRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
+
+        // 소셜 로그인이면 외부 플랫폼 로그아웃 처리
+        if (user.getProvider() != null) {
+            oAuthUtil.logoutFromProvider(user.getProvider());
+        }
     }
 
     /**
@@ -257,5 +267,53 @@ public class UserServiceImpl implements UserService {
 
         // 4. 저장 (JPA는 변경 감지로 자동 반영되지만 명시적으로 저장해도 좋음)
         userRepository.save(user);
+    }
+
+    @Override
+    public MyPageResponse getMyPage(String userId) {
+        User user = userRepository.findByUserId(Long.valueOf(userId));
+        return UserConverter.toMyPageResponse(user);
+    }
+
+    @Override
+    public UpdateJoinDateResponse updateJoinDate(String userId, LocalDate joinDate) {
+        User user = userRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
+
+        user.updateJoinDate(joinDate);
+        userRepository.save(user);
+
+        return UpdateJoinDateResponse.builder()
+                .updatedJoinDate(user.getJoinDate())
+                .build();
+    }
+
+    @Override
+    public void withdraw(HttpServletRequest request) {
+        String accessToken = resolveToken(request);
+        if (accessToken == null) {
+            throw new UserException(ErrorStatus.TOKEN_NOT_FOUND);
+        }
+
+        Long userId = jwtUtil.extractUserId(accessToken);
+        if (userId == null) {
+            throw new UserException(ErrorStatus.USER_NOT_FOUND);
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
+
+        // 로그아웃 처리 (블랙리스트 등록 + Refresh 삭제)
+        Long expiration = jwtUtil.getExpiration(accessToken);
+        redisUtil.addTokenToBlacklist(accessToken, expiration);
+        redisUtil.deleteRefreshToken(String.valueOf(userId));
+
+        // 소셜 로그인이면 외부 로그아웃
+        if (user.getProvider() != null) {
+            oAuthUtil.logoutFromProvider(user.getProvider());
+        }
+
+        // DB에서 삭제
+        userRepository.delete(user);
     }
 }
