@@ -57,9 +57,11 @@ jobs:
       - name: docker stop container
         run: sudo docker stop $(sudo docker ps -q -f "name=github-actions-demo") 2>/dev/null || true
 
-      # 3. 미사용 이미지를 정리합니다
-      - name: delete old docker image
-        run: sudo docker system prune -f
+      # 3. 24시간이 지난 미사용 이미지와 컨테이너를 정리합니다
+      - name: delete old docker image and containers (older than 24h)
+        run: |
+          sudo docker container prune -f --filter "until=24h"
+          sudo docker image prune -f --filter "until=24h"
 
       # 4. 최신 이미지를 컨테이너화하여 실행시킵니다
       - name: docker run new container
