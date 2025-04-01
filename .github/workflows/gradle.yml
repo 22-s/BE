@@ -60,8 +60,8 @@ jobs:
       # 3. 24시간이 지난 미사용 이미지와 컨테이너를 정리합니다
       - name: delete old docker image and containers (older than 24h)
         run: |
-          sudo docker container prune -f --filter "until=24h"
-          sudo docker image prune -f --filter "until=24h"
+          sudo docker container prune -f
+          sudo docker image prune -f
 
       # 4. 최신 이미지를 컨테이너화하여 실행시킵니다
       - name: docker run new container
