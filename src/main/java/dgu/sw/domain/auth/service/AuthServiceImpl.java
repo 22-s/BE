@@ -6,9 +6,11 @@ import dgu.sw.domain.auth.dto.AuthUserProfile;
 import dgu.sw.domain.user.entity.User;
 import dgu.sw.domain.user.repository.UserRepository;
 import dgu.sw.global.config.redis.RedisUtil;
+import dgu.sw.global.exception.OAuthException;
 import dgu.sw.global.security.JwtTokenProvider;
 import dgu.sw.global.security.OAuthProvider;
 import dgu.sw.global.security.OAuthUtil;
+import dgu.sw.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,34 +29,67 @@ public class AuthServiceImpl implements AuthService {
 
     /**
      * 카카오 로그인 처리
-     * - OAuth 인가 코드로 사용자 정보 조회
-     * - 기존 회원이면 로그인, 아니면 회원가입 후 JWT 발급
      */
     @Override
     public AuthUserResponse kakaoLoginWithAccessToken(String accessToken) {
-        // 1. 카카오 사용자 정보 요청
-        AuthUserProfile userProfile = oAuthUtil.requestUserProfile(OAuthProvider.KAKAO, accessToken);
+        return handleSocialLogin(OAuthProvider.KAKAO, accessToken);
+    }
 
-        // 2. DB에서 기존 사용자 조회 또는 신규 회원가입
-        Optional<User> existingUser = userRepository.findByEmail(userProfile.getEmail());
-        boolean isNewUser = existingUser.isEmpty();
+    /**
+     * 네이버 로그인 처리
+     */
+    @Override
+    public AuthUserResponse naverLoginWithAccessToken(String accessToken) {
+        return handleSocialLogin(OAuthProvider.NAVER, accessToken);
+    }
 
-        User user = existingUser.orElseGet(() -> registerNewUser(userProfile));
+    /**
+     * 구글 로그인 처리
+     */
+    @Override
+    public AuthUserResponse googleLoginWithAccessToken(String accessToken) {
+        return handleSocialLogin(OAuthProvider.GOOGLE, accessToken);
+    }
 
-        // 3. JWT 발급
+    /**
+     * 공통 소셜 로그인 처리
+     * - 소셜 access token으로 사용자 정보 조회
+     * - DB에 기존 회원 존재 여부 확인
+     * - 신규 회원이면 회원가입
+     * - JWT 발급 + RefreshToken 저장
+     * - 응답 DTO로 변환하여 반환
+     */
+    private AuthUserResponse handleSocialLogin(OAuthProvider provider, String accessToken) {
+        // 1. 소셜 사용자 프로필 조회
+        AuthUserProfile userProfile = oAuthUtil.requestUserProfile(provider, accessToken);
+
+        // 2. 이메일로 기존 회원 조회
+        Optional<User> existingUserOpt = userRepository.findByEmail(userProfile.getEmail());
+
+        // 3. 이미 다른 provider로 가입된 경우 에러
+        if (existingUserOpt.isPresent()) {
+            User existingUser = existingUserOpt.get();
+            if (!existingUser.getProvider().equals(provider)) {
+                throw new OAuthException(ErrorStatus.SOCIAL_PROVIDER_CONFLICT);
+            }
+        }
+
+        // 4. 신규 회원이면 회원가입 또는 기존 유저 반환
+        User user = existingUserOpt.orElseGet(() -> registerNewUser(userProfile));
+
+        // 5. JWT 발급
         String jwtAccessToken = jwtTokenProvider.generateAccessToken(user);
         String jwtRefreshToken = jwtTokenProvider.generateRefreshToken(user);
 
-        // Redis에 RefreshToken 저장
+        // 5. Redis에 RefreshToken 저장
         redisUtil.saveRefreshToken(user.getUserId().toString(), jwtRefreshToken);
 
-        // 4. 응답 DTO 변환 후 반환
+        boolean isNewUser = existingUserOpt.isEmpty();
         return AuthConverter.toAuthUserResponse(user, jwtAccessToken, jwtRefreshToken, isNewUser);
     }
 
-
     /**
-     * 카카오 신규 회원가입
+     * 신규 회원 DB 등록
      */
     private User registerNewUser(AuthUserProfile profile) {
         User newUser = AuthConverter.toUser(profile);

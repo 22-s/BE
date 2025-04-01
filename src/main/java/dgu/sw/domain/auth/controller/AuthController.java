@@ -1,6 +1,6 @@
 package dgu.sw.domain.auth.controller;
 
-import dgu.sw.domain.auth.dto.AuthDTO.AuthRequest.KakaoLoginRequest;
+import dgu.sw.domain.auth.dto.AuthDTO.AuthRequest.SocialLoginRequest;
 import dgu.sw.domain.auth.dto.AuthDTO.AuthResponse.AuthUserResponse;
 import dgu.sw.domain.auth.service.AuthService;
 import dgu.sw.global.ApiResponse;
@@ -19,7 +19,19 @@ public class AuthController {
 
     @PostMapping("/kakao/login")
     @Operation(summary = "카카오 로그인 API", description = "카카오 SDK access token 기반 로그인 API")
-    public ApiResponse<AuthUserResponse> kakaoLogin(@RequestBody KakaoLoginRequest request) {
+    public ApiResponse<AuthUserResponse> kakaoLogin(@RequestBody SocialLoginRequest request) {
         return ApiResponse.onSuccess(authService.kakaoLoginWithAccessToken(request.getAccessToken()));
+    }
+
+    @PostMapping("/naver/login")
+    @Operation(summary = "네이버 로그인 API", description = "네이버 access token 기반 로그인 API")
+    public ApiResponse<AuthUserResponse> naverLogin(@RequestBody SocialLoginRequest request) {
+        return ApiResponse.onSuccess(authService.naverLoginWithAccessToken(request.getAccessToken()));
+    }
+
+    @PostMapping("/google/login")
+    @Operation(summary = "구글 로그인 API", description = "구글 access token 기반 로그인 API")
+    public ApiResponse<AuthUserResponse> googleLogin(@RequestBody SocialLoginRequest request) {
+        return ApiResponse.onSuccess(authService.googleLoginWithAccessToken(request.getAccessToken()));
     }
 }

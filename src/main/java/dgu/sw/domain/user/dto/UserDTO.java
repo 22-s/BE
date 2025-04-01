@@ -93,6 +93,14 @@ public class UserDTO {
             @Schema(description = "새 비밀번호 확인", example = "newpassword123")
             private String confirmPassword;
         }
+
+
+        @Getter
+        public static class UpdateJoinDateRequest {
+            @NotNull
+            @Schema(description = "변경할 입사일", example = "2025-03-14")
+            private LocalDate joinDate;
+        }
     }
 
     public static class UserResponse {
@@ -119,6 +127,31 @@ public class UserDTO {
 
             @Schema(description = "Refresh Token", example = "eyJhbGciOiJIUzI1NiIsInR...")
             private String refreshToken;
+        }
+
+        @Getter
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class MyPageResponse {
+            @Schema(description = "유저 이름", example = "김동국")
+            private String nickname;
+
+            @Schema(description = "유저 이메일", example = "2025123456@dgu.ac.kr")
+            private String email;
+
+            @Schema(description = "입사일", example = "2025-03-14")
+            private LocalDate joinDate;
+        }
+
+
+        @Getter
+        @Builder
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class UpdateJoinDateResponse {
+            @Schema(description = "변경된 입사일", example = "2025-03-14")
+            private LocalDate updatedJoinDate;
         }
     }
 }

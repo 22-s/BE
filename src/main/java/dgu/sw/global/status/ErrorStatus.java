@@ -55,7 +55,8 @@ public enum ErrorStatus implements BaseErrorCode {
     OAUTH_UNSUPPORTED_PROVIDER(HttpStatus.BAD_REQUEST, "OAUTH4002", "지원하지 않는 소셜 로그인 방식입니다."),
     OAUTH_JSON_PARSE_ERROR(HttpStatus.BAD_REQUEST, "OAUTH4003", "OAuth 응답 파싱에 실패했습니다."),
     OAUTH_ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "OAUTH4004", "OAuth 인증에 실패했습니다."),
-  
+    SOCIAL_PROVIDER_CONFLICT(HttpStatus.CONFLICT, "AUTH4004", "다른 소셜 로그인으로 이미 가입된 이메일입니다."),
+
     // 인증코드 관련 에러
     CODE_EXPIRED(HttpStatus.BAD_REQUEST, "USER4009", "인증코드가 만료되었습니다."),
     CODE_MISMATCH(HttpStatus.BAD_REQUEST, "USER4010", "인증코드가 일치하지 않습니다."),

@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -33,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping("/signout")
-    @Operation(summary = "로그아웃 API", description = "로그아웃 API 입니다.")
+    @Operation(summary = "로그아웃 API", description = "일반 및 소셜 통합 로그아웃 API입니다.")
     public ApiResponse<String> signOut(HttpServletRequest request, HttpServletResponse response) {
         userService.signOut(request, response);
         return ApiResponse.onSuccess("로그아웃 성공");
@@ -83,5 +84,28 @@ public class UserController {
     public ApiResponse<String> resetPassword(@RequestBody @Valid PasswordResetRequest request) {
         userService.resetPassword(request);
         return ApiResponse.onSuccess("비밀번호가 성공적으로 변경되었습니다.");
+    }
+
+    @GetMapping("/mypage")
+    @Operation(summary = "마이페이지 조회", description = "유저의 마이페이지 정보를 반환합니다.")
+    public ApiResponse<MyPageResponse> getMyPage(Authentication authentication) {
+        return ApiResponse.onSuccess(userService.getMyPage(authentication.getName()));
+    }
+
+    @PatchMapping("/join-date")
+    @Operation(summary = "입사일 변경 API", description = "사용자의 입사일을 수정합니다.")
+    public ApiResponse<UpdateJoinDateResponse> updateJoinDate(
+            Authentication authentication,
+            @RequestBody @Valid UpdateJoinDateRequest request
+    ) {
+        UpdateJoinDateResponse response = userService.updateJoinDate(authentication.getName(), request.getJoinDate());
+        return ApiResponse.onSuccess(response);
+    }
+
+    @DeleteMapping("/withdraw")
+    @Operation(summary = "회원탈퇴 API", description = "일반 및 소셜 통합 회원탈퇴 API입니다.")
+    public ApiResponse<String> withdraw(HttpServletRequest request) {
+        userService.withdraw(request);
+        return ApiResponse.onSuccess("회원탈퇴 완료");
     }
 }
