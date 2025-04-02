@@ -71,7 +71,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 모의고사 관련 에러
     MOCK_TEST_NOT_FOUND(HttpStatus.NOT_FOUND, "MOCK4041", "해당 모의고사를 찾을 수 없습니다."),
-    MOCK_TEST_ALREADY_SUBMITTED(HttpStatus.BAD_REQUEST, "MOCK4001", "이미 제출된 모의고사입니다."),
+    // MOCK_TEST_ALREADY_SUBMITTED(HttpStatus.BAD_REQUEST, "MOCK4001", "이미 제출된 모의고사입니다."),
     MOCK_TEST_QUIZ_NOT_FOUND(HttpStatus.NOT_FOUND, "MOCK4042", "해당 모의고사 문제를 찾을 수 없습니다."),
     MOCK_TEST_USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MOCK4002", "해당 사용자의 모의고사를 찾을 수 없습니다.");
 
