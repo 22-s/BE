@@ -60,13 +60,27 @@ public class AuthServiceImpl implements AuthService {
      * - 응답 DTO로 변환하여 반환
      */
     private AuthUserResponse handleSocialLogin(OAuthProvider provider, String accessToken) {
-        // 1. 소셜 사용자 프로필 조회
-        AuthUserProfile userProfile = oAuthUtil.requestUserProfile(provider, accessToken);
+        // 1. accessToken 유효성 검사
+        if (accessToken == null || accessToken.isBlank()) {
+            throw new OAuthException(ErrorStatus.OAUTH_ACCESS_TOKEN_MISSING);
+        }
 
-        // 2. 이메일로 기존 회원 조회
+        // 2. 소셜 사용자 프로필 조회
+        AuthUserProfile userProfile;
+        try {
+            userProfile = oAuthUtil.requestUserProfile(provider, accessToken);
+        } catch (Exception e) {
+            throw new OAuthException(ErrorStatus.OAUTH_USERINFO_FETCH_FAILED);
+        }
+
+        // 3. 이메일 유무 체크
+        if (userProfile.getEmail() == null || userProfile.getEmail().isBlank()) {
+            throw new OAuthException(ErrorStatus.OAUTH_EMAIL_NOT_PROVIDED);
+        }
+
+        // 4. 이메일로 기존 회원 조회 && 이미 다른 provider로 가입된 경우 에러
         Optional<User> existingUserOpt = userRepository.findByEmail(userProfile.getEmail());
 
-        // 3. 이미 다른 provider로 가입된 경우 에러
         if (existingUserOpt.isPresent()) {
             User existingUser = existingUserOpt.get();
             if (!existingUser.getProvider().equals(provider)) {
@@ -74,15 +88,19 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
-        // 4. 신규 회원이면 회원가입 또는 기존 유저 반환
+        // 5. 신규 회원이면 회원가입 또는 기존 유저 반환
         User user = existingUserOpt.orElseGet(() -> registerNewUser(userProfile));
 
-        // 5. JWT 발급
+        // 6. JWT 발급
         String jwtAccessToken = jwtTokenProvider.generateAccessToken(user);
         String jwtRefreshToken = jwtTokenProvider.generateRefreshToken(user);
 
-        // 5. Redis에 RefreshToken 저장
-        redisUtil.saveRefreshToken(user.getUserId().toString(), jwtRefreshToken);
+        // 7. Redis에 RefreshToken 저장
+        try {
+            redisUtil.saveRefreshToken(user.getUserId().toString(), jwtRefreshToken);
+        } catch (Exception e) {
+            throw new OAuthException(ErrorStatus.OAUTH_REFRESH_TOKEN_SAVE_FAILED);
+        }
 
         boolean isNewUser = existingUserOpt.isEmpty();
         return AuthConverter.toAuthUserResponse(user, jwtAccessToken, jwtRefreshToken, isNewUser);
