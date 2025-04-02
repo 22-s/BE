@@ -92,6 +92,16 @@ public class UserController {
         return ApiResponse.onSuccess(userService.getMyPage(authentication.getName()));
     }
 
+    @PostMapping("/join-date")
+    @Operation(summary = "입사일 최초 등록 API", description = "소셜 로그인 유저의 최초 입사일을 등록합니다. 이미 존재하면 400 반환.")
+    public ApiResponse<UpdateJoinDateResponse> registerJoinDate(
+            Authentication authentication,
+            @RequestBody @Valid RegisterJoinDateRequest request
+    ) {
+        UpdateJoinDateResponse response = userService.registerJoinDate(authentication.getName(), request.getJoinDate());
+        return ApiResponse.onSuccess(response);
+    }
+
     @PatchMapping("/join-date")
     @Operation(summary = "입사일 변경 API", description = "사용자의 입사일을 수정합니다.")
     public ApiResponse<UpdateJoinDateResponse> updateJoinDate(

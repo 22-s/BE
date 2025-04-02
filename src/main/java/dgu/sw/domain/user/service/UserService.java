@@ -36,4 +36,7 @@ public interface UserService {
     UpdateJoinDateResponse updateJoinDate(String userId, LocalDate joinDate);
 
     void withdraw(HttpServletRequest request);
+
+    UpdateJoinDateResponse registerJoinDate(String userId, LocalDate joinDate);
+    // 클라이언트 입장에서 응답은 같으니 Register용을 따로 만들지 않고 Update를 사용!
 }
