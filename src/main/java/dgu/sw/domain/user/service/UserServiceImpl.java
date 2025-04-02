@@ -316,4 +316,23 @@ public class UserServiceImpl implements UserService {
         // DB에서 삭제
         userRepository.delete(user);
     }
+
+    // 소셜 로그인용 입사일 등록 API
+    @Override
+    public UpdateJoinDateResponse registerJoinDate(String userId, LocalDate joinDate) {
+        User user = userRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
+
+        // 이미 입사일이 등록되어 있다면 예외 발생
+        if (user.getJoinDate() != null) {
+            throw new UserException(ErrorStatus.JOIN_DATE_ALREADY_REGISTERED);
+        }
+
+        user.updateJoinDate(joinDate);
+        userRepository.save(user);
+
+        return UpdateJoinDateResponse.builder()
+                .updatedJoinDate(user.getJoinDate())
+                .build();
+    }
 }

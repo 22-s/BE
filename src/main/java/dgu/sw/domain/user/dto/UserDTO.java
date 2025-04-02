@@ -94,6 +94,12 @@ public class UserDTO {
             private String confirmPassword;
         }
 
+        @Getter
+        public static class RegisterJoinDateRequest {
+            @NotNull
+            @Schema(description = "등록할 입사일", example = "2025-04-01")
+            private LocalDate joinDate;
+        }
 
         @Getter
         public static class UpdateJoinDateRequest {
