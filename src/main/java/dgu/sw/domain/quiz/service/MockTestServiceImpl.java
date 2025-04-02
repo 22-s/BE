@@ -15,6 +15,7 @@ import dgu.sw.domain.quiz.repository.QuizRepository;
 import dgu.sw.domain.user.entity.User;
 import dgu.sw.domain.user.repository.UserRepository;
 import dgu.sw.global.exception.QuizException;
+import dgu.sw.global.exception.MockTestException;
 import dgu.sw.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -70,7 +71,7 @@ public class MockTestServiceImpl implements MockTestService {
     @Transactional
     public SubmitMockTestResponse submitMockTest(Long mockTestId, SubmitMockTestRequest request) {
         MockTest mockTest = mockTestRepository.findById(mockTestId)
-                .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_FOUND));
+                .orElseThrow(() -> new MockTestException(ErrorStatus.MOCK_TEST_NOT_FOUND));
 
         List<MockTestQuiz> mockTestQuizzes = mockTestQuizRepository.findByMockTest_MockTestId(mockTestId);
 
@@ -79,7 +80,7 @@ public class MockTestServiceImpl implements MockTestService {
             MockTestQuiz quizRecord = mockTestQuizzes.stream()
                     .filter(mtq -> mtq.getQuiz().getQuizId().equals(answer.getQuizId()))
                     .findFirst()
-                    .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_FOUND));
+                    .orElseThrow(() -> new MockTestException(ErrorStatus.MOCK_TEST_QUIZ_NOT_FOUND));
 
             boolean isCorrect = quizRecord.getQuiz().getAnswer().equals(answer.getSelectedAnswer());
             quizRecord.updateCorrect(isCorrect);
@@ -121,7 +122,7 @@ public class MockTestServiceImpl implements MockTestService {
     public MockTestResultResponse getMockTestResult(Long mockTestId) {
         // 1. 모의고사 정보 가져오기
         MockTest mockTest = mockTestRepository.findById(mockTestId)
-                .orElseThrow(() -> new QuizException(ErrorStatus.MOCK_TEST_NOT_COMPLETED));
+                .orElseThrow(() -> new MockTestException(ErrorStatus.MOCK_TEST_NOT_FOUND));
 
         List<MockTestQuiz> mockTestQuizzes = mockTestQuizRepository.findByMockTest_MockTestId(mockTestId);
 
@@ -207,7 +208,7 @@ public class MockTestServiceImpl implements MockTestService {
                 .findTopByUser_UserIdAndIsCompletedTrueOrderByCreatedDateDesc(uid);
 
         MockTest mockTest = previousMockTestOpt
-                .orElseThrow(() -> new QuizException(ErrorStatus.MOCK_TEST_NOT_FOUND));
+                .orElseThrow(() -> new MockTestException(ErrorStatus.MOCK_TEST_NOT_FOUND));
 
         return getMockTestResult(mockTest.getMockTestId());
     }

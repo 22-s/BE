@@ -66,8 +66,10 @@ public enum ErrorStatus implements BaseErrorCode {
     PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "USER4011", "새 비밀번호와 비밀번호 확인이 일치하지 않습니다."),
 
     // 모의고사 관련 에러
-    MOCK_TEST_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "MOCK4001", "아직 제출되지 않은 모의고사입니다."),
-    MOCK_TEST_NOT_FOUND(HttpStatus.NOT_FOUND, "MOCK4002", "해당 모의고사를 찾을 수 없습니다.");
+    MOCK_TEST_NOT_FOUND(HttpStatus.NOT_FOUND, "MOCK4041", "해당 모의고사를 찾을 수 없습니다."),
+    MOCK_TEST_ALREADY_SUBMITTED(HttpStatus.BAD_REQUEST, "MOCK4001", "이미 제출된 모의고사입니다."),
+    MOCK_TEST_QUIZ_NOT_FOUND(HttpStatus.NOT_FOUND, "MOCK4042", "해당 모의고사 문제를 찾을 수 없습니다."),
+    MOCK_TEST_USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MOCK4002", "해당 사용자의 모의고사를 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
