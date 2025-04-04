@@ -27,5 +27,5 @@ public interface MockTestRepository extends JpaRepository<MockTest, Long> {
 
     List<MockTest> findByUser_UserIdAndMockTestIdLessThan(Long userId, Long mockTestId);
 
-    Optional<MockTest> findTopByUser_UserIdAndIsCompletedTrueOrderByCreatedDateDesc(Long userId);
+    List<MockTest> findByUser_UserIdAndIsCompletedTrueOrderByMockTestIdAsc(Long userId);
 }

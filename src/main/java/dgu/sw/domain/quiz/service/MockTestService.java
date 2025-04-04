@@ -5,9 +5,10 @@ import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.SubmitMockTestRespons
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestRequest.SubmitMockTestRequest;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.CreateMockTestResponse;
 
+import java.util.List;
+
 public interface MockTestService {
     CreateMockTestResponse startMockTest(String userId);
     SubmitMockTestResponse submitMockTest(Long mockTestId, SubmitMockTestRequest request);
-    MockTestResultResponse getMockTestResult(Long mockTestId);
-    MockTestResultResponse getPreviousMockTestResult(String userId);
+    List<MockTestResultResponse> getAllMockTestResults(String userId);
 }

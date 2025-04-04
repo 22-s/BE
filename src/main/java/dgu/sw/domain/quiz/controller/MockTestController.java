@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/mockTest")
@@ -36,17 +38,10 @@ public class MockTestController {
         return ApiResponse.onSuccess(response);
     }
 
-    @GetMapping("/{mockTestId}/result")
-    @Operation(summary = "모의고사 결과 조회", description = "모의고사 결과를 반환합니다.")
-    public ApiResponse<MockTestResultResponse> getMockTestResult(@PathVariable Long mockTestId) {
-        MockTestResultResponse response = mockTestService.getMockTestResult(mockTestId);
-        return ApiResponse.onSuccess(response);
-    }
-
-    @GetMapping("/previous/result")
-    @Operation(summary = "이전 모의고사 결과 조회", description = "가장 최근에 완료한 이전 모의고사 결과를 조회합니다.")
-    public ApiResponse<MockTestResultResponse> getPreviousMockTestResult(Authentication authentication) {
-        MockTestResultResponse response = mockTestService.getPreviousMockTestResult(authentication.getName());
+    @GetMapping("/result/all")
+    @Operation(summary = "전체 모의고사 결과 조회", description = "해당 사용자가 완료한 모든 모의고사 결과를 반환합니다.")
+    public ApiResponse<List<MockTestResultResponse>> getAllMockTestResults(Authentication authentication) {
+        List<MockTestResultResponse> response = mockTestService.getAllMockTestResults(authentication.getName());
         return ApiResponse.onSuccess(response);
     }
 }

@@ -1,5 +1,6 @@
 package dgu.sw.domain.quiz.converter;
 
+import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.MockTestResultResponse;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestRequest.SubmitMockTestRequest;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.SubmittedQuizResult;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.SubmitMockTestResponse;
@@ -46,6 +47,27 @@ public class MockTestConverter {
                 .correctCount(mockTest.getCorrectCount())
                 .topPercentile(mockTest.getTopPercentile())
                 .results(results)
+                .build();
+    }
+
+    public static MockTestResultResponse toMockTestResultResponse(
+            MockTest mockTest,
+            int attemptCount,
+            int score,
+            int scoreChange,
+            double topPercentileChange,
+            List<MockTestResultResponse.CategoryResult> categoryResults,
+            List<MockTestResultResponse.MockTestQuestionResult> questionResults
+    ) {
+        return MockTestResultResponse.builder()
+                .mockTestId(mockTest.getMockTestId())
+                .attemptCount(attemptCount)
+                .score(score)
+                .scoreChange(scoreChange)
+                .topPercentile(mockTest.getTopPercentile())
+                .topPercentileChange(topPercentileChange)
+                .categoryResults(categoryResults)
+                .questionResults(questionResults)
                 .build();
     }
 }
