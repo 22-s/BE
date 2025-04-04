@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class MockTestConverter {
     public static CreateMockTestResponse toCreateMockTestResponse(MockTest mockTest, List<MockTestQuiz> mockTestQuizzes) {
         List<MockTestQuestionResponse> quizResponses = mockTestQuizzes.stream()
-                .map(mtq -> new MockTestQuestionResponse(mtq.getQuiz().getQuizId(), mtq.getQuiz().getQuestion()))
+                .map(mtq -> new MockTestQuestionResponse(mtq.getQuiz().getQuizId(), mtq.getQuiz().getQuestion(), mtq.getQuiz().getQuestionDetail()))
                 .collect(Collectors.toList());
 
         return CreateMockTestResponse.builder()
