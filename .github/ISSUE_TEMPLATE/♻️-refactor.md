@@ -1,6 +1,6 @@
 ---
 name: "♻️ Refactor"
-about: 리펙토링 직업
+about: 리펙토링 작업
 title: "♻️ [Refactor] - "
 labels: ":recycle: refactor"
 assignees: ''
