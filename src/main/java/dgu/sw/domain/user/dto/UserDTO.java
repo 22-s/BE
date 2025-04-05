@@ -148,6 +148,9 @@ public class UserDTO {
 
             @Schema(description = "입사일", example = "2025-03-14")
             private LocalDate joinDate;
+
+            @Schema(description = "프로필 이미지 URL", example = "http://example.com/image.jpg")
+            private String profileImage;
         }
 
 

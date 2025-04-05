@@ -81,6 +81,7 @@ public class QuizDTO {
         @Getter
         @Builder
         public static class QuizMainPageResponse {
+            private String nickname;
             private int yesterdaySolvedCount;
             private double progressRate;
             private Integer latestMockExamScore;

@@ -52,6 +52,7 @@ public class MockTestDTO {
         public static class MockTestQuestionResponse {
             private Long quizId;
             private String question;
+            private String questionDetail;
         }
 
         @Getter

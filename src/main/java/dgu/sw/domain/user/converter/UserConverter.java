@@ -35,6 +35,7 @@ public class UserConverter {
                 .nickname(user.getNickname())
                 .email(user.getEmail())
                 .joinDate(user.getJoinDate())
+                .profileImage(user.getProfileImage())
                 .build();
     }
 }
