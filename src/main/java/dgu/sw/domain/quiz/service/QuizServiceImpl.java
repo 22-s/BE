@@ -280,6 +280,8 @@ public class QuizServiceImpl implements QuizService {
     public QuizMainPageResponse getQuizMainPageData(String userId) {
         Long uid = Long.valueOf(userId);
 
+        User user = userRepository.findByUserId(uid);
+
         int yesterdayCount = userQuizRepository.countByUserIdAndSolvedDate(uid, LocalDate.now().minusDays(1));
         long totalQuizCount = quizRepository.count();
         long userSolvedCount = userQuizRepository.countDistinctByUserId(uid);
@@ -299,6 +301,7 @@ public class QuizServiceImpl implements QuizService {
                 .toList();
 
         return QuizMainPageResponse.builder()
+                .nickname(user.getNickname())
                 .yesterdaySolvedCount(yesterdayCount)
                 .progressRate(progressRate)
                 .latestMockExamScore(recentScore)
