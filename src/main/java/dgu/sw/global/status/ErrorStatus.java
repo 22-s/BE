@@ -57,6 +57,10 @@ public enum ErrorStatus implements BaseErrorCode {
     OAUTH_JSON_PARSE_ERROR(HttpStatus.BAD_REQUEST, "OAUTH4003", "OAuth 응답 파싱에 실패했습니다."),
     OAUTH_ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "OAUTH4004", "OAuth 인증에 실패했습니다."),
     SOCIAL_PROVIDER_CONFLICT(HttpStatus.CONFLICT, "AUTH4004", "다른 소셜 로그인으로 이미 가입된 이메일입니다."),
+    OAUTH_ACCESS_TOKEN_MISSING(HttpStatus.BAD_REQUEST, "OAUTH4005", "Access Token이 누락되었습니다."),
+    OAUTH_USERINFO_FETCH_FAILED(HttpStatus.UNAUTHORIZED, "OAUTH4006", "소셜 사용자 정보를 가져오는 데 실패했습니다."),
+    OAUTH_EMAIL_NOT_PROVIDED(HttpStatus.BAD_REQUEST, "OAUTH4007", "소셜 로그인에 이메일 정보가 포함되어 있지 않습니다."),
+    OAUTH_REFRESH_TOKEN_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "OAUTH5001", "Redis에 Refresh Token 저장에 실패했습니다."),
 
     // 인증코드 관련 에러
     CODE_EXPIRED(HttpStatus.BAD_REQUEST, "USER4009", "인증코드가 만료되었습니다."),
@@ -66,8 +70,10 @@ public enum ErrorStatus implements BaseErrorCode {
     PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "USER4011", "새 비밀번호와 비밀번호 확인이 일치하지 않습니다."),
 
     // 모의고사 관련 에러
-    MOCK_TEST_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "MOCK4001", "아직 제출되지 않은 모의고사입니다."),
-    MOCK_TEST_NOT_FOUND(HttpStatus.NOT_FOUND, "MOCK4002", "해당 모의고사를 찾을 수 없습니다.");
+    MOCK_TEST_NOT_FOUND(HttpStatus.NOT_FOUND, "MOCK4041", "해당 모의고사를 찾을 수 없습니다."),
+    // MOCK_TEST_ALREADY_SUBMITTED(HttpStatus.BAD_REQUEST, "MOCK4001", "이미 제출된 모의고사입니다."),
+    MOCK_TEST_QUIZ_NOT_FOUND(HttpStatus.NOT_FOUND, "MOCK4042", "해당 모의고사 문제를 찾을 수 없습니다."),
+    MOCK_TEST_USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MOCK4002", "해당 사용자의 모의고사를 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
