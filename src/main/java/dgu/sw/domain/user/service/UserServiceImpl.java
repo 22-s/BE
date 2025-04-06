@@ -170,9 +170,11 @@ public class UserServiceImpl implements UserService {
     // 이메일 유효성 검사
     @Override
     public void verifyEmailForPasswordReset(String email) {
-        boolean exists = userRepository.existsByEmail(email);
-        if (!exists) {
-            throw new UserException(ErrorStatus.USER_NOT_FOUND);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
+
+        if (user.getProvider() != null) {
+            throw new UserException(ErrorStatus.SOCIAL_USER_CANNOT_CHANGE_PASSWORD);
         }
     }
 
@@ -180,8 +182,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void sendVerificationCode(String email) {
         // 1. 이메일 존재 여부 확인
-        if (!userRepository.existsByEmail(email)) {
-            throw new UserException(ErrorStatus.USER_NOT_FOUND);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
+
+        if (user.getProvider() != null) {
+            throw new UserException(ErrorStatus.SOCIAL_USER_CANNOT_CHANGE_PASSWORD);
         }
 
         // 2. 인증코드 생성 (6자리 숫자) - 랜덤
@@ -255,6 +260,10 @@ public class UserServiceImpl implements UserService {
 
         // 1. 사용자 존재 확인
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
+        // 소셜 로그인 사용자는 비밀번호 변경 제한
+        if (user.getProvider() != null) {
+            throw new UserException(ErrorStatus.SOCIAL_USER_CANNOT_CHANGE_PASSWORD);
+        }
 
         // 2. 새 비밀번호, 확인 일치 여부 체크
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
