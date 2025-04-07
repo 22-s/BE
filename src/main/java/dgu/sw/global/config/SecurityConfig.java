@@ -1,5 +1,7 @@
 package dgu.sw.global.config;
 
+import dgu.sw.global.config.redis.RedisUtil;
+import dgu.sw.global.security.JwtAuthenticationEntryPoint;
 import dgu.sw.global.security.JwtAuthenticationFilter;
 import dgu.sw.global.security.JwtAuthenticationProvider;
 import dgu.sw.global.security.JwtUtil;
@@ -27,6 +29,8 @@ public class SecurityConfig {
 
     private final JwtAuthenticationProvider jwtAuthenticationProvider;
     private final JwtUtil jwtUtil;
+    private final RedisUtil redisUtil;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     // PasswordEncoder 빈 등록
     @Bean
@@ -43,7 +47,7 @@ public class SecurityConfig {
     // JwtAuthenticationFilter를 직접 생성하여 빈으로 등록
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(AuthenticationManager authenticationManager) {
-        return new JwtAuthenticationFilter(jwtUtil, authenticationManager);
+        return new JwtAuthenticationFilter(jwtUtil, authenticationManager, redisUtil);
     }
 
     // SecurityFilterChain 설정
@@ -53,6 +57,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 new AntPathRequestMatcher("/"),

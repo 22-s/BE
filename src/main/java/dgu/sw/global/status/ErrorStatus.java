@@ -37,6 +37,7 @@ public enum ErrorStatus implements BaseErrorCode {
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "USER4008", "유효하지 않은 Refresh Token입니다."),
     JOIN_DATE_ALREADY_REGISTERED(HttpStatus.BAD_REQUEST, "USER4012", "이미 입사일이 등록된 사용자입니다."),
     SOCIAL_USER_CANNOT_CHANGE_PASSWORD(HttpStatus.FORBIDDEN, "USER4013", "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다."),
+    LOGGED_OUT_TOKEN(HttpStatus.UNAUTHORIZED, "USER4013", "이미 로그아웃된 토큰입니다."),
 
     // 업무 용어 관련 에러
     VOCA_NOT_FOUND(HttpStatus.NOT_FOUND, "VOCA4041", "해당 업무 용어를 찾을 수 없습니다."),
