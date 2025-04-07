@@ -1,5 +1,8 @@
 package dgu.sw.global.security;
 
+import dgu.sw.global.config.redis.RedisUtil;
+import dgu.sw.global.exception.UserException;
+import dgu.sw.global.status.ErrorStatus;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,6 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final RedisUtil redisUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -32,17 +36,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String token = jwtUtil.resolveToken(request);
-            if (token != null && jwtUtil.validateToken(token)) {
-                // 인증 토큰 생성하고 AuthenticationManager를 통해 인증 수행
-                Authentication authentication = authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(token, null)
-                );
-                // 인증이 성공하면 SecurityContext에 저장하여 이후의 요청에서 인증 정보 활용 가능하게 함
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            if (token != null) {
+                // 블랙리스트에 등록된 토큰이면 인증 불가 처리
+                if (redisUtil.getData(token).orElse("").equals("BLACKLIST")) {
+                    throw new UserException(ErrorStatus.LOGGED_OUT_TOKEN);
+                }
+
+                if (jwtUtil.validateToken(token)) {
+                    // 인증 토큰 생성하고 AuthenticationManager를 통해 인증 수행
+                    Authentication authentication = authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(token, null)
+                    );
+                    // 인증이 성공하면 SecurityContext에 저장하여 이후의 요청에서 인증 정보 활용 가능하게 함
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
         } catch (ExpiredJwtException e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token expired");
-            return;
         } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication error: " + e.getMessage());
             return;
