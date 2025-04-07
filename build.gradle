@@ -57,6 +57,9 @@ dependencies {
 	// 인증코드 전송 - JavaMailSender를 자동으로 Bean으로 등록하기 위함
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+	// 알림 기능 - FCM
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
+
 	// Test dependencies
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
