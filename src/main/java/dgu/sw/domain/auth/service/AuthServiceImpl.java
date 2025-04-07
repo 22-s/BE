@@ -83,10 +83,18 @@ public class AuthServiceImpl implements AuthService {
 
         if (existingUserOpt.isPresent()) {
             User existingUser = existingUserOpt.get();
+
+            // 일반 로그인으로 가입한 경우 (provider == null)
+            if (existingUser.getProvider() == null) {
+                throw new OAuthException(ErrorStatus.GENERAL_LOGIN_USER);
+            }
+
+            // 소셜 로그인 but 이미 다른 provider로 가입된 경우
             if (!existingUser.getProvider().equals(provider)) {
                 throw new OAuthException(ErrorStatus.SOCIAL_PROVIDER_CONFLICT);
             }
         }
+
 
         // 5. 신규 회원이면 회원가입 또는 기존 유저 반환
         User user = existingUserOpt.orElseGet(() -> registerNewUser(userProfile));
