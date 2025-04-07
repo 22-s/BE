@@ -5,6 +5,7 @@ import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignUpResponse;
 import dgu.sw.domain.user.dto.UserDTO.UserRequest.SignUpRequest;
 import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignInResponse;
 import dgu.sw.domain.user.entity.User;
+import dgu.sw.global.security.OAuthProvider;
 
 public class UserConverter {
     public static SignUpResponse toSignUpResponseDTO(User user) {
@@ -27,6 +28,7 @@ public class UserConverter {
                 .email(signUpRequest.getEmail())
                 .password(password)
                 .joinDate(signUpRequest.getJoinDate())
+                .provider(OAuthProvider.GENERAL)
                 .build();
     }
 
