@@ -10,6 +10,7 @@ import dgu.sw.global.security.JwtTokenProvider;
 import dgu.sw.global.security.JwtUtil;
 import dgu.sw.global.config.redis.RedisUtil;
 import dgu.sw.global.exception.UserException;
+import dgu.sw.global.security.OAuthProvider;
 import dgu.sw.global.security.OAuthUtil;
 import dgu.sw.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
@@ -111,7 +112,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
 
         // 소셜 로그인이면 외부 플랫폼 로그아웃 처리
-        if (user.getProvider() != null) {
+        if (user.getProvider() != OAuthProvider.GENERAL) {
             oAuthUtil.logoutFromProvider(user.getProvider());
         }
     }
