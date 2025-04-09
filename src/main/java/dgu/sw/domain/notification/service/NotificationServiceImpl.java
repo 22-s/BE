@@ -38,7 +38,9 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepository.save(notification);
 
         // 2. FCM 전송
-        fcmService.sendMessageTo(user.fcmToken(), title, body);
+        fcmService.sendMessageTo(
+                new FCMService.NotificationTarget(user.getFcmToken(), title, body)
+        );
     }
 
     @Override

@@ -48,16 +48,14 @@ public class NotificationController {
     }
 
     @PostMapping("/test")
-    @Operation(summary = "알림 테스트", description = "지정된 사용자에게 테스트 알림을 전송합니다.")
-    public ApiResponse<String> sendTestNotification(
-            @RequestParam Long userId,
-            @RequestParam String title,
-            @RequestParam String body
-    ) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
+    @Operation(summary = "테스트 알림 전송", description = "FCM 및 알림 저장 테스트용 API")
+    public ApiResponse<String> sendTestNotification(Authentication authentication) {
+        User user = getUser(authentication);
+
+        String title = "🎉 알림 테스트";
+        String body = "안녕하세요, 지금 알림 기능이 잘 작동하나요?";
 
         notificationService.sendNotification(user, title, body);
-        return ApiResponse.onSuccess("테스트 알림이 전송되었습니다.");
+        return ApiResponse.onSuccess("알림 전송 완료");
     }
 }

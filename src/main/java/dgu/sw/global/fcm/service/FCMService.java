@@ -17,10 +17,8 @@ public class FCMService {
             // 메시지 구성
             Message message = Message.builder()
                     .setToken(targetToken)
-                    .setNotification(Notification.builder()
-                            .setTitle(title)
-                            .setBody(body)
-                            .build())
+                    .putData("title", title)
+                    .putData("body", body)
                     .build();
 
             // Firebase 메시지 전송
