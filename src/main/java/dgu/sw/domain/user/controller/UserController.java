@@ -118,4 +118,18 @@ public class UserController {
         userService.withdraw(request);
         return ApiResponse.onSuccess("회원탈퇴 완료");
     }
+
+    // 알림 기능
+    @RequestMapping(
+            value = "/fcm-token",
+            method = {RequestMethod.POST, RequestMethod.PATCH}
+    )
+    @Operation(summary = "FCM 토큰 등록/수정", description = "모바일 디바이스에서 FCM 토큰을 받아 저장합니다.")
+    public ApiResponse<String> updateFcmToken(
+            Authentication authentication,
+            @RequestBody @Valid FcmTokenUpdateRequest request
+    ) {
+        userService.updateFcmToken(authentication.getName(), request.getFcmToken());
+        return ApiResponse.onSuccess("FCM 토큰이 저장되었습니다.");
+    }
 }

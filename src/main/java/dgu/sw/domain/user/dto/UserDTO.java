@@ -107,6 +107,12 @@ public class UserDTO {
             @Schema(description = "변경할 입사일", example = "2025-03-14")
             private LocalDate joinDate;
         }
+
+        @Getter
+        public static class FcmTokenUpdateRequest {
+            @NotBlank
+            private String fcmToken;
+        }
     }
 
     public static class UserResponse {
