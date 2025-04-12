@@ -91,6 +91,7 @@ public class UserServiceImpl implements UserService {
      * 로그아웃
      */
     @Override
+    @Transactional
     public void signOut(HttpServletRequest request, HttpServletResponse response) {
         // 요청에서 AccessToken 추출
         String accessToken = resolveToken(request);
