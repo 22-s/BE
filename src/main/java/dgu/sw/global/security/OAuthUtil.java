@@ -172,9 +172,14 @@ public class OAuthUtil {
     }
 
     public void logoutFromProvider(OAuthProvider provider) {
+        if (provider == null) {
+            System.out.println("❗ OAuthProvider가 null입니다. 로그아웃 생략");
+            return;
+        }
         switch (provider) {
             case KAKAO -> logoutFromKakao();
             case NAVER -> logoutFromNaver();
+            case GOOGLE -> logoutFromGoogle();
             default -> throw new OAuthException(ErrorStatus.OAUTH_UNSUPPORTED_PROVIDER);
         }
     }
@@ -186,5 +191,9 @@ public class OAuthUtil {
 
     private void logoutFromNaver() {
         System.out.println("👉 네이버 로그아웃 요청 완료 (추후 SDK 연동 필요)");
+    }
+
+    private void logoutFromGoogle() {
+        System.out.println("👉 구글 로그아웃 요청 완료 (추후 SDK 연동 필요)");
     }
 }
