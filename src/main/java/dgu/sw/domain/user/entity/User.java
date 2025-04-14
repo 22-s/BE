@@ -30,6 +30,11 @@ public class User {
     @Enumerated(EnumType.STRING)
     private OAuthProvider provider;
 
+    @Getter
+    @Setter
+    @Column(name = "fcm_token")
+    private String fcmToken;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserQuiz> userQuizzes;
 
