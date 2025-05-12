@@ -46,7 +46,6 @@ public class MockTestServiceImpl implements MockTestService {
         // 모의고사 생성
         MockTest mockTest = MockTest.builder()
                 .user(user)
-                .createdDate(LocalDate.now())
                 .isCompleted(false)
                 .correctCount(0)
                 .build();

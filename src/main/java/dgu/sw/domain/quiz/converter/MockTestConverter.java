@@ -21,7 +21,7 @@ public class MockTestConverter {
 
         return CreateMockTestResponse.builder()
                 .mockTestId(mockTest.getMockTestId())
-                .createdDate(mockTest.getCreatedDate())
+                .createdAt(mockTest.getCreatedAt())
                 .isCompleted(mockTest.isCompleted())
                 .correctCount(mockTest.getCorrectCount())
                 .quizzes(quizResponses)
