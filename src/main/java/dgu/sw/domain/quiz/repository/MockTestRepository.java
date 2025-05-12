@@ -12,15 +12,13 @@ import java.util.Optional;
 
 @Repository
 public interface MockTestRepository extends JpaRepository<MockTest, Long> {
-    MockTest findTopByUser_UserIdOrderByCreatedDateDesc(Long userId);
     @Query("SELECT COUNT(me) FROM MockTest me WHERE me.isCompleted = true")
     long countCompletedExams();
 
     @Query("SELECT COUNT(me) FROM MockTest me WHERE me.correctCount > :score")
     long countByCorrectCountGreaterThan(@Param("score") int score);
 
-    List<MockTest> findByUser_UserIdOrderByCreatedDateAsc(Long userId);
-
+    Optional<MockTest> findTopByUser_UserIdOrderByCreatedAtDesc(Long userId);
     List<MockTest> findAllByIsCompletedTrue();
 
     Optional<MockTest> findTopByUser_UserIdAndMockTestIdLessThanOrderByMockTestIdDesc(Long userId, Long mockTestId);

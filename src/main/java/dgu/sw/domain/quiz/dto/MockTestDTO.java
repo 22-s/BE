@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class MockTestDTO {
@@ -40,7 +40,7 @@ public class MockTestDTO {
         @Builder
         public static class CreateMockTestResponse {
             private Long mockTestId;
-            private LocalDate createdDate;
+            private LocalDateTime createdAt;
             private boolean isCompleted;
             private int correctCount;
             private List<MockTestQuestionResponse> quizzes;

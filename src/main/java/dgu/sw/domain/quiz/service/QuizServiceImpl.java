@@ -289,7 +289,7 @@ public class QuizServiceImpl implements QuizService {
         double progressRate = (double) userSolvedCount / totalQuizCount * 100;
 
         // 최근 모의고사 점수
-        MockTest recentExam = mockTestRepository.findTopByUser_UserIdOrderByCreatedDateDesc(uid);
+        MockTest recentExam = mockTestRepository.findTopByUser_UserIdOrderByCreatedAtDesc(uid).orElse(null);
         Integer recentScore = recentExam != null ? recentExam.getCorrectCount() * 10 : null;
 
         // 상위 % 계산
