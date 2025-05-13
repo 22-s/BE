@@ -42,7 +42,7 @@ public class MannerDTO {
                 private Long mannerId;
                 private String category;
                 private String title;
-                private String contentPreview;
+                private String content;
                 private String imageUrl;
             }
 
