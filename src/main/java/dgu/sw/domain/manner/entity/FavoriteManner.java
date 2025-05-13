@@ -25,4 +25,5 @@ public class FavoriteManner {
 
     private String category;
     private String content;
+
 }
