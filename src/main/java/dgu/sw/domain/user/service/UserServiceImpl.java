@@ -10,6 +10,7 @@ import dgu.sw.global.security.JwtTokenProvider;
 import dgu.sw.global.security.JwtUtil;
 import dgu.sw.global.config.redis.RedisUtil;
 import dgu.sw.global.exception.UserException;
+import dgu.sw.global.security.OAuthProvider;
 import dgu.sw.global.security.OAuthUtil;
 import dgu.sw.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
@@ -90,9 +91,10 @@ public class UserServiceImpl implements UserService {
      * 로그아웃
      */
     @Override
+    @Transactional
     public void signOut(HttpServletRequest request, HttpServletResponse response) {
         // 요청에서 AccessToken 추출
-        String accessToken = resolveToken(request);
+        String accessToken = jwtUtil.resolveToken(request);
         if (accessToken == null) {
             throw new UserException(ErrorStatus.TOKEN_NOT_FOUND);
         }
@@ -111,7 +113,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
 
         // 소셜 로그인이면 외부 플랫폼 로그아웃 처리
-        if (user.getProvider() != null) {
+        if (user.getProvider() != OAuthProvider.GENERAL) {
             oAuthUtil.logoutFromProvider(user.getProvider());
         }
     }
@@ -156,14 +158,6 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(email)) {
             throw new UserException(ErrorStatus.USER_ALREADY_EXISTS);
         }
-    }
-
-    /**
-     * 요청에서 JWT 토큰 추출
-     */
-    private String resolveToken(HttpServletRequest request) {
-        String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
-        return (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
     }
 
     // 비밀번호 변경
@@ -299,7 +293,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void withdraw(HttpServletRequest request) {
-        String accessToken = resolveToken(request);
+        String accessToken = jwtUtil.resolveToken(request);
         if (accessToken == null) {
             throw new UserException(ErrorStatus.TOKEN_NOT_FOUND);
         }

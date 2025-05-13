@@ -1,6 +1,7 @@
 package dgu.sw.domain.quiz.entity;
 
 import dgu.sw.domain.user.entity.User;
+import dgu.sw.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "mockTest")
-public class MockTest {
+public class MockTest extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long mockTestId;
@@ -21,8 +22,6 @@ public class MockTest {
     @ManyToOne
     @JoinColumn(name = "userId")
     private User user;
-
-    private LocalDate createdDate;
 
     private boolean isCompleted; // 다 풀었는지 여부
 
