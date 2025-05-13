@@ -52,7 +52,7 @@ public class MannerController {
     @GetMapping(value = "/search/category")
     @Operation(summary = "카테고리 내 검색", description = "특정 카테고리 내에서 매너 설명서를 검색합니다.")
     public ApiResponse<List<MannerListResponse>> searchMannersByCategory(
-            @RequestParam String category,
+            @RequestParam int category,
             @RequestParam(value = "keyword", required = false) String keyword) {
         return ApiResponse.onSuccess(mannerService.searchMannersByCategory(category, keyword));
     }

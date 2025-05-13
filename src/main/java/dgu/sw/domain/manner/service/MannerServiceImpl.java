@@ -87,17 +87,19 @@ public class MannerServiceImpl implements MannerService {
     }
 
     @Override
-    public List<MannerListResponse> searchMannersByCategory(String category, String keyword) {
+    public List<MannerListResponse> searchMannersByCategory(int category, String keyword) {
+        String categoryName = mapCategoryToString(category);
+
         if (keyword == null || keyword.isEmpty()) {
-            return mannerRepository.findByCategory(category)
+            return mannerRepository.findByCategory(categoryName)
                     .stream()
-                    .map(manner -> MannerConverter.toMannerListResponse(manner, false)) // 로그인 없이 항상 false
+                    .map(manner -> MannerConverter.toMannerListResponse(manner, false))
                     .collect(Collectors.toList());
         }
-        return mannerRepository.findByCategoryAndTitleContainingOrCategoryAndContentContaining(
-                        category, keyword, category, keyword)
+
+        return mannerRepository.searchByCategoryAndKeyword(categoryName, keyword)
                 .stream()
-                .map(manner -> MannerConverter.toMannerListResponse(manner, false)) // 로그인 없이 항상 false
+                .map(manner -> MannerConverter.toMannerListResponse(manner, false))
                 .collect(Collectors.toList());
     }
 
