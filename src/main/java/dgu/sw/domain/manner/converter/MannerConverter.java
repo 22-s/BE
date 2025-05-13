@@ -33,11 +33,7 @@ public class MannerConverter {
                 .mannerId(manner.getMannerId())
                 .title(manner.getTitle())
                 .category(manner.getCategory())
-                .contentPreview(
-                        manner.getContent().length() > 20
-                                ? manner.getContent().substring(0, 20) + "..."
-                                : manner.getContent()
-                ) // 내용 20자 제한
+                .content(manner.getContent())
                 .imageUrl(manner.getImageUrl())
                 .build();
 
