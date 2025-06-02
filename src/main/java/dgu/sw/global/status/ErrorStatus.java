@@ -63,6 +63,7 @@ public enum ErrorStatus implements BaseErrorCode {
     OAUTH_USERINFO_FETCH_FAILED(HttpStatus.UNAUTHORIZED, "OAUTH4006", "소셜 사용자 정보를 가져오는 데 실패했습니다."),
     OAUTH_EMAIL_NOT_PROVIDED(HttpStatus.BAD_REQUEST, "OAUTH4007", "소셜 로그인에 이메일 정보가 포함되어 있지 않습니다."),
     OAUTH_REFRESH_TOKEN_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "OAUTH5001", "Redis에 Refresh Token 저장에 실패했습니다."),
+    OAUTH_MISSING_EMAIL(HttpStatus.BAD_REQUEST, "OAUTH5002", "이메일이 누락되었습니다."),
 
     // 인증코드 관련 에러
     CODE_EXPIRED(HttpStatus.BAD_REQUEST, "USER4009", "인증코드가 만료되었습니다."),
