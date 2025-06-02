@@ -34,4 +34,10 @@ public class AuthController {
     public ApiResponse<AuthUserResponse> googleLogin(@RequestBody SocialLoginRequest request) {
         return ApiResponse.onSuccess(authService.googleLoginWithAccessToken(request.getAccessToken()));
     }
+
+    @PostMapping("/apple/login")
+    @Operation(summary = "애플 로그인 API", description = "애플 identity token 기반 로그인 API")
+    public ApiResponse<AuthUserResponse> appleLogin(@RequestBody SocialLoginRequest request) {
+        return ApiResponse.onSuccess(authService.appleLoginWithAccessToken(request.getAccessToken()));
+    }
 }

@@ -27,29 +27,30 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisUtil redisUtil;
 
-    /**
-     * 카카오 로그인 처리
-     */
+    // 카카오 로그인 처리
     @Override
     public AuthUserResponse kakaoLoginWithAccessToken(String accessToken) {
         return handleSocialLogin(OAuthProvider.KAKAO, accessToken);
     }
 
-    /**
-     * 네이버 로그인 처리
-     */
+    // 네이버 로그인 처리
     @Override
     public AuthUserResponse naverLoginWithAccessToken(String accessToken) {
         return handleSocialLogin(OAuthProvider.NAVER, accessToken);
     }
 
-    /**
-     * 구글 로그인 처리
-     */
+    // 구글 로그인 처리
     @Override
     public AuthUserResponse googleLoginWithAccessToken(String accessToken) {
         return handleSocialLogin(OAuthProvider.GOOGLE, accessToken);
     }
+
+    // 애플 로그인 처리
+    @Override
+    public AuthUserResponse appleLoginWithAccessToken(String identityToken) {
+        return handleSocialLogin(OAuthProvider.APPLE, identityToken);
+    }
+
 
     /**
      * 공통 소셜 로그인 처리

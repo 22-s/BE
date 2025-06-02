@@ -13,6 +13,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Base64;
+
 @Component
 @RequiredArgsConstructor
 public class OAuthUtil {
@@ -67,7 +69,7 @@ public class OAuthUtil {
             case KAKAO -> requestKakaoUserProfile(accessToken);
             case NAVER -> requestNaverUserProfile(accessToken);
             case GOOGLE -> requestGoogleUserProfile(accessToken);
-//            case APPLE -> requestAppleUserProfile(accessToken);
+            case APPLE -> requestAppleUserProfile(accessToken);
             default -> throw new OAuthException(ErrorStatus.OAUTH_UNSUPPORTED_PROVIDER);
         };
     }
@@ -93,7 +95,8 @@ public class OAuthUtil {
 
             String email = kakaoAccount.get("email").asText();
             String nickname = kakaoAccount.get("profile").get("nickname").asText();
-            String profileImage = kakaoAccount.get("profile").get("thumbnail_image_url").asText();
+            String profileImageRaw = kakaoAccount.get("profile").get("thumbnail_image_url").asText();
+            String profileImage = profileImageRaw.replace("http://", "https://");
 
             return AuthUserProfile.builder()
                     .provider(OAuthProvider.KAKAO)
@@ -171,6 +174,29 @@ public class OAuthUtil {
         }
     }
 
+    private AuthUserProfile requestAppleUserProfile(String identityToken) {
+        try {
+            // Apple의 identityToken은 JWT 형식이며, 가운데 payload를 Base64로 디코딩하여 정보 추출
+            String[] chunks = identityToken.split("\\.");
+            String payload = new String(Base64.getUrlDecoder().decode(chunks[1]));
+
+            JsonNode jsonNode = objectMapper.readTree(payload);
+
+            String email = jsonNode.has("email") ? jsonNode.get("email").asText() : null;
+            if (email == null) throw new OAuthException(ErrorStatus.OAUTH_MISSING_EMAIL);
+
+            return AuthUserProfile.builder()
+                    .provider(OAuthProvider.APPLE)
+                    .email(email)
+                    .nickname("신입사원") // 고정 닉네임
+                    .profileImage(null)
+                    .build();
+
+        } catch (Exception e) {
+            throw new OAuthException(ErrorStatus.OAUTH_JSON_PARSE_ERROR);
+        }
+    }
+
     public void logoutFromProvider(OAuthProvider provider) {
         if (provider == null) {
             System.out.println("❗ OAuthProvider가 null입니다. 로그아웃 생략");
@@ -180,6 +206,7 @@ public class OAuthUtil {
             case KAKAO -> logoutFromKakao();
             case NAVER -> logoutFromNaver();
             case GOOGLE -> logoutFromGoogle();
+            case APPLE -> logoutFromApple();
             default -> throw new OAuthException(ErrorStatus.OAUTH_UNSUPPORTED_PROVIDER);
         }
     }
@@ -195,5 +222,9 @@ public class OAuthUtil {
 
     private void logoutFromGoogle() {
         System.out.println("👉 구글 로그아웃 요청 완료 (추후 SDK 연동 필요)");
+    }
+
+    private void logoutFromApple() {
+        System.out.println("👉 애플 로그아웃 요청 완료 (추후 SDK 연동 필요)");
     }
 }
