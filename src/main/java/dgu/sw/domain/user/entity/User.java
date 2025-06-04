@@ -1,6 +1,7 @@
 package dgu.sw.domain.user.entity;
 
 import dgu.sw.domain.manner.entity.FavoriteManner;
+import dgu.sw.domain.quiz.entity.MockTest;
 import dgu.sw.domain.quiz.entity.QuizReviewList;
 import dgu.sw.domain.quiz.entity.UserQuiz;
 import dgu.sw.domain.voca.entity.FavoriteVoca;
@@ -42,6 +43,9 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<QuizReviewList> quizReviewLists;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MockTest> mockTests;
 
     public void updatePassword(String newPassword) {
         this.password = newPassword;
