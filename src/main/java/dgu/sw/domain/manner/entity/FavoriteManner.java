@@ -1,6 +1,7 @@
 package dgu.sw.domain.manner.entity;
 
 import dgu.sw.domain.user.entity.User;
+import dgu.sw.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "favoriteManner")
-public class FavoriteManner {
+public class FavoriteManner extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long favoriteMannerId;
