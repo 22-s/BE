@@ -1,5 +1,6 @@
 package dgu.sw.domain.quiz.entity;
 
+import dgu.sw.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "mockTestQuiz")
-public class MockTestQuiz {
+public class MockTestQuiz extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long mockTestQuizId;

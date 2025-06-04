@@ -1,6 +1,7 @@
 package dgu.sw.domain.quiz.entity;
 
 import dgu.sw.domain.user.entity.User;
+import dgu.sw.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "userQuiz")
-public class UserQuiz {
+public class UserQuiz extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userQuizId;

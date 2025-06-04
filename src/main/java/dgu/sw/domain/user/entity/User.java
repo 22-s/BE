@@ -4,6 +4,7 @@ import dgu.sw.domain.manner.entity.FavoriteManner;
 import dgu.sw.domain.quiz.entity.QuizReviewList;
 import dgu.sw.domain.quiz.entity.UserQuiz;
 import dgu.sw.domain.voca.entity.FavoriteVoca;
+import dgu.sw.global.BaseEntity;
 import dgu.sw.global.security.OAuthProvider;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "users")
-public class User {
+public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
