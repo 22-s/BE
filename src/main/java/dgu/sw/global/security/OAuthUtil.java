@@ -13,7 +13,17 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Base64;
+import java.util.Date;
+import java.security.KeyFactory;
+import java.security.interfaces.ECPrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 
 @Component
 @RequiredArgsConstructor
@@ -33,6 +43,19 @@ public class OAuthUtil {
 
     @Value("${oauth.naver.client-secret}")
     private String naverClientSecret;
+
+    @Value("${oauth.apple.client-id}")
+    private String appleClientId;
+
+    @Value("${oauth.apple.key-id}")
+    private String appleKeyId;
+
+    @Value("${oauth.apple.team-id}")
+    private String appleTeamId;
+
+    @Value("${oauth.apple.private-key}")
+    private String applePrivateKey; // `.p8` 파일을 문자열로 환경변수에 저장한 경우
+
 
     public String requestAccessToken(OAuthProvider provider, String code) {
         // 보통 SDK 방식에서는 호출되지 않음
@@ -211,6 +234,22 @@ public class OAuthUtil {
         }
     }
 
+    private String generateAppleClientSecret() throws NoSuchAlgorithmException, InvalidKeySpecException {
+        Algorithm algorithm = Algorithm.ECDSA256(null,
+                (ECPrivateKey) KeyFactory.getInstance("EC")
+                        .generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder().decode(applePrivateKey))));
+
+        return JWT.create()
+                .withIssuer(appleTeamId)
+                .withIssuedAt(new Date())
+                .withExpiresAt(Date.from(Instant.now().plus(180, ChronoUnit.DAYS))) // 6개월 유효
+                .withAudience("https://appleid.apple.com")
+                .withSubject(appleClientId)
+                .withKeyId(appleKeyId)
+                .sign(algorithm);
+    }
+
+
     private void logoutFromKakao() {
         // 실제 구현 시 사용자 accessToken 등을 활용하여 로그아웃 API 호출 가능
         System.out.println("👉 카카오 로그아웃 요청 완료 (추후 SDK 연동 필요)");
@@ -227,4 +266,38 @@ public class OAuthUtil {
     private void logoutFromApple() {
         System.out.println("👉 애플 로그아웃 요청 완료 (추후 SDK 연동 필요)");
     }
+
+    public void withDrawApple(String refreshToken) {
+        try {
+            String clientSecret = generateAppleClientSecret();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("client_id", appleClientId);
+            params.add("client_secret", clientSecret);
+            params.add("token", refreshToken);
+            params.add("token_type_hint", "refresh_token");
+
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+            ResponseEntity<String> response = restTemplate.exchange(
+                    "https://appleid.apple.com/auth/revoke",
+                    HttpMethod.POST,
+                    request,
+                    String.class
+            );
+
+            if (response.getStatusCode() == HttpStatus.OK) {
+                System.out.println("✅ Apple 토큰 해지 완료");
+            } else {
+                System.out.println("❌ Apple 토큰 해지 실패: " + response.getBody());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new OAuthException(ErrorStatus.OAUTH_REQUEST_FAILED);
+        }
+    }
+
 }

@@ -306,6 +306,12 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
 
+        // Apple 로그인 사용자일 경우 전용 처리 메서드 호출
+        if (user.getProvider() == OAuthProvider.APPLE) {
+            withdrawAppleUser(user, accessToken);
+            return;
+        }
+
         // 로그아웃 처리 (블랙리스트 등록 + Refresh 삭제)
         Long expiration = jwtUtil.getExpiration(accessToken);
         redisUtil.addTokenToBlacklist(accessToken, expiration);
@@ -318,6 +324,29 @@ public class UserServiceImpl implements UserService {
 
         // DB에서 삭제
         userRepository.delete(user);
+    }
+
+    private void withdrawAppleUser(User user, String accessToken) {
+        String userId = String.valueOf(user.getUserId());
+
+        // Redis에서 refreshToken 조회
+        String refreshToken = redisUtil.getRefreshToken(userId)
+                .orElseThrow(() -> new UserException(ErrorStatus.REFRESH_TOKEN_NOT_FOUND));
+
+        // Apple 서버에 토큰 해지 요청
+        oAuthUtil.withDrawApple(refreshToken);
+
+        // AccessToken 블랙리스트 등록
+        Long expiration = jwtUtil.getExpiration(accessToken);
+        redisUtil.addTokenToBlacklist(accessToken, expiration);
+
+        // RefreshToken 제거
+        redisUtil.deleteRefreshToken(userId);
+
+        // 사용자 DB 삭제
+        userRepository.delete(user);
+
+        log.info("Apple 사용자 탈퇴 완료: userId = {}", userId);
     }
 
     // 소셜 로그인용 입사일 등록 API

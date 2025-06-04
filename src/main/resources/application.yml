@@ -38,6 +38,11 @@ oauth:
   naver:
     client-id: ${NAVER_CLIENT_ID}
     client-secret: ${NAVER_CLIENT_SECRET}
+  apple:
+    client-id: ${APPLE_CLIENT_ID}
+    key-id: ${APPLE_KEY_ID}
+    team-id: ${APPLE_TEAM_ID}
+    private-key: ${APPLE_PRIVATE_KEY}
 ##  google:
 ##    client-id: ${GOOGLE_CLIENT_ID}
 ##    client-secret: ${GOOGLE_CLIENT_SECRET}
