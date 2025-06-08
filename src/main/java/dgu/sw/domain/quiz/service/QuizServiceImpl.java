@@ -296,8 +296,32 @@ public class QuizServiceImpl implements QuizService {
         Double topPercentile = recentExam != null ? recentExam.getTopPercentile() : null;
         // 어제 많이 틀린 Top5 퀴즈
         List<Quiz> top5Wrong = userQuizRepository.findTop5MostWrongOnDate(LocalDate.now().minusDays(1));
+        List<UserQuiz> userQuizzes = userQuizRepository.findByUser_UserId(uid);
+        Map<Long, UserQuiz> userQuizMap = userQuizzes.stream()
+                .collect(Collectors.toMap(
+                        uq -> uq.getQuiz().getQuizId(),
+                        uq -> uq,
+                        (e1, e2) -> e1
+                ));
+
         List<QuizListResponse> top5Responses = top5Wrong.stream()
-                .map(quiz -> QuizConverter.toQuizListResponse(quiz, false, false, false, false))
+                .map(quiz -> {
+                    Long quizId = quiz.getQuizId();
+                    boolean isSolved = userQuizMap.containsKey(quizId);
+                    boolean isCorrect = isSolved && userQuizMap.get(quizId).isCorrect();
+
+                    Long firstQuizId = quizRepository.findFirstQuizIdByCategory(quiz.getCategory());
+                    Long previousQuizId = quizRepository.findPreviousQuizId(quiz.getCategory(), quizId);
+
+                    boolean isLocked = false;
+                    if (!quizId.equals(firstQuizId)) {
+                        // 첫 퀴즈가 아니면 이전 퀴즈 풀었는지 확인
+                        boolean previousSolved = userQuizMap.containsKey(previousQuizId);
+                        isLocked = !previousSolved;
+                    }
+
+                    return QuizConverter.toQuizListResponse(quiz, isLocked, isSolved, false, isCorrect);
+                })
                 .toList();
 
         return QuizMainPageResponse.builder()
