@@ -96,13 +96,13 @@ public class QuizServiceImpl implements QuizService {
             case 2:
                 return "명함 공유 매너";
             case 3:
-                return "직장인 글쓰기 Tip";
-            case 4:
                 return "팀장님께 메일 보내기";
+            case 4:
+                return "직장인 글쓰기 Tip";
             case 5:
-                return "커뮤니케이션 매너";
-            case 6:
                 return "TPO에 맞는 복장";
+            case 6:
+                return "커뮤니케이션 매너";
             default:
                 throw new IllegalArgumentException("잘못된 카테고리 번호입니다: " + category);
         }
