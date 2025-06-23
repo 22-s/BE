@@ -172,6 +172,11 @@ public class MockTestServiceImpl implements MockTestService {
                 topPercentileChange = previous.getTopPercentile() - mockTest.getTopPercentile();
             }
 
+            else {
+                scoreChange = score;
+                topPercentileChange = mockTest.getTopPercentile();
+            }
+
             return MockTestConverter.toMockTestResultResponse(
                     mockTest,
                     attemptCount,
