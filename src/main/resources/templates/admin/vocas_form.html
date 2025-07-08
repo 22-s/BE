@@ -1,0 +1,17 @@
+<h2>✏️ 어휘 등록</h2>
+<form method="post" th:action="@{/admin/vocas}">
+    <label>카테고리:
+        <select name="category">
+            <option value="회계재무">회계재무</option>
+            <option value="기술IT">기술IT</option>
+            <option value="마케팅세일즈">마케팅세일즈</option>
+            <option value="HR조직">HR조직</option>
+            <option value="리더십팀워크">리더십팀워크</option>
+            <option value="협상의사결정">협상의사결정</option>
+        </select>
+    </label><br/><br/>
+    <label>용어: <input type="text" name="term"/></label><br/><br/>
+    <label>설명: <textarea name="description" rows="3" cols="50"></textarea></label><br/><br/>
+    <label>예문: <textarea name="example" rows="3" cols="50"></textarea></label><br/><br/>
+    <button type="submit">등록</button>
+</form>
