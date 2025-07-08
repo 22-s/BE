@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>매너 등록</title>
+</head>
+<body>
+<h2>📝 매너 등록</h2>
+<form method="post" th:action="@{/admin/manners}">
+    <label>카테고리:
+        <select name="category">
+            <option value="기본 매너">기본 매너</option>
+            <option value="명함 공유 매너">명함 공유 매너</option>
+            <option value="직장인 글쓰기 Tip">직장인 글쓰기 Tip</option>
+            <option value="팀장님께 메일 보내기">팀장님께 메일 보내기</option>
+            <option value="커뮤니케이션 매너">커뮤니케이션 매너</option>
+            <option value="TPO에 맞는 복장">TPO에 맞는 복장</option>
+        </select>
+    </label>
+    <br/><br/>
+
+    <label>제목: <input type="text" name="title"/></label><br/><br/>
+    <label>이미지 URL: <input type="text" name="imageUrl"/></label><br/><br/>
+    <label>내용:<br/><textarea name="content" rows="5" cols="50"></textarea></label><br/><br/>
+    <button type="submit">등록하기</button>
+</form>
+</body>
+</html>

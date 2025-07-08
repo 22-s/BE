@@ -1,11 +1,14 @@
 package dgu.sw.domain.admin.controller;
 
+import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminMannerRequest;
 import dgu.sw.domain.admin.service.AdminService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -25,5 +28,29 @@ public class AdminController {
     public String showUserList(Model model) {
         model.addAttribute("users", adminService.getAllUsers());
         return "admin/users"; // resources/templates/admin/users.html
+    }
+
+    @GetMapping("/manners")
+    public String showManners(Model model) {
+        model.addAttribute("manners", adminService.getAllManners());
+        return "admin/manners_list";
+    }
+
+    @PostMapping("/manners/{mannerId}/delete")
+    public String deleteManner(@PathVariable Long mannerId) {
+        adminService.deleteManner(mannerId);
+        return "redirect:/admin/manners";
+    }
+
+    @GetMapping("/manners/new")
+    public String showMannerForm(Model model) {
+        model.addAttribute("manner", new AdminMannerRequest());
+        return "admin/manners_form"; // 등록 폼
+    }
+
+    @PostMapping("/manners")
+    public String saveManner(AdminMannerRequest request) {
+        adminService.saveManner(request);
+        return "redirect:/admin/manners";
     }
 }

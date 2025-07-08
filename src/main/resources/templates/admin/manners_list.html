@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>매너 목록</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ccc; }
+        form { display: inline; }
+    </style>
+</head>
+<body>
+<h2>🗂 등록된 매너 목록</h2>
+<a th:href="@{/admin/manners/new}">➕ 새 매너 등록</a>
+<br/><br/>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>카테고리</th>
+        <th>제목</th>
+        <th>이미지</th>
+        <th>내용</th>
+        <th>관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="manner : ${manners}">
+        <td th:text="${manner.mannerId}"></td>
+        <td th:text="${manner.category}"></td>
+        <td th:text="${manner.title}"></td>
+        <td><img th:src="${manner.imageUrl}" width="50"/></td>
+        <td th:text="${manner.content}"></td>
+        <td>
+            <form th:action="@{|/admin/manners/${manner.mannerId}/delete|}" method="post">
+                <button type="submit">❌ 삭제</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

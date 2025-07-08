@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>퀴즈 등록</title>
+</head>
+<body>
+<h2>🎯 퀴즈 등록</h2>
+<form method="post" th:action="@{/admin/quizzes}" enctype="application/x-www-form-urlencoded">
+    <label>카테고리: <input type="text" name="category"/></label><br/><br/>
+    <label>질문: <input type="text" name="question"/></label><br/><br/>
+    <label>정답: <input type="text" name="answer"/></label><br/><br/>
+    <label>설명: <input type="text" name="description"/></label><br/><br/>
+    <label>질문 상세: <textarea name="questionDet" rows="4" cols="40"></textarea></label><br/><br/>
+    <button type="submit">등록</button>
+</form>
+</body>
+</html>
