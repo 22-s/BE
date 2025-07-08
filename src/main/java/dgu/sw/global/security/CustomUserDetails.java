@@ -3,6 +3,7 @@ package dgu.sw.global.security;
 import dgu.sw.domain.user.entity.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -19,11 +20,13 @@ public class CustomUserDetails implements UserDetails {
     private final Long id;
     private final String email;
     private final String password;
+    private final String role;
 
     public CustomUserDetails(User user) {
         this.id = user.getUserId();
         this.email = user.getEmail();
         this.password = user.getPassword();
+        this.role = user.getRole().toString();
     }
 
     /**
@@ -32,8 +35,11 @@ public class CustomUserDetails implements UserDetails {
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList(); // 역할이 추가되면 여기서 관리 가능
+        return Collections.singletonList(
+                new SimpleGrantedAuthority("ROLE_" + role) // prefix 붙이기!
+        );
     }
+
 
     /**
      * Spring Security에서 사용자명을 반환하는 메서드

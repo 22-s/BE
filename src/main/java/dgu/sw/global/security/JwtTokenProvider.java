@@ -43,21 +43,22 @@ public class JwtTokenProvider {
 
     // AccessToken 생성 (userId를 Subject로 설정)
     public String generateAccessToken(User user) {
-        return createToken(user.getUserId(), user.getEmail(), jwtExpirationInMs);
+        return createToken(user.getUserId(), user.getEmail(), user.getRole().toString(), jwtExpirationInMs);
     }
 
     // RefreshToken 생성 및 Redis 저장
     public String generateRefreshToken(User user) {
-        String token = createToken(user.getUserId(), user.getEmail(), jwtRefreshExpirationInMs);
+        String token = createToken(user.getUserId(), user.getEmail(), user.getRole().toString(), jwtRefreshExpirationInMs);
         redisTemplate.opsForValue().set(String.valueOf(user.getUserId()), token, jwtRefreshExpirationInMs, TimeUnit.MILLISECONDS);
         return token;
     }
 
     // JWT 생성 로직 (userId를 Subject로 설정)
-    private String createToken(Long userId, String email, long expirationMs) {
+    private String createToken(Long userId, String email, String role, long expirationMs) {
         return Jwts.builder()
-                .setSubject(String.valueOf(userId)) // userId를 Subject로 저장
-                .claim("email", email) // email을 claims로 저장
+                .setSubject(String.valueOf(userId))
+                .claim("email", email)
+                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(secretKey, SignatureAlgorithm.HS512)

@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -45,8 +44,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 if (jwtUtil.validateToken(token)) {
                     // 인증 토큰 생성하고 AuthenticationManager를 통해 인증 수행
+                    Long userId = jwtUtil.extractUserId(token);
+                    String role = jwtUtil.extractRole(token);
                     Authentication authentication = authenticationManager.authenticate(
-                            new UsernamePasswordAuthenticationToken(token, null)
+                            new JwtAuthenticationToken(userId, role)
                     );
                     // 인증이 성공하면 SecurityContext에 저장하여 이후의 요청에서 인증 정보 활용 가능하게 함
                     SecurityContextHolder.getContext().setAuthentication(authentication);

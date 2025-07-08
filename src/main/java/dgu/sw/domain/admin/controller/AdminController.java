@@ -3,17 +3,18 @@ package dgu.sw.domain.admin.controller;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminMannerRequest;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminQuizRequest;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminVocaRequest;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminMannerResponse;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminQuizResponse;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminUserResponse;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminVocaResponse;
 import dgu.sw.domain.admin.service.AdminService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+import java.util.List;
+
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin")
 @Tag(name = "Admin 컨트롤러", description = "관리자 관련 화면 렌더링")
@@ -21,87 +22,63 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    @GetMapping("")
-    public String adminHome() {
-        return "admin/home"; // templates/admin/home.html
-    }
-
+    // 사용자 전체 조회
     @GetMapping("/users")
-    public String showUserList(Model model) {
-        model.addAttribute("users", adminService.getAllUsers());
-        return "admin/users"; // resources/templates/admin/users.html
+    public List<AdminUserResponse> getAllUsers() {
+        return adminService.getAllUsers();
     }
 
+    // 매너 전체 조회
     @GetMapping("/manners")
-    public String showManners(Model model) {
-        model.addAttribute("manners", adminService.getAllManners());
-        return "admin/manners_list";
+    public List<AdminMannerResponse> getAllManners() {
+        return adminService.getAllManners();
     }
 
-    @PostMapping("/manners/{mannerId}/delete")
-    public String deleteManner(@PathVariable Long mannerId) {
-        adminService.deleteManner(mannerId);
-        return "redirect:/admin/manners";
-    }
-
-    @GetMapping("/manners/new")
-    public String showMannerForm(Model model) {
-        model.addAttribute("manner", new AdminMannerRequest());
-        return "admin/manners_form"; // 등록 폼
-    }
-
+    // 매너 등록
     @PostMapping("/manners")
-    public String saveManner(AdminMannerRequest request) {
+    public void saveManner(@RequestBody AdminMannerRequest request) {
         adminService.saveManner(request);
-        return "redirect:/admin/manners";
     }
 
+    // 매너 삭제
+    @DeleteMapping("/manners/{mannerId}")
+    public void deleteManner(@PathVariable Long mannerId) {
+        adminService.deleteManner(mannerId);
+    }
+
+    // 퀴즈 전체 조회
     @GetMapping("/quizzes")
-    public String showQuizzes(Model model) {
-        model.addAttribute("quizzes", adminService.getAllQuizzes());
-        return "admin/quizzes_list";
+    public List<AdminQuizResponse> getAllQuizzes() {
+        return adminService.getAllQuizzes();
     }
 
-    @GetMapping("/quizzes/new")
-    public String showQuizForm(Model model) {
-        model.addAttribute("quiz", new AdminQuizRequest());
-        return "admin/quizzes_form";
-    }
-
+    // 퀴즈 등록
     @PostMapping("/quizzes")
-    public String saveQuiz(AdminQuizRequest request) {
+    public void saveQuiz(@RequestBody AdminQuizRequest request) {
         adminService.saveQuiz(request);
-        return "redirect:/admin/quizzes";
     }
 
-    @PostMapping("/quizzes/{quizId}/delete")
-    public String deleteQuiz(@PathVariable Long quizId) {
+    // 퀴즈 삭제
+    @DeleteMapping("/quizzes/{quizId}")
+    public void deleteQuiz(@PathVariable Long quizId) {
         adminService.deleteQuiz(quizId);
-        return "redirect:/admin/quizzes";
     }
 
-
+    // 단어 전체 조회
     @GetMapping("/vocas")
-    public String showVocaList(Model model) {
-        model.addAttribute("vocas", adminService.getAllVocas());
-        return "admin/vocas_list";
+    public List<AdminVocaResponse> getAllVocas() {
+        return adminService.getAllVocas();
     }
 
-    @GetMapping("/vocas/new")
-    public String showVocaForm(Model model) {
-        model.addAttribute("voca", new AdminVocaRequest());
-        return "admin/vocas_form";
-    }
-
+    // 단어 등록
     @PostMapping("/vocas")
-    public String saveVoca(AdminVocaRequest request) {
+    public void saveVoca(@RequestBody AdminVocaRequest request) {
         adminService.saveVoca(request);
-        return "redirect:/admin/vocas";
     }
 
-    @PostMapping("/vocas/{vocaId}/delete")
-    public String deleteVoca(@PathVariable Long vocaId) {
+    // 단어 삭제
+    @DeleteMapping("/vocas/{vocaId}")
+    public void deleteVoca(@PathVariable Long vocaId) {
         adminService.deleteVoca(vocaId);
-        return "redirect:/admin/vocas";
     }
 }

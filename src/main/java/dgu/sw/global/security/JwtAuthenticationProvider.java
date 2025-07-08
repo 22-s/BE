@@ -3,7 +3,6 @@ package dgu.sw.global.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
@@ -22,24 +21,30 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        if (authentication.getPrincipal() == null) {
-            throw new BadCredentialsException("Invalid authentication request: missing credentials.");
+        // 1. JwtAuthenticationToken으로 캐스팅
+        JwtAuthenticationToken jwtToken = (JwtAuthenticationToken) authentication;
+
+        // 2. userId (principal) 와 role (credentials) 추출
+        Long userId = (Long) jwtToken.getPrincipal();
+        String role = (String) jwtToken.getCredentials();
+
+        if (userId == null || role == null) {
+            throw new BadCredentialsException("Missing authentication information.");
         }
 
-        String token = (String) authentication.getPrincipal();
-        Long userId = jwtUtil.extractUserId(token);
-
-        if (userId == null) {
-            throw new BadCredentialsException("Invalid token: cannot extract user ID.");
-        }
-
+        // 3. DB에서 사용자 조회
         CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUserId(userId);
-        // 인증 객체 생성 및 반환 (SecurityContextHolder에 저장될 객체)
-        return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
+
+        if (!userDetails.getRole().equals(role)) {
+            throw new BadCredentialsException("Invalid Role");
+        }
+
+        // 4. 인증 완료 토큰 반환
+        return new JwtAuthenticationToken(userDetails, role, userDetails.getAuthorities());
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
+        return JwtAuthenticationToken.class.isAssignableFrom(authentication);
     }
 }
