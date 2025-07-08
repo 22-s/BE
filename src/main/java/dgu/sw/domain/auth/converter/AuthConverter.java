@@ -2,8 +2,8 @@ package dgu.sw.domain.auth.converter;
 
 import dgu.sw.domain.auth.dto.AuthDTO.AuthResponse.AuthUserResponse;
 import dgu.sw.domain.auth.dto.AuthUserProfile;
+import dgu.sw.domain.user.entity.Role;
 import dgu.sw.domain.user.entity.User;
-import dgu.sw.global.security.OAuthProvider;
 
 public class AuthConverter {
 
@@ -13,6 +13,7 @@ public class AuthConverter {
                 .nickname(profile.getNickname())
                 .profileImage(profile.getProfileImage())
                 .provider(profile.getProvider())
+                .role(Role.USER)
                 .build();
     }
 

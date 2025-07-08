@@ -70,11 +70,11 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/swagger-ui/**"),
                                 new AntPathRequestMatcher("/v3/api-docs/**"),
                                 new AntPathRequestMatcher("/api-docs/**"),
-                                new AntPathRequestMatcher("/error"),
+                                new AntPathRequestMatcher("/admin/login"),
                                 new AntPathRequestMatcher("/favicon.ico"),
-                                new AntPathRequestMatcher("/health"),
-                                new AntPathRequestMatcher("/admin/**")
+                                new AntPathRequestMatcher("/health")
                         ).permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

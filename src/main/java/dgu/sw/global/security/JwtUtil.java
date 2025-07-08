@@ -62,6 +62,20 @@ public class JwtUtil {
         }
     }
 
+    public String extractRole(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .get("role", String.class); // "role" 클레임에서 값을 추출
+        } catch (Exception e) {
+            LOGGER.warning("Failed to extract role from token: " + e.getMessage());
+            return null;
+        }
+    }
+
     // JWT 유효성 검사
     public boolean validateToken(String token) {
         try {

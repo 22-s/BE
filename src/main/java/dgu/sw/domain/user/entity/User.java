@@ -31,6 +31,8 @@ public class User extends BaseEntity {
     private String profileImage;
     @Enumerated(EnumType.STRING)
     private OAuthProvider provider;
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserQuiz> userQuizzes;

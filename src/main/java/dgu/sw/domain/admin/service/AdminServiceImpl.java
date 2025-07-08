@@ -1,21 +1,32 @@
 package dgu.sw.domain.admin.service;
 
-import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminVocaRequest;
-import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminVocaResponse;
+import dgu.sw.domain.user.converter.UserConverter;
+import dgu.sw.domain.user.dto.UserDTO.UserRequest.SignInRequest;
+import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignInResponse;
 import dgu.sw.domain.admin.converter.AdminConverter;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminMannerRequest;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminQuizRequest;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminVocaRequest;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminMannerResponse;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminQuizResponse;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminUserResponse;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminVocaResponse;
 import dgu.sw.domain.manner.entity.Manner;
 import dgu.sw.domain.manner.repository.MannerRepository;
 import dgu.sw.domain.quiz.entity.Quiz;
 import dgu.sw.domain.quiz.repository.QuizRepository;
+import dgu.sw.domain.user.entity.Role;
+import dgu.sw.domain.user.entity.User;
 import dgu.sw.domain.user.repository.UserRepository;
 import dgu.sw.domain.voca.repository.VocaRepository;
+import dgu.sw.global.exception.UserException;
+import dgu.sw.global.security.JwtTokenProvider;
+import dgu.sw.global.security.JwtUtil;
+import dgu.sw.global.status.ErrorStatus;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +39,9 @@ public class AdminServiceImpl implements AdminService {
     private final MannerRepository mannerRepository;
     private final QuizRepository quizRepository;
     private final VocaRepository vocaRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtUtil jwtUtil;
 
     @Override
     public List<AdminUserResponse> getAllUsers() {
