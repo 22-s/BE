@@ -1,0 +1,23 @@
+<h2>📘 등록된 어휘 목록</h2>
+<a th:href="@{/admin/vocas/new}">➕ 새 어휘 등록</a><br/><br/>
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th><th>카테고리</th><th>용어</th><th>설명</th><th>예문</th><th>관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="voca : ${vocas}">
+        <td th:text="${voca.vocaId}"></td>
+        <td th:text="${voca.category}"></td>
+        <td th:text="${voca.term}"></td>
+        <td th:text="${voca.description}"></td>
+        <td th:text="${voca.example}"></td>
+        <td>
+            <form th:action="@{|/admin/vocas/${voca.vocaId}/delete|}" method="post">
+                <button type="submit">❌ 삭제</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>

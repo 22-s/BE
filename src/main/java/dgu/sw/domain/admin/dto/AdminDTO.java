@@ -31,6 +31,16 @@ public class AdminDTO {
             private String questionDetail;
         }
 
+        @Getter
+        @Setter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class AdminVocaRequest {
+            private String category;
+            private String term;
+            private String description;
+            private String example;
+        }
     }
 
     public static class AdminResponse {
@@ -65,6 +75,16 @@ public class AdminDTO {
             private String answer;
             private String description;
             private String questionDetail;
+        }
+
+        @Getter
+        @Builder
+        public static class AdminVocaResponse {
+            private Long vocaId;
+            private String category;
+            private String term;
+            private String description;
+            private String example;
         }
     }
 }

@@ -1,13 +1,16 @@
 package dgu.sw.domain.admin.converter;
 
-import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminQuizResponse;
-import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminQuizRequest;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminVocaRequest;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminVocaResponse;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminMannerRequest;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminQuizRequest;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminMannerResponse;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminQuizResponse;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminUserResponse;
 import dgu.sw.domain.manner.entity.Manner;
 import dgu.sw.domain.quiz.entity.Quiz;
 import dgu.sw.domain.user.entity.User;
+import dgu.sw.domain.voca.entity.Voca;
 
 public class AdminConverter {
     public static AdminUserResponse toAdminUserResponse(User user) {
@@ -61,4 +64,22 @@ public class AdminConverter {
                 .build();
     }
 
+    public static AdminVocaResponse toAdminVocaResponse(Voca voca) {
+        return AdminVocaResponse.builder()
+                .vocaId(voca.getVocaId())
+                .category(voca.getCategory())
+                .term(voca.getTerm())
+                .description(voca.getDescription())
+                .example(voca.getExample())
+                .build();
+    }
+
+    public static Voca toVoca(AdminVocaRequest request) {
+        return Voca.builder()
+                .category(request.getCategory())
+                .term(request.getTerm())
+                .description(request.getDescription())
+                .example(request.getExample())
+                .build();
+    }
 }

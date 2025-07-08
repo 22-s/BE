@@ -1,7 +1,8 @@
 package dgu.sw.domain.admin.controller;
 
-import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminQuizRequest;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminMannerRequest;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminQuizRequest;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminVocaRequest;
 import dgu.sw.domain.admin.service.AdminService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -79,4 +80,28 @@ public class AdminController {
         return "redirect:/admin/quizzes";
     }
 
+
+    @GetMapping("/vocas")
+    public String showVocaList(Model model) {
+        model.addAttribute("vocas", adminService.getAllVocas());
+        return "admin/vocas_list";
+    }
+
+    @GetMapping("/vocas/new")
+    public String showVocaForm(Model model) {
+        model.addAttribute("voca", new AdminVocaRequest());
+        return "admin/vocas_form";
+    }
+
+    @PostMapping("/vocas")
+    public String saveVoca(AdminVocaRequest request) {
+        adminService.saveVoca(request);
+        return "redirect:/admin/vocas";
+    }
+
+    @PostMapping("/vocas/{vocaId}/delete")
+    public String deleteVoca(@PathVariable Long vocaId) {
+        adminService.deleteVoca(vocaId);
+        return "redirect:/admin/vocas";
+    }
 }
