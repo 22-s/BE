@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        body { font-family: sans-serif; padding: 40px; }
+        ul { list-style: none; padding: 0; }
+        li { margin-bottom: 16px; }
+        a { font-size: 18px; text-decoration: none; color: #0077cc; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<h1>🛠 관리자 기능 선택</h1>
+<ul>
+    <li><a th:href="@{/admin/users}">1. 유저 목록 조회</a></li>
+    <li><a th:href="@{/admin/manners/new}">2. 매너 등록</a></li>
+    <li><a th:href="@{/admin/vocas/new}">3. 단어 등록</a></li>
+    <li><a th:href="@{/admin/quizzes/new}">4. 퀴즈 등록</a></li>
+</ul>
+</body>
+</html>
