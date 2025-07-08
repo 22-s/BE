@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>퀴즈 목록</title></head>
+<body>
+<h2>📋 등록된 퀴즈 목록</h2>
+<a th:href="@{/admin/quizzes/new}">➕ 새 퀴즈 등록</a><br/><br/>
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th><th>카테고리</th><th>문제</th><th>문제 상세</th><th>정답</th><th>설명</th><th>관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="quiz : ${quizzes}">
+        <td th:text="${quiz.quizId}"></td>
+        <td th:text="${quiz.category}"></td>
+        <td th:text="${quiz.question}"></td>
+        <td th:text="${quiz.questionDetail}"></td>
+        <td th:text="${quiz.answer}"></td>
+        <td th:text="${quiz.description}"></td>
+        <td>
+            <form th:action="@{|/admin/quizzes/${quiz.quizId}/delete|}" method="post">
+                <button type="submit">❌ 삭제</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

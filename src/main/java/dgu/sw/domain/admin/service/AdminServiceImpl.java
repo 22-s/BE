@@ -2,10 +2,14 @@ package dgu.sw.domain.admin.service;
 
 import dgu.sw.domain.admin.converter.AdminConverter;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminMannerRequest;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminQuizRequest;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminMannerResponse;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminQuizResponse;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminUserResponse;
 import dgu.sw.domain.manner.entity.Manner;
 import dgu.sw.domain.manner.repository.MannerRepository;
+import dgu.sw.domain.quiz.entity.Quiz;
+import dgu.sw.domain.quiz.repository.QuizRepository;
 import dgu.sw.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +23,7 @@ import java.util.stream.Collectors;
 public class AdminServiceImpl implements AdminService {
     private final UserRepository userRepository;
     private final MannerRepository mannerRepository;
+    private final QuizRepository quizRepository;
 
     @Override
     public List<AdminUserResponse> getAllUsers() {
@@ -45,5 +50,25 @@ public class AdminServiceImpl implements AdminService {
     public void saveManner(AdminMannerRequest request) {
         Manner manner = AdminConverter.toManner(request);
         mannerRepository.save(manner);
+    }
+
+    @Override
+    public List<AdminQuizResponse> getAllQuizzes() {
+        return quizRepository.findAll().stream()
+                .map(AdminConverter::toAdminQuizResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void saveQuiz(AdminQuizRequest request) {
+        Quiz quiz = AdminConverter.toQuiz(request);
+        quizRepository.save(quiz);
+    }
+
+    @Override
+    @Transactional
+    public void deleteQuiz(Long quizId) {
+        quizRepository.deleteById(quizId);
     }
 }

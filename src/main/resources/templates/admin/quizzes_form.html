@@ -1,17 +1,30 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>퀴즈 등록</title>
-</head>
+<head><meta charset="UTF-8"><title>퀴즈 등록</title></head>
 <body>
-<h2>🎯 퀴즈 등록</h2>
-<form method="post" th:action="@{/admin/quizzes}" enctype="application/x-www-form-urlencoded">
-    <label>카테고리: <input type="text" name="category"/></label><br/><br/>
-    <label>질문: <input type="text" name="question"/></label><br/><br/>
-    <label>정답: <input type="text" name="answer"/></label><br/><br/>
-    <label>설명: <input type="text" name="description"/></label><br/><br/>
-    <label>질문 상세: <textarea name="questionDet" rows="4" cols="40"></textarea></label><br/><br/>
+<h2>✏️ 퀴즈 등록</h2>
+<form method="post" th:action="@{/admin/quizzes}">
+    <label>카테고리:
+        <select name="category">
+            <option value="기본 매너">기본 매너</option>
+            <option value="명함 공유 매너">명함 공유 매너</option>
+            <option value="직장인 글쓰기 Tip">직장인 글쓰기 Tip</option>
+            <option value="팀장님께 메일 보내기">팀장님께 메일 보내기</option>
+            <option value="커뮤니케이션 매너">커뮤니케이션 매너</option>
+            <option value="TPO에 맞는 복장">TPO에 맞는 복장</option>
+        </select>
+    </label>
+    <br/><br/>
+    <label>문제: <input type="text" name="question"/></label><br/><br/>
+    <label>문제 상세: <textarea name="questionDetail" rows="4" cols="50"></textarea></label><br/><br/>
+    <label>정답:
+        <select name="answer">
+            <option value="O">O</option>
+            <option value="X">X</option>
+        </select>
+    </label>
+    <br/><br/>
+    <label>설명: <textarea name="description" rows="4" cols="50"></textarea></label><br/><br/>
     <button type="submit">등록</button>
 </form>
 </body>

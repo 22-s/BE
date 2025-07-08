@@ -18,6 +18,19 @@ public class AdminDTO {
             private String imageUrl;
             private String content;
         }
+
+        @Getter
+        @Setter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class AdminQuizRequest {
+            private String category;
+            private String question;
+            private String answer;
+            private String description;
+            private String questionDetail;
+        }
+
     }
 
     public static class AdminResponse {
@@ -41,6 +54,17 @@ public class AdminDTO {
             private String title;
             private String imageUrl;
             private String content;
+        }
+
+        @Getter
+        @Builder
+        public static class AdminQuizResponse {
+            private Long quizId;
+            private String category;
+            private String question;
+            private String answer;
+            private String description;
+            private String questionDetail;
         }
     }
 }

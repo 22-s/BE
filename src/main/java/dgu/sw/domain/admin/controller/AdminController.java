@@ -1,5 +1,6 @@
 package dgu.sw.domain.admin.controller;
 
+import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminQuizRequest;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminMannerRequest;
 import dgu.sw.domain.admin.service.AdminService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,4 +54,29 @@ public class AdminController {
         adminService.saveManner(request);
         return "redirect:/admin/manners";
     }
+
+    @GetMapping("/quizzes")
+    public String showQuizzes(Model model) {
+        model.addAttribute("quizzes", adminService.getAllQuizzes());
+        return "admin/quizzes_list";
+    }
+
+    @GetMapping("/quizzes/new")
+    public String showQuizForm(Model model) {
+        model.addAttribute("quiz", new AdminQuizRequest());
+        return "admin/quizzes_form";
+    }
+
+    @PostMapping("/quizzes")
+    public String saveQuiz(AdminQuizRequest request) {
+        adminService.saveQuiz(request);
+        return "redirect:/admin/quizzes";
+    }
+
+    @PostMapping("/quizzes/{quizId}/delete")
+    public String deleteQuiz(@PathVariable Long quizId) {
+        adminService.deleteQuiz(quizId);
+        return "redirect:/admin/quizzes";
+    }
+
 }
