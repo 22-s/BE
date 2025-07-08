@@ -72,7 +72,8 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/api-docs/**"),
                                 new AntPathRequestMatcher("/error"),
                                 new AntPathRequestMatcher("/favicon.ico"),
-                                new AntPathRequestMatcher("/health")
+                                new AntPathRequestMatcher("/health"),
+                                new AntPathRequestMatcher("/admin/**")
                         ).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

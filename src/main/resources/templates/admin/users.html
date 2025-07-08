@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - 유저 목록</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
+    </style>
+</head>
+<body>
+<h2>전체 유저 목록</h2>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>이메일</th>
+        <th>닉네임</th>
+        <th>프로필</th>
+        <th>소셜</th>
+        <th>가입일</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.userId}"></td>
+        <td th:text="${user.email}"></td>
+        <td th:text="${user.nickname}"></td>
+        <td><img th:src="${user.profileImage}" width="50"/></td>
+        <td th:text="${user.provider}"></td>
+        <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
