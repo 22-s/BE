@@ -367,4 +367,14 @@ public class UserServiceImpl implements UserService {
                 .updatedJoinDate(user.getJoinDate())
                 .build();
     }
+
+    // 알림 기능
+    @Override
+    public void updateFcmToken(String userId, String fcmToken) {
+        User user = userRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
+
+        user.setFcmToken(fcmToken);
+        userRepository.save(user);
+    }
 }

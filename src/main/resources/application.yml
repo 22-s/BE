@@ -51,3 +51,9 @@ oauth:
 REDIS_HOST: ${REDIS_URL}
 REDIS_PORT: ${REDIS_PORT}
 REDIS_TLS: ${REDIS_TLS}
+
+fcm:
+  file-path: ${FCM_JSON_PATH}
+  url: https://fcm.googleapis.com/v1/projects/${FCM_PROJECT_ID}/messages:send
+  google-api: https://www.googleapis.com/auth/cloud-platform
+  project-id: ${FCM_PROJECT_ID}

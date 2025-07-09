@@ -34,6 +34,12 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
+    @Getter
+    @Setter
+    @Column(name = "fcm_token")
+    private String fcmToken;
+
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserQuiz> userQuizzes;
 
