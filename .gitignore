@@ -16,6 +16,7 @@ build/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
+java/dgu/sw/quiz/
 
 ### IntelliJ IDEA ###
 .idea
@@ -44,3 +45,4 @@ src/main/generated
 
 .DS_Store
 /src/main/resources/application-secret.yml
+/src/test/java/dgu/sw/quiz/
