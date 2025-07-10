@@ -83,8 +83,11 @@ public enum ErrorStatus implements BaseErrorCode {
     FCM_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FCM5001", "FCM 알림 전송에 실패했습니다."),
     FCM_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "FCM4041", "FCM 토큰이 존재하지 않습니다."),
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTI4041", "해당 알림을 찾을 수 없습니다."),
-    NOTIFICATION_ACCESS_DENIED(HttpStatus.FORBIDDEN, "NOTI4031", "해당 알림에 접근할 수 없습니다.");
+    NOTIFICATION_ACCESS_DENIED(HttpStatus.FORBIDDEN, "NOTI4031", "해당 알림에 접근할 수 없습니다."),
 
+    // 피드백 관련 에러
+    FEEDBACK_BAD_REQUEST(HttpStatus.BAD_REQUEST, "FEEDBACK4001", "필수 입력값이 누락되었습니다."),
+    FEEDBACK_INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "FEEDBACK4002", "존재하지 않는 피드백 카테고리입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
