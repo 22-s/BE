@@ -8,6 +8,16 @@ import java.time.LocalDateTime;
 public class AdminDTO {
 
     public static class AdminRequest {
+
+        @Getter
+        @Setter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class AdminLoginRequest {
+            private String email;
+            private String password;
+        }
+
         @Getter
         @Setter
         @NoArgsConstructor
@@ -44,6 +54,18 @@ public class AdminDTO {
     }
 
     public static class AdminResponse {
+
+        @Getter
+        @Builder
+        @AllArgsConstructor
+        public static class AdminLoginResponse {
+            private String accessToken;
+            private String refreshToken;
+            private Long userId;
+            private String email;
+            private String nickname;
+        }
+
         @Getter
         @Builder
         public static class AdminUserResponse {

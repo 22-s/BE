@@ -1,5 +1,6 @@
 package dgu.sw.domain.admin.converter;
 
+import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminLoginResponse;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminVocaRequest;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminVocaResponse;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminMannerRequest;
@@ -13,6 +14,17 @@ import dgu.sw.domain.user.entity.User;
 import dgu.sw.domain.voca.entity.Voca;
 
 public class AdminConverter {
+
+    public static AdminLoginResponse toAdminLoginResponse(String accessToken, String refreshToken, User user) {
+        return AdminLoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .userId(user.getUserId())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .build();
+    }
+
     public static AdminUserResponse toAdminUserResponse(User user) {
         return AdminUserResponse.builder()
                 .userId(user.getUserId())
