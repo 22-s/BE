@@ -23,4 +23,7 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
 
     @Query(value = "SELECT * FROM quiz ORDER BY RAND() LIMIT :limit", nativeQuery = true)
     List<Quiz> findRandomQuizzes(@Param("limit") int limit);
+
+    @Query(value = "SELECT * FROM quiz WHERE quiz_level = :level ORDER BY RAND() LIMIT :limit", nativeQuery = true)
+    List<Quiz> findRandomQuizzesByLevel(@Param("limit") int limit, @Param("level") String level);
 }
