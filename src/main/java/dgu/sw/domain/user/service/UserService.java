@@ -14,7 +14,7 @@ public interface UserService {
 
     void signOut(HttpServletRequest request, HttpServletResponse response);
 
-    SignInResponse refreshAccessToken(String refreshToken, HttpServletResponse response);
+    SignInResponse refreshAccessToken(String refreshToken);
 
     void checkEmailDuplicate(String email);
 
