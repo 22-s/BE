@@ -1,33 +1,30 @@
 package dgu.sw.domain.user.service;
 
 import dgu.sw.domain.user.converter.UserConverter;
-import dgu.sw.domain.user.dto.UserDTO.UserResponse.UpdateJoinDateResponse;
+import dgu.sw.domain.user.dto.UserDTO.UserRequest.PasswordResetRequest;
+import dgu.sw.domain.user.dto.UserDTO.UserRequest.SignInRequest;
+import dgu.sw.domain.user.dto.UserDTO.UserRequest.SignUpRequest;
 import dgu.sw.domain.user.dto.UserDTO.UserResponse.MyPageResponse;
 import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignInResponse;
+import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignUpResponse;
+import dgu.sw.domain.user.dto.UserDTO.UserResponse.UpdateJoinDateResponse;
 import dgu.sw.domain.user.entity.User;
 import dgu.sw.domain.user.repository.UserRepository;
+import dgu.sw.global.config.redis.RedisUtil;
+import dgu.sw.global.config.util.EmailService;
+import dgu.sw.global.exception.UserException;
 import dgu.sw.global.security.JwtTokenProvider;
 import dgu.sw.global.security.JwtUtil;
-import dgu.sw.global.config.redis.RedisUtil;
-import dgu.sw.global.exception.UserException;
 import dgu.sw.global.security.OAuthProvider;
 import dgu.sw.global.security.OAuthUtil;
 import dgu.sw.global.status.ErrorStatus;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignUpResponse;
-import dgu.sw.domain.user.dto.UserDTO.UserRequest.SignUpRequest;
-import dgu.sw.domain.user.dto.UserDTO.UserRequest.SignInRequest;
-import dgu.sw.domain.user.dto.UserDTO.UserRequest.PasswordResetRequest;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import dgu.sw.global.config.util.EmailService;
 
 import java.time.LocalDate;
 
@@ -122,7 +119,7 @@ public class UserServiceImpl implements UserService {
      * AccessToken 갱신
      */
     @Override
-    public SignInResponse refreshAccessToken(String refreshToken, HttpServletResponse response) {
+    public SignInResponse refreshAccessToken(String refreshToken) {
         Long extractedUserId = jwtUtil.extractUserId(refreshToken);
         if (extractedUserId == null) {
             throw new UserException(ErrorStatus.INVALID_REFRESH_TOKEN);

@@ -42,8 +42,9 @@ public class UserController {
 
     @PostMapping("/refresh")
     @Operation(summary = "토큰 갱신 API", description = "Refresh Token을 이용하여 Access Token을 갱신합니다.")
-    public ApiResponse<SignInResponse> refresh(@RequestHeader("refreshToken") String refreshToken, HttpServletResponse response) {
-        return ApiResponse.onSuccess(userService.refreshAccessToken(refreshToken, response));
+    public ApiResponse<SignInResponse> refresh(@RequestHeader("Authorization") String authorizationHeader) {
+        String refreshToken = authorizationHeader.replace("Bearer ", "");
+        return ApiResponse.onSuccess(userService.refreshAccessToken(refreshToken));
     }
 
     @PostMapping("/check-email")
