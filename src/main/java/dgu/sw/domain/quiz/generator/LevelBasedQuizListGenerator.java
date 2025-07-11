@@ -3,10 +3,7 @@ package dgu.sw.domain.quiz.generator;
 import dgu.sw.domain.quiz.entity.Quiz;
 import dgu.sw.domain.quiz.repository.QuizRepository;
 import lombok.RequiredArgsConstructor;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
