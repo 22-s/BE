@@ -30,7 +30,7 @@ public class MockTestServiceImpl implements MockTestService {
     private final MockTestRepository mockTestRepository;
     private final UserRepository userRepository;
     private final MockTestQuizRepository mockTestQuizRepository;
-    private final QuizListGenerator levelBasedQuizListGenerator;
+    private final QuizListGenerator randomQuizListGenerator;
 
     @Override
     @Transactional
@@ -38,7 +38,7 @@ public class MockTestServiceImpl implements MockTestService {
         User user = userRepository.findByUserId(Long.valueOf(userId));
         
         //퀴즈 리스트 생성
-        List<Quiz> randomQuizzes = levelBasedQuizListGenerator.generateQuizList();
+        List<Quiz> randomQuizzes = randomQuizListGenerator.generateQuizList();
         
         // 모의고사 양식 저장
         MockTest mockTest = MockTest.builder()
