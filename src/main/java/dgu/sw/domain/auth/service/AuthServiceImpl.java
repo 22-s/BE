@@ -91,7 +91,6 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
-
         // 5. 신규 회원이면 회원가입 또는 기존 유저 반환
         User user = existingUserOpt.orElseGet(() -> registerNewUser(userProfile));
 

@@ -2,16 +2,15 @@ package dgu.sw.domain.quiz.service;
 
 import dgu.sw.domain.quiz.converter.MockTestConverter;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.MockTestResultResponse;
-import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.MockTestResultResponse.MockTestQuestionResult;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.SubmitMockTestResponse;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestRequest.SubmitMockTestRequest;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.CreateMockTestResponse;
 import dgu.sw.domain.quiz.entity.MockTest;
 import dgu.sw.domain.quiz.entity.MockTestQuiz;
 import dgu.sw.domain.quiz.entity.Quiz;
+import dgu.sw.domain.quiz.generator.QuizListGenerator;
 import dgu.sw.domain.quiz.repository.MockTestQuizRepository;
 import dgu.sw.domain.quiz.repository.MockTestRepository;
-import dgu.sw.domain.quiz.repository.QuizRepository;
 import dgu.sw.domain.user.entity.User;
 import dgu.sw.domain.user.repository.UserRepository;
 import dgu.sw.global.exception.QuizException;
@@ -20,30 +19,28 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class MockTestServiceImpl implements MockTestService {
     private final MockTestRepository mockTestRepository;
-    private final QuizRepository quizRepository;
     private final UserRepository userRepository;
     private final MockTestQuizRepository mockTestQuizRepository;
+    private final QuizListGenerator randomQuizListGenerator;
 
     @Override
     @Transactional
     public CreateMockTestResponse startMockTest(String userId) {
         User user = userRepository.findByUserId(Long.valueOf(userId));
-
-        // 랜덤한 10문제 가져오기
-        List<Quiz> randomQuizzes = quizRepository.findRandomQuizzes(10);
-
-        // 모의고사 생성
+        
+        //퀴즈 리스트 생성
+        List<Quiz> randomQuizzes = randomQuizListGenerator.generateQuizList();
+        
+        // 모의고사 양식 저장
         MockTest mockTest = MockTest.builder()
                 .user(user)
                 .isCompleted(false)

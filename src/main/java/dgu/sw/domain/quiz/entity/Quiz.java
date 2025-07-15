@@ -31,4 +31,8 @@ public class Quiz {
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL)
     private List<QuizReviewList> quizReviewLists;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private QuizLevel quizLevel = QuizLevel.MEDIUM;
 }
