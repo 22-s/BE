@@ -6,6 +6,7 @@ import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminMannerRequest;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminQuizRequest;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminVocaRequest;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.*;
+import dgu.sw.domain.feedback.repository.FeedbackRepository;
 import dgu.sw.domain.manner.entity.Manner;
 import dgu.sw.domain.manner.repository.MannerRepository;
 import dgu.sw.domain.quiz.entity.Quiz;
@@ -21,7 +22,6 @@ import dgu.sw.global.exception.QuizException;
 import dgu.sw.global.exception.UserException;
 import dgu.sw.global.exception.VocaException;
 import dgu.sw.global.security.JwtTokenProvider;
-import dgu.sw.global.security.JwtUtil;
 import dgu.sw.global.status.ErrorStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +40,8 @@ public class AdminServiceImpl implements AdminService {
     private final VocaRepository vocaRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final JwtUtil jwtUtil;
     private final RedisUtil redisUtil;
+    private final FeedbackRepository feedbackRepository;
 
     @Override
     public AdminLoginResponse login(AdminLoginRequest request) {
@@ -199,5 +199,13 @@ public class AdminServiceImpl implements AdminService {
     public void deleteVoca(Long vocaId, String userId) {
         checkAdminRole(userId);  // 권한 확인
         vocaRepository.deleteById(vocaId);
+    }
+
+    @Override
+    public List<AdminFeedbackResponse> getAllFeedbacks(String userId) {
+        checkAdminRole(userId);
+        return feedbackRepository.findAll().stream()
+                .map(AdminConverter::toAdminFeedbackResponse)
+                .collect(Collectors.toList());
     }
 }

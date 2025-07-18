@@ -1,13 +1,10 @@
 package dgu.sw.domain.admin.converter;
 
-import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminLoginResponse;
-import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminVocaRequest;
-import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminVocaResponse;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminMannerRequest;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminQuizRequest;
-import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminMannerResponse;
-import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminQuizResponse;
-import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminUserResponse;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminVocaRequest;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.*;
+import dgu.sw.domain.feedback.entity.Feedback;
 import dgu.sw.domain.manner.entity.Manner;
 import dgu.sw.domain.quiz.entity.Quiz;
 import dgu.sw.domain.user.entity.User;
@@ -93,6 +90,17 @@ public class AdminConverter {
                 .term(request.getTerm())
                 .description(request.getDescription())
                 .example(request.getExample())
+                .build();
+    }
+
+    public static AdminFeedbackResponse toAdminFeedbackResponse(Feedback feedback) {
+        return AdminFeedbackResponse.builder()
+                .feedbackId(feedback.getFeedbackId())
+                .email(feedback.getUser().getEmail())
+                .nickname(feedback.getUser().getNickname())
+                .category(feedback.getCategory())
+                .content(feedback.getContent())
+                .isAnonymous(feedback.getIsAnonymous())
                 .build();
     }
 }

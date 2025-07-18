@@ -1,5 +1,6 @@
 package dgu.sw.domain.admin.controller;
 
+import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminFeedbackResponse;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminLoginResponse;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminLoginRequest;;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminMannerRequest;
@@ -117,5 +118,11 @@ public class AdminController {
     public ApiResponse<String> deleteVoca(@PathVariable Long vocaId, Authentication authentication) {
         adminService.deleteVoca(vocaId, authentication.getName());
         return ApiResponse.onSuccess("단어가 삭제되었습니다.");
+    }
+
+    // 앱 피드백 조회
+    @GetMapping("/app")
+    public ApiResponse<List<AdminFeedbackResponse>> getFeedback(Authentication authentication) {
+        return ApiResponse.onSuccess(adminService.getAllFeedbacks(authentication.getName()));
     }
 }

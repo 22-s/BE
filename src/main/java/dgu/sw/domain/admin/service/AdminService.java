@@ -1,5 +1,6 @@
 package dgu.sw.domain.admin.service;
 
+import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminFeedbackResponse;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminLoginResponse;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminLoginRequest;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminMannerRequest;
@@ -27,4 +28,5 @@ public interface AdminService {
     void saveVoca(AdminVocaRequest request, String userId);
     void updateVoca(Long vocaId, AdminVocaRequest request, String userId);
     void deleteVoca(Long vocaId, String userId);
+    List<AdminFeedbackResponse> getAllFeedbacks(String userId);
 }
