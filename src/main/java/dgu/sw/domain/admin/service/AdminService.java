@@ -18,10 +18,13 @@ public interface AdminService {
     List<AdminMannerResponse> getAllManners(String userId);
     void deleteManner(Long mannerId, String userId);
     void saveManner(AdminMannerRequest request, String userId);
+    void updateManner(Long mannerId, AdminMannerRequest request, String userId);
     List<AdminQuizResponse> getAllQuizzes(String userId);
     void saveQuiz(AdminQuizRequest request, String userId);
+    void updateQuiz(Long quizId, AdminQuizRequest request, String userId);
     void deleteQuiz(Long quizId, String userId);
     List<AdminVocaResponse> getAllVocas(String userId);
     void saveVoca(AdminVocaRequest request, String userId);
+    void updateVoca(Long vocaId, AdminVocaRequest request, String userId);
     void deleteVoca(Long vocaId, String userId);
 }

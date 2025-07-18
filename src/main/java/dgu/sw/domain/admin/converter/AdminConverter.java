@@ -63,6 +63,7 @@ public class AdminConverter {
                 .answer(quiz.getAnswer())
                 .description(quiz.getDescription())
                 .questionDetail(quiz.getQuestionDetail())
+                .quizLevel(quiz.getQuizLevel())
                 .build();
     }
 

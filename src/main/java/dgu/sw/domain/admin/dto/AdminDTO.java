@@ -1,5 +1,6 @@
 package dgu.sw.domain.admin.dto;
 
+import dgu.sw.domain.quiz.entity.QuizLevel;
 import dgu.sw.global.security.OAuthProvider;
 import lombok.*;
 
@@ -39,6 +40,7 @@ public class AdminDTO {
             private String answer;
             private String description;
             private String questionDetail;
+            private QuizLevel quizLevel;
         }
 
         @Getter
@@ -97,6 +99,7 @@ public class AdminDTO {
             private String answer;
             private String description;
             private String questionDetail;
+            private QuizLevel quizLevel;
         }
 
         @Getter

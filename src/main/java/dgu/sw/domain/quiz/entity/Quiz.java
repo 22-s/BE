@@ -35,4 +35,13 @@ public class Quiz {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private QuizLevel quizLevel = QuizLevel.MEDIUM;
+
+    public void updateQuiz(String category, String question, String answer, String description, String questionDetail, QuizLevel quizLevel) {
+        this.category = category;
+        this.question = question;
+        this.answer = answer;
+        this.description = description;
+        this.questionDetail = questionDetail;
+        this.quizLevel = quizLevel;
+    }
 }
