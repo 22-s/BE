@@ -25,4 +25,11 @@ public class Manner {
 
     @OneToMany(mappedBy = "manner", cascade = CascadeType.ALL)
     private List<FavoriteManner> favoriteManner;
+
+    public void updateManner(String category, String title, String content, String imageUrl) {
+        this.category = category;
+        this.title = title;
+        this.content = content;
+        this.imageUrl = imageUrl;
+    }
 }

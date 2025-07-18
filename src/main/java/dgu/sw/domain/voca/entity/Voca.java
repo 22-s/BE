@@ -23,4 +23,11 @@ public class Voca {
 
     @OneToMany(mappedBy = "voca", cascade = CascadeType.ALL)
     private List<FavoriteVoca> favoriteVocas;
+
+    public void updateVoca(String category, String term, String description, String example) {
+        this.category = category;
+        this.term = term;
+        this.description = description;
+        this.example = example;
+    }
 }

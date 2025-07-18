@@ -1,15 +1,11 @@
 package dgu.sw.domain.admin.service;
 
-import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminLoginResponse;
-import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminLoginRequest;
 import dgu.sw.domain.admin.converter.AdminConverter;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminLoginRequest;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminMannerRequest;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminQuizRequest;
 import dgu.sw.domain.admin.dto.AdminDTO.AdminRequest.AdminVocaRequest;
-import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminMannerResponse;
-import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminQuizResponse;
-import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminUserResponse;
-import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.AdminVocaResponse;
+import dgu.sw.domain.admin.dto.AdminDTO.AdminResponse.*;
 import dgu.sw.domain.manner.entity.Manner;
 import dgu.sw.domain.manner.repository.MannerRepository;
 import dgu.sw.domain.quiz.entity.Quiz;
@@ -17,9 +13,13 @@ import dgu.sw.domain.quiz.repository.QuizRepository;
 import dgu.sw.domain.user.entity.Role;
 import dgu.sw.domain.user.entity.User;
 import dgu.sw.domain.user.repository.UserRepository;
+import dgu.sw.domain.voca.entity.Voca;
 import dgu.sw.domain.voca.repository.VocaRepository;
 import dgu.sw.global.config.redis.RedisUtil;
+import dgu.sw.global.exception.MannerException;
+import dgu.sw.global.exception.QuizException;
 import dgu.sw.global.exception.UserException;
+import dgu.sw.global.exception.VocaException;
 import dgu.sw.global.security.JwtTokenProvider;
 import dgu.sw.global.security.JwtUtil;
 import dgu.sw.global.status.ErrorStatus;
@@ -110,6 +110,21 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
+    public void updateManner(Long mannerId, AdminMannerRequest request, String userId) {
+        checkAdminRole(userId);
+        Manner existingManner = mannerRepository.findById(mannerId)
+                .orElseThrow(() -> new MannerException(ErrorStatus.MANNER_NOT_FOUND));
+
+        existingManner.updateManner(
+                request.getCategory(),
+                request.getTitle(),
+                request.getContent(),
+                request.getImageUrl()
+        );
+    }
+
+    @Override
     public List<AdminQuizResponse> getAllQuizzes(String userId) {
         checkAdminRole(userId);  // 권한 확인
         return quizRepository.findAll().stream()
@@ -123,6 +138,23 @@ public class AdminServiceImpl implements AdminService {
         checkAdminRole(userId);  // 권한 확인
         Quiz quiz = AdminConverter.toQuiz(request);
         quizRepository.save(quiz);
+    }
+
+    @Override
+    @Transactional
+    public void updateQuiz(Long quizId, AdminQuizRequest request, String userId) {
+        checkAdminRole(userId);
+        Quiz existingQuiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_FOUND));
+
+        existingQuiz.updateQuiz(
+                request.getCategory(),
+                request.getQuestion(),
+                request.getAnswer(),
+                request.getDescription(),
+                request.getQuestionDetail(),
+                request.getQuizLevel()
+            );
     }
 
     @Override
@@ -145,6 +177,21 @@ public class AdminServiceImpl implements AdminService {
     public void saveVoca(AdminVocaRequest request, String userId) {
         checkAdminRole(userId);  // 권한 확인
         vocaRepository.save(AdminConverter.toVoca(request));
+    }
+
+    @Override
+    @Transactional
+    public void updateVoca(Long vocaId, AdminVocaRequest request, String userId) {
+        checkAdminRole(userId);
+        Voca existingVoca = vocaRepository.findById(vocaId)
+                .orElseThrow(() -> new VocaException(ErrorStatus.VOCA_NOT_FOUND));
+
+        existingVoca.updateVoca(
+                request.getCategory(),
+                request.getTerm(),
+                request.getDescription(),
+                request.getExample()
+        );
     }
 
     @Override
