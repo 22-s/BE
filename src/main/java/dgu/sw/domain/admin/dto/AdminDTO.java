@@ -1,5 +1,6 @@
 package dgu.sw.domain.admin.dto;
 
+import dgu.sw.domain.feedback.dto.FeedbackCategory;
 import dgu.sw.domain.quiz.entity.QuizLevel;
 import dgu.sw.global.security.OAuthProvider;
 import lombok.*;
@@ -110,6 +111,17 @@ public class AdminDTO {
             private String term;
             private String description;
             private String example;
+        }
+
+        @Getter
+        @Builder
+        public static class AdminFeedbackResponse {
+            private Long feedbackId;
+            private String email;        // 작성자 이메일 (익명 아닐 때만)
+            private String nickname;     // 작성자 닉네임 (익명 아닐 때만)
+            private FeedbackCategory category;
+            private String content;
+            private Boolean isAnonymous;
         }
     }
 }
