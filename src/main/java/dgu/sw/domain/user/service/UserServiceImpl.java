@@ -164,7 +164,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
 
-        if (user.getProvider() != null) {
+        if (user.getProvider() != OAuthProvider.GENERAL) {
             throw new UserException(ErrorStatus.SOCIAL_USER_CANNOT_CHANGE_PASSWORD);
         }
     }
@@ -176,7 +176,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
 
-        if (user.getProvider() != null) {
+        if (user.getProvider() != OAuthProvider.GENERAL) {
             throw new UserException(ErrorStatus.SOCIAL_USER_CANNOT_CHANGE_PASSWORD);
         }
 
@@ -252,7 +252,7 @@ public class UserServiceImpl implements UserService {
         // 1. 사용자 존재 확인
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
         // 소셜 로그인 사용자는 비밀번호 변경 제한
-        if (user.getProvider() != null) {
+        if (user.getProvider() != OAuthProvider.GENERAL) {
             throw new UserException(ErrorStatus.SOCIAL_USER_CANNOT_CHANGE_PASSWORD);
         }
 
