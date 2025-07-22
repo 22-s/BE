@@ -17,16 +17,19 @@ public class FCMService {
             // 메시지 구성
             Message message = Message.builder()
                     .setToken(targetToken)
-                    .putData("title", title)
-                    .putData("body", body)
+                    .setNotification(Notification.builder()
+                            .setTitle(title)
+                            .setBody(body)
+                            .build())
+                    .putData("type", "mocktest")
                     .build();
 
             // Firebase 메시지 전송
             String response = FirebaseMessaging.getInstance().send(message);
-            log.info("FCM 메시지 전송 완료: {}", response);
+            log.info("✅ FCM 메시지 전송 완료: {}", response);
 
         } catch (FirebaseMessagingException e) {
-            log.error("FCM 메시지 전송 실패: {}", e.getMessage());
+            log.error("❌ FCM 메시지 전송 실패: {}", e.getMessage());
             throw new UserException(ErrorStatus._INTERNAL_SERVER_ERROR);
         }
     }
