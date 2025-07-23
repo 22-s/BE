@@ -2,6 +2,7 @@ package dgu.sw.domain.feedback.entity;
 
 import dgu.sw.domain.feedback.dto.FeedbackCategory;
 import dgu.sw.domain.user.entity.User;
+import dgu.sw.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,14 +11,14 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Feedback {
+public class Feedback extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long feedbackId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "userId", nullable = true)
     private User user;
 
     @Enumerated(EnumType.STRING)
