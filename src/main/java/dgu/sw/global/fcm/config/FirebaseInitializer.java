@@ -6,10 +6,7 @@ import com.google.firebase.FirebaseOptions;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 
 @Slf4j
@@ -17,14 +14,11 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class FirebaseInitializer {
 
-    @Value("${fcm.file-path}")
-    private Resource firebaseConfig;
-
     @PostConstruct
     public void initialize() {
         try {
             FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(firebaseConfig.getInputStream()))
+                    .setCredentials(GoogleCredentials.getApplicationDefault())
                     .build();
 
             if (FirebaseApp.getApps().isEmpty()) {
