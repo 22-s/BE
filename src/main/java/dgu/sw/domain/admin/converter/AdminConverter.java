@@ -95,13 +95,15 @@ public class AdminConverter {
     }
 
     public static AdminFeedbackResponse toAdminFeedbackResponse(Feedback feedback) {
+        User user = feedback.getUser(); // 탈퇴한 경우 null일 수 있음
+
         return AdminFeedbackResponse.builder()
                 .feedbackId(feedback.getFeedbackId())
-                .email(feedback.getUser().getEmail())
-                .nickname(feedback.getUser().getNickname())
                 .category(feedback.getCategory())
                 .content(feedback.getContent())
                 .isAnonymous(feedback.getIsAnonymous())
+                .email(user != null ? user.getEmail() : null)
+                .nickname(user != null ? user.getNickname() : null)
                 .build();
     }
 }
