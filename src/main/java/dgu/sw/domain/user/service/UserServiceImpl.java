@@ -8,7 +8,9 @@ import dgu.sw.domain.user.dto.UserDTO.UserResponse.MyPageResponse;
 import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignInResponse;
 import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignUpResponse;
 import dgu.sw.domain.user.dto.UserDTO.UserResponse.UpdateJoinDateResponse;
+import dgu.sw.domain.user.entity.DeletedUser;
 import dgu.sw.domain.user.entity.User;
+import dgu.sw.domain.user.repository.DeletedUserRepository;
 import dgu.sw.domain.user.repository.UserRepository;
 import dgu.sw.global.config.redis.RedisUtil;
 import dgu.sw.global.config.util.EmailService;
@@ -41,6 +43,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final OAuthUtil oAuthUtil;
+    private final DeletedUserRepository deletedUserRepository;
 
     /**
      * 회원가입
@@ -302,6 +305,16 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
+
+        // DeletedUser 엔티티 생성 및 저장
+        DeletedUser deletedUser = DeletedUser.builder()
+                .userId(user.getUserId())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .joinDate(user.getJoinDate())
+                .deletedAt(LocalDate.now())
+                .build();
+        deletedUserRepository.save(deletedUser);
 
         // Apple 로그인 사용자일 경우 전용 처리 메서드 호출
         if (user.getProvider() == OAuthProvider.APPLE) {
