@@ -21,12 +21,12 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
      *
      * 조건:
      * 1. @LoginUser 어노테이션이 붙어있고
-     * 2. 파라미터 타입이 String인 경우
+     * 2. 파라미터 타입이 Long인 경우
      */
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.hasParameterAnnotation(LoginUser.class)
-                && parameter.getParameterType().equals(String.class);
+                && parameter.getParameterType().equals(Long.class);
     }
 
     /**
@@ -46,7 +46,7 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
 
         // principal이 CustomUserDetails이면 userId 반환
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
-            return String.valueOf(userDetails.getId());
+            return userDetails.getId();
         }
 
         // 인증 정보가 없거나 타입이 다를 경우 null 반환 (또는 예외로 처리 가능)
