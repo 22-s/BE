@@ -1,16 +1,19 @@
 package dgu.sw.domain.user.controller;
 
-import dgu.sw.domain.user.dto.UserDTO.UserResponse.*;
 import dgu.sw.domain.user.dto.UserDTO.UserRequest.*;
+import dgu.sw.domain.user.dto.UserDTO.UserResponse.MyPageResponse;
+import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignInResponse;
+import dgu.sw.domain.user.dto.UserDTO.UserResponse.SignUpResponse;
+import dgu.sw.domain.user.dto.UserDTO.UserResponse.UpdateJoinDateResponse;
 import dgu.sw.domain.user.service.UserService;
 import dgu.sw.global.ApiResponse;
+import dgu.sw.global.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -89,27 +92,27 @@ public class UserController {
 
     @GetMapping("/mypage")
     @Operation(summary = "마이페이지 조회", description = "유저의 마이페이지 정보를 반환합니다.")
-    public ApiResponse<MyPageResponse> getMyPage(Authentication authentication) {
-        return ApiResponse.onSuccess(userService.getMyPage(authentication.getName()));
+    public ApiResponse<MyPageResponse> getMyPage(@LoginUser Long userId) {
+        return ApiResponse.onSuccess(userService.getMyPage(userId));
     }
 
     @PostMapping("/join-date")
     @Operation(summary = "입사일 최초 등록 API", description = "소셜 로그인 유저의 최초 입사일을 등록합니다. 이미 존재하면 400 반환.")
     public ApiResponse<UpdateJoinDateResponse> registerJoinDate(
-            Authentication authentication,
+            @LoginUser Long userId,
             @RequestBody @Valid RegisterJoinDateRequest request
     ) {
-        UpdateJoinDateResponse response = userService.registerJoinDate(authentication.getName(), request.getJoinDate());
+        UpdateJoinDateResponse response = userService.registerJoinDate(userId, request.getJoinDate());
         return ApiResponse.onSuccess(response);
     }
 
     @PatchMapping("/join-date")
     @Operation(summary = "입사일 변경 API", description = "사용자의 입사일을 수정합니다.")
     public ApiResponse<UpdateJoinDateResponse> updateJoinDate(
-            Authentication authentication,
+            @LoginUser Long userId,
             @RequestBody @Valid UpdateJoinDateRequest request
     ) {
-        UpdateJoinDateResponse response = userService.updateJoinDate(authentication.getName(), request.getJoinDate());
+        UpdateJoinDateResponse response = userService.updateJoinDate(userId, request.getJoinDate());
         return ApiResponse.onSuccess(response);
     }
 
@@ -127,10 +130,10 @@ public class UserController {
     )
     @Operation(summary = "FCM 토큰 등록/수정", description = "모바일 디바이스에서 FCM 토큰을 받아 저장합니다.")
     public ApiResponse<String> updateFcmToken(
-            Authentication authentication,
+            @LoginUser Long userId,
             @RequestBody @Valid FcmTokenUpdateRequest request
     ) {
-        userService.updateFcmToken(authentication.getName(), request.getFcmToken());
+        userService.updateFcmToken(userId, request.getFcmToken());
         return ApiResponse.onSuccess("FCM 토큰이 저장되었습니다.");
     }
 }

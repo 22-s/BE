@@ -28,7 +28,7 @@ public class MannerServiceImpl implements MannerService {
     private final UserRepository userRepository;
 
     @Override
-    public List<MannerListResponse> getMannersByCategory(int category, String userId) {
+    public List<MannerListResponse> getMannersByCategory(int category, Long userId) {
         // int 카테고리를 String으로 매핑
         String categoryName = mapCategoryToString(category);
 
@@ -37,7 +37,7 @@ public class MannerServiceImpl implements MannerService {
                 .map(manner -> {
                     boolean isFavorited = false;
                     if (userId != null) {
-                        User user = userRepository.findById(Long.valueOf(userId)).orElse(null);
+                        User user = userRepository.findById(userId).orElse(null);
                         isFavorited = user != null && favoriteMannerRepository.existsByUserAndManner(user, manner);
                     }
                     return MannerConverter.toMannerListResponse(manner, isFavorited);
@@ -65,13 +65,13 @@ public class MannerServiceImpl implements MannerService {
     }
 
     @Override
-    public MannerDetailResponse getMannerDetail(Long mannerId, String userId) {
+    public MannerDetailResponse getMannerDetail(Long mannerId, Long userId) {
         Manner manner = mannerRepository.findById(mannerId)
                 .orElseThrow(() -> new MannerException(ErrorStatus.MANNER_NOT_FOUND));
 
         boolean isFavorited = false;
         if (userId != null) {
-            User user = userRepository.findById(Long.valueOf(userId)).orElse(null);
+            User user = userRepository.findById(userId).orElse(null);
             isFavorited = user != null && favoriteMannerRepository.existsByUserAndManner(user, manner);
         }
 
@@ -104,8 +104,8 @@ public class MannerServiceImpl implements MannerService {
     }
 
     @Override
-    public void addFavorite(String userId, Long mannerId) {
-        User user = userRepository.findById(Long.valueOf(userId))
+    public void addFavorite(Long userId, Long mannerId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
 
         Manner manner = mannerRepository.findById(mannerId)
@@ -124,8 +124,8 @@ public class MannerServiceImpl implements MannerService {
     }
 
     @Override
-    public void removeFavorite(String userId, Long mannerId) {
-        User user = userRepository.findById(Long.valueOf(userId))
+    public void removeFavorite(Long userId, Long mannerId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
 
         Manner manner = mannerRepository.findById(mannerId)
@@ -138,8 +138,8 @@ public class MannerServiceImpl implements MannerService {
     }
 
     @Override
-    public List<MannerFavoriteResponse> getFavorites(String userId) {
-        User user = userRepository.findById(Long.valueOf(userId))
+    public List<MannerFavoriteResponse> getFavorites(Long userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
 
         return favoriteMannerRepository.findByUser(user)

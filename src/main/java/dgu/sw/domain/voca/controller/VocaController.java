@@ -4,6 +4,7 @@ import dgu.sw.domain.voca.dto.VocaDTO.VocaResponse.VocaListResponse;
 import dgu.sw.domain.voca.dto.VocaDTO.VocaResponse.VocaFavoriteResponse;
 import dgu.sw.domain.voca.service.VocaService;
 import dgu.sw.global.ApiResponse;
+import dgu.sw.global.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +25,7 @@ public class VocaController {
     @Operation(summary = "업무 용어 리스트 조회", description = "카테고리별 업무 용어 리스트를 반환합니다.")
     public ApiResponse<List<VocaListResponse>> getVocaList(
             @RequestParam String category,
-            Authentication authentication) {
-        String userId = (authentication != null) ? authentication.getName() : null;
+            @LoginUser Long userId) {
         List<VocaListResponse> response = vocaService.getVocaList(userId, category);
         return ApiResponse.onSuccess(response);
     }
@@ -34,30 +34,29 @@ public class VocaController {
     @Operation(summary = "업무 용어 검색", description = "키워드로 업무 용어를 검색합니다.")
     public ApiResponse<List<VocaListResponse>> searchVoca(
             @RequestParam String keyword,
-            Authentication authentication) {
-        String userId = (authentication != null) ? authentication.getName() : null;
+            @LoginUser Long userId) {
         List<VocaListResponse> response = vocaService.searchVoca(userId, keyword);
         return ApiResponse.onSuccess(response);
     }
 
     @PostMapping("/likes/{vocaId}")
     @Operation(summary = "업무 용어 즐겨찾기 추가", description = "업무 용어를 즐겨찾기에 추가합니다.")
-    public ApiResponse<String> addFavorite(@PathVariable Long vocaId, Authentication authentication) {
-        vocaService.addFavorite(authentication.getName(), vocaId);
+    public ApiResponse<String> addFavorite(@PathVariable Long vocaId, @LoginUser Long userId) {
+        vocaService.addFavorite(userId, vocaId);
         return ApiResponse.onSuccess("즐겨찾기에 추가되었습니다.");
     }
 
     @DeleteMapping("/likes/{vocaId}")
     @Operation(summary = "업무 용어 즐겨찾기 삭제", description = "업무 용어를 즐겨찾기에서 삭제합니다.")
-    public ApiResponse<String> removeFavorite(@PathVariable Long vocaId, Authentication authentication) {
-        vocaService.removeFavorite(authentication.getName(), vocaId);
+    public ApiResponse<String> removeFavorite(@PathVariable Long vocaId, @LoginUser Long userId) {
+        vocaService.removeFavorite(userId, vocaId);
         return ApiResponse.onSuccess("즐겨찾기에서 삭제되었습니다.");
     }
 
     @GetMapping("/likes")
     @Operation(summary = "즐겨찾기 조회", description = "사용자의 즐겨찾기 리스트를 반환합니다.")
-    public ApiResponse<List<VocaFavoriteResponse>> getFavorites(Authentication authentication) {
-        List<VocaFavoriteResponse> response = vocaService.getFavorites(authentication.getName());
+    public ApiResponse<List<VocaFavoriteResponse>> getFavorites(@LoginUser Long userId) {
+        List<VocaFavoriteResponse> response = vocaService.getFavorites(userId);
         return ApiResponse.onSuccess(response);
     }
 }

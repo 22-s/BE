@@ -40,7 +40,7 @@ public class QuizServiceImpl implements QuizService {
     private final MockTestRepository mockTestRepository;
 
     @Override
-    public List<QuizListResponse> getQuizList(String userId, int category) {
+    public List<QuizListResponse> getQuizList(Long userId, int category) {
         // int 카테고리를 String으로 매핑
         String categoryName = mapCategoryToString(category);
 
@@ -51,11 +51,11 @@ public class QuizServiceImpl implements QuizService {
         }
 
         // 사용자 관련 데이터를 조회
-        List<UserQuiz> userQuizzes = userQuizRepository.findByUser_UserId(Long.valueOf(userId));
+        List<UserQuiz> userQuizzes = userQuizRepository.findByUser_UserId(userId);
         Map<Long, UserQuiz> userQuizMap = userQuizzes.stream()
                 .collect(Collectors.toMap(userQuiz -> userQuiz.getQuiz().getQuizId(), userQuiz -> userQuiz));
 
-        List<QuizReviewList> reviewList = quizReviewListRepository.findByUser_UserId(Long.valueOf(userId));
+        List<QuizReviewList> reviewList = quizReviewListRepository.findByUser_UserId(userId);
         Map<Long, QuizReviewList> reviewQuizMap = reviewList.stream()
                 .collect(Collectors.toMap(quizReview -> quizReview.getQuiz().getQuizId(), quizReview -> quizReview));
 
@@ -109,25 +109,24 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public QuizDetailResponse getQuizDetail(String userId, Long quizId) {
+    public QuizDetailResponse getQuizDetail(Long userId, Long quizId) {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_FOUND));
 
         // 사용자가 해당 퀴즈를 풀었는지 확인
-        boolean isSolved = userQuizRepository.findByUser_UserIdAndQuiz_QuizId(Long.valueOf(userId), quizId).isPresent();
+        boolean isSolved = userQuizRepository.findByUser_UserIdAndQuiz_QuizId(userId, quizId).isPresent();
 
         // 복습 리스트에 포함 여부 확인
-        boolean isInReviewList = quizReviewListRepository.existsByUser_UserIdAndQuiz_QuizId(Long.valueOf(userId), quizId);
+        boolean isInReviewList = quizReviewListRepository.existsByUser_UserIdAndQuiz_QuizId(userId, quizId);
 
         return QuizConverter.toQuizDetailResponse(quiz, isSolved, isInReviewList);
     }
 
     @Override
-    public QuizResultResponse submitQuizAnswer(String userId, Long quizId, SubmitQuizRequest request) {
+    public QuizResultResponse submitQuizAnswer(Long userId, Long quizId, SubmitQuizRequest request) {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_FOUND));
 
-        Long uid = Long.valueOf(userId);
         String category = quiz.getCategory();
 
         // 해당 카테고리에서 가장 먼저 풀어야 하는 퀴즈 ID 찾기
@@ -138,7 +137,7 @@ public class QuizServiceImpl implements QuizService {
 
         // 이전 퀴즈를 풀었는지 확인 (첫 퀴즈가 아닐 경우만 체크)
         if (!quizId.equals(firstQuizId)) {
-            boolean previousSolved = userQuizRepository.existsByUser_UserIdAndQuiz_QuizId(uid, previousQuizId);
+            boolean previousSolved = userQuizRepository.existsByUser_UserIdAndQuiz_QuizId(userId, previousQuizId);
             if (!previousSolved) {
                 throw new QuizException(ErrorStatus.QUIZ_LOCKED);
             }
@@ -146,7 +145,7 @@ public class QuizServiceImpl implements QuizService {
 
         boolean isCorrect = quiz.getAnswer().equals(request.getSelectedAnswer());
 
-        UserQuiz existingUserQuiz = userQuizRepository.findByUser_UserIdAndQuiz_QuizId(Long.valueOf(userId), quizId)
+        UserQuiz existingUserQuiz = userQuizRepository.findByUser_UserIdAndQuiz_QuizId(userId, quizId)
                 .orElse(null);
 
         if (existingUserQuiz != null) {
@@ -154,14 +153,14 @@ public class QuizServiceImpl implements QuizService {
 
             // retriedToday 체크
             boolean solvedYesterday = userQuizRepository.existsByUser_UserIdAndQuiz_QuizIdAndSolvedDate(
-                    Long.valueOf(userId), quizId, LocalDate.now().minusDays(1)
+                    userId, quizId, LocalDate.now().minusDays(1)
             );
             existingUserQuiz.updateRetriedToday(solvedYesterday);
 
             userQuizRepository.save(existingUserQuiz);
         }
         else {
-            User user = userRepository.findByUserId(Long.valueOf(userId));
+            User user = userRepository.findByUserId(userId);
             UserQuiz userQuiz = QuizConverter.toUserQuiz(user, quiz, isCorrect);
 
             userQuizRepository.save(userQuiz);
@@ -171,14 +170,14 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public void addQuizToReview(String userId, Long quizId) {
+    public void addQuizToReview(Long userId, Long quizId) {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_FOUND));
 
-        boolean alreadyInReview = quizReviewListRepository.existsByUser_UserIdAndQuiz_QuizId(Long.valueOf(userId), quizId);
+        boolean alreadyInReview = quizReviewListRepository.existsByUser_UserIdAndQuiz_QuizId(userId, quizId);
 
         // 사용자가 해당 퀴즈를 풀었는지 확인
-        UserQuiz userQuiz = userQuizRepository.findByUser_UserIdAndQuiz_QuizId(Long.valueOf(userId), quizId)
+        UserQuiz userQuiz = userQuizRepository.findByUser_UserIdAndQuiz_QuizId(userId, quizId)
                 .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_SOLVED));
 
         if (alreadyInReview) {
@@ -186,20 +185,20 @@ public class QuizServiceImpl implements QuizService {
         }
 
         QuizReviewList reviewItem = QuizReviewList.builder()
-                .user(userRepository.findByUserId(Long.valueOf(userId)))
+                .user(userRepository.findByUserId(userId))
                 .quiz(quiz)
                 .build();
         quizReviewListRepository.save(reviewItem);
     }
 
     @Override
-    public void removeQuizFromReview(String userId, Long quizId) {
+    public void removeQuizFromReview(Long userId, Long quizId) {
         // 1. 유효한 퀴즈 ID인지 확인
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_FOUND));
 
         // 2. 유효한 사용자 ID인지 확인
-        User user = userRepository.findByUserId(Long.valueOf(userId));
+        User user = userRepository.findByUserId(userId);
 
         // 3. 복습 리스트에서 해당 퀴즈 조회
         QuizReviewList quizReviewList = quizReviewListRepository.findByUserAndQuiz(user, quiz)
@@ -210,15 +209,15 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public List<QuizReviewResponse> getReviewList(String userId) {
-        List<QuizReviewList> reviewList = quizReviewListRepository.findByUser_UserId(Long.valueOf(userId));
+    public List<QuizReviewResponse> getReviewList(Long userId) {
+        List<QuizReviewList> reviewList = quizReviewListRepository.findByUser_UserId(userId);
 
         if (reviewList.isEmpty()) {
             throw new QuizException(ErrorStatus.QUIZ_SEARCH_NO_RESULTS);
         }
 
         // 사용자와 연결된 모든 UserQuiz를 조회
-        List<UserQuiz> userQuizzes = userQuizRepository.findByUser_UserId(Long.valueOf(userId));
+        List<UserQuiz> userQuizzes = userQuizRepository.findByUser_UserId(userId);
         Map<Long, Boolean> quizCorrectMap = userQuizzes.stream()
                 .collect(Collectors.toMap(userQuiz -> userQuiz.getQuiz().getQuizId(), UserQuiz::isCorrect));
 
@@ -237,7 +236,7 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public List<QuizSearchResponse> searchQuizzes(String userId, String keyword) {
+    public List<QuizSearchResponse> searchQuizzes(Long userId, String keyword) {
         // 1. 퀴즈 검색
         List<Quiz> quizzes = quizRepository.findByQuestionContainingOrDescriptionContaining(keyword, keyword);
 
@@ -246,11 +245,11 @@ public class QuizServiceImpl implements QuizService {
         }
 
         // 2. 사용자와 관련된 데이터를 조회
-        List<UserQuiz> userQuizzes = userQuizRepository.findByUser_UserId(Long.valueOf(userId));
+        List<UserQuiz> userQuizzes = userQuizRepository.findByUser_UserId(userId);
         Map<Long, UserQuiz> userQuizMap = userQuizzes.stream()
                 .collect(Collectors.toMap(userQuiz -> userQuiz.getQuiz().getQuizId(), userQuiz -> userQuiz));
 
-        List<QuizReviewList> reviewList = quizReviewListRepository.findByUser_UserId(Long.valueOf(userId));
+        List<QuizReviewList> reviewList = quizReviewListRepository.findByUser_UserId(userId);
         Map<Long, QuizReviewList> reviewQuizMap = reviewList.stream()
                 .collect(Collectors.toMap(quizReview -> quizReview.getQuiz().getQuizId(), quizReview -> quizReview));
 
@@ -277,26 +276,24 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public QuizMainPageResponse getQuizMainPageData(String userId) {
-        Long uid = Long.valueOf(userId);
+    public QuizMainPageResponse getQuizMainPageData(Long userId) {
+        User user = userRepository.findByUserId(userId);
 
-        User user = userRepository.findByUserId(uid);
-
-        int yesterdayCount = userQuizRepository.countByUserIdAndSolvedDate(uid, LocalDate.now().minusDays(1));
+        int yesterdayCount = userQuizRepository.countByUserIdAndSolvedDate(userId, LocalDate.now().minusDays(1));
         long totalQuizCount = quizRepository.count();
-        long userSolvedCount = userQuizRepository.countDistinctByUserId(uid);
+        long userSolvedCount = userQuizRepository.countDistinctByUserId(userId);
 
         double progressRate = (double) userSolvedCount / totalQuizCount * 100;
 
         // 최근 모의고사 점수
-        MockTest recentExam = mockTestRepository.findTopByUser_UserIdOrderByCreatedAtDesc(uid).orElse(null);
+        MockTest recentExam = mockTestRepository.findTopByUser_UserIdOrderByCreatedAtDesc(userId).orElse(null);
         Integer recentScore = recentExam != null ? recentExam.getCorrectCount() * 10 : null;
 
         // 상위 % 계산
         Double topPercentile = recentExam != null ? recentExam.getTopPercentile() : null;
         // 어제 많이 틀린 Top5 퀴즈
         List<Quiz> top5Wrong = userQuizRepository.findTop5MostWrongOnDate(LocalDate.now().minusDays(1));
-        List<UserQuiz> userQuizzes = userQuizRepository.findByUser_UserId(uid);
+        List<UserQuiz> userQuizzes = userQuizRepository.findByUser_UserId(userId);
         Map<Long, UserQuiz> userQuizMap = userQuizzes.stream()
                 .collect(Collectors.toMap(
                         uq -> uq.getQuiz().getQuizId(),
@@ -335,11 +332,10 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public List<YesterdayQuizResponse> getYesterdaySolvedQuizzes(String userId) {
-        Long uid = Long.valueOf(userId);
+    public List<YesterdayQuizResponse> getYesterdaySolvedQuizzes(Long userId) {
         LocalDate yesterday = LocalDate.now().minusDays(1);
 
-        List<UserQuiz> solvedQuizzes = userQuizRepository.findByUser_UserIdAndSolvedDate(uid, yesterday);
+        List<UserQuiz> solvedQuizzes = userQuizRepository.findByUser_UserIdAndSolvedDate(userId, yesterday);
 
         if (solvedQuizzes.isEmpty()) {
             throw new QuizException(ErrorStatus.QUIZ_SEARCH_NO_RESULTS);
@@ -348,7 +344,7 @@ public class QuizServiceImpl implements QuizService {
         return solvedQuizzes.stream()
                 .map(userQuiz -> {
                     Quiz quiz = userQuiz.getQuiz();
-                    boolean isInReviewList = quizReviewListRepository.existsByUser_UserIdAndQuiz_QuizId(uid, quiz.getQuizId());
+                    boolean isInReviewList = quizReviewListRepository.existsByUser_UserIdAndQuiz_QuizId(userId, quiz.getQuizId());
                     boolean retriedToday = Boolean.TRUE.equals(userQuiz.getRetriedToday());
 
                     return QuizConverter.toYesterdayQuizResponse(quiz, isInReviewList, retriedToday);

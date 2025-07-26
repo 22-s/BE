@@ -17,10 +17,7 @@ import dgu.sw.domain.user.repository.UserRepository;
 import dgu.sw.domain.voca.entity.Voca;
 import dgu.sw.domain.voca.repository.VocaRepository;
 import dgu.sw.global.config.redis.RedisUtil;
-import dgu.sw.global.exception.MannerException;
-import dgu.sw.global.exception.QuizException;
-import dgu.sw.global.exception.UserException;
-import dgu.sw.global.exception.VocaException;
+import dgu.sw.global.exception.*;
 import dgu.sw.global.security.JwtTokenProvider;
 import dgu.sw.global.status.ErrorStatus;
 import jakarta.transaction.Transactional;
@@ -46,16 +43,16 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public AdminLoginResponse login(AdminLoginRequest request) {
         User admin = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
+                .orElseThrow(() -> new AdminException(ErrorStatus.ADMIN_NOT_FOUND));
 
         // 관리자 권한 확인
         if (!admin.getRole().equals(Role.ADMIN)) {
-            throw new UserException(ErrorStatus.FORBIDDEN_ACCESS);
+            throw new AdminException(ErrorStatus.ADMIN_FORBIDDEN_ACCESS);
         }
 
         // 비밀번호 일치 확인 (bcrypt 비교)
         if (!passwordEncoder.matches(request.getPassword(), admin.getPassword())) {
-            throw new UserException(ErrorStatus.INVALID_CREDENTIALS);
+            throw new AdminException(ErrorStatus.ADMIN_INVALID_CREDENTIALS);
         }
 
         // 토큰 생성
@@ -68,18 +65,18 @@ public class AdminServiceImpl implements AdminService {
         return AdminConverter.toAdminLoginResponse(accessToken, refreshToken, admin);
     }
 
-    private void checkAdminRole(String userId) {
-        User user = userRepository.findById(Long.valueOf(userId))
-                .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
+    private void checkAdminRole(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AdminException(ErrorStatus.ADMIN_NOT_FOUND));
 
         // 사용자 권한 확인
         if (!user.getRole().equals(Role.ADMIN)) {
-            throw new UserException(ErrorStatus.FORBIDDEN_ACCESS);
+            throw new AdminException(ErrorStatus.ADMIN_FORBIDDEN_ACCESS);
         }
     }
 
     @Override
-    public List<AdminUserResponse> getAllUsers(String userId) {
+    public List<AdminUserResponse> getAllUsers(Long userId) {
         checkAdminRole(userId);  // 권한 확인
         return userRepository.findAll().stream()
                 .map(AdminConverter::toAdminUserResponse)
@@ -87,7 +84,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<AdminMannerResponse> getAllManners(String userId) {
+    public List<AdminMannerResponse> getAllManners(Long userId) {
         checkAdminRole(userId);  // 권한 확인
         return mannerRepository.findAll().stream()
                 .map(AdminConverter::toAdminMannerResponse)
@@ -96,14 +93,14 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public void deleteManner(Long mannerId, String userId) {
+    public void deleteManner(Long mannerId, Long userId) {
         checkAdminRole(userId);  // 권한 확인
         mannerRepository.deleteById(mannerId);
     }
 
     @Override
     @Transactional
-    public void saveManner(AdminMannerRequest request, String userId) {
+    public void saveManner(AdminMannerRequest request, Long userId) {
         checkAdminRole(userId);  // 권한 확인
         Manner manner = AdminConverter.toManner(request);
         mannerRepository.save(manner);
@@ -111,7 +108,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public void updateManner(Long mannerId, AdminMannerRequest request, String userId) {
+    public void updateManner(Long mannerId, AdminMannerRequest request, Long userId) {
         checkAdminRole(userId);
         Manner existingManner = mannerRepository.findById(mannerId)
                 .orElseThrow(() -> new MannerException(ErrorStatus.MANNER_NOT_FOUND));
@@ -125,7 +122,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<AdminQuizResponse> getAllQuizzes(String userId) {
+    public List<AdminQuizResponse> getAllQuizzes(Long userId) {
         checkAdminRole(userId);  // 권한 확인
         return quizRepository.findAll().stream()
                 .map(AdminConverter::toAdminQuizResponse)
@@ -134,7 +131,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public void saveQuiz(AdminQuizRequest request, String userId) {
+    public void saveQuiz(AdminQuizRequest request, Long userId) {
         checkAdminRole(userId);  // 권한 확인
         Quiz quiz = AdminConverter.toQuiz(request);
         quizRepository.save(quiz);
@@ -142,7 +139,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public void updateQuiz(Long quizId, AdminQuizRequest request, String userId) {
+    public void updateQuiz(Long quizId, AdminQuizRequest request, Long userId) {
         checkAdminRole(userId);
         Quiz existingQuiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new QuizException(ErrorStatus.QUIZ_NOT_FOUND));
@@ -159,13 +156,13 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public void deleteQuiz(Long quizId, String userId) {
+    public void deleteQuiz(Long quizId, Long userId) {
         checkAdminRole(userId);  // 권한 확인
         quizRepository.deleteById(quizId);
     }
 
     @Override
-    public List<AdminVocaResponse> getAllVocas(String userId) {
+    public List<AdminVocaResponse> getAllVocas(Long userId) {
         checkAdminRole(userId);  // 권한 확인
         return vocaRepository.findAll().stream()
                 .map(AdminConverter::toAdminVocaResponse)
@@ -174,14 +171,14 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public void saveVoca(AdminVocaRequest request, String userId) {
+    public void saveVoca(AdminVocaRequest request, Long userId) {
         checkAdminRole(userId);  // 권한 확인
         vocaRepository.save(AdminConverter.toVoca(request));
     }
 
     @Override
     @Transactional
-    public void updateVoca(Long vocaId, AdminVocaRequest request, String userId) {
+    public void updateVoca(Long vocaId, AdminVocaRequest request, Long userId) {
         checkAdminRole(userId);
         Voca existingVoca = vocaRepository.findById(vocaId)
                 .orElseThrow(() -> new VocaException(ErrorStatus.VOCA_NOT_FOUND));
@@ -196,13 +193,13 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public void deleteVoca(Long vocaId, String userId) {
+    public void deleteVoca(Long vocaId, Long userId) {
         checkAdminRole(userId);  // 권한 확인
         vocaRepository.deleteById(vocaId);
     }
 
     @Override
-    public List<AdminFeedbackResponse> getAllFeedbacks(String userId) {
+    public List<AdminFeedbackResponse> getAllFeedbacks(Long userId) {
         checkAdminRole(userId);
         return feedbackRepository.findAll().stream()
                 .map(AdminConverter::toAdminFeedbackResponse)

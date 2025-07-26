@@ -273,14 +273,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public MyPageResponse getMyPage(String userId) {
-        User user = userRepository.findByUserId(Long.valueOf(userId));
+    public MyPageResponse getMyPage(Long userId) {
+        User user = userRepository.findByUserId(userId);
         return UserConverter.toMyPageResponse(user);
     }
 
     @Override
-    public UpdateJoinDateResponse updateJoinDate(String userId, LocalDate joinDate) {
-        User user = userRepository.findById(Long.valueOf(userId))
+    public UpdateJoinDateResponse updateJoinDate(Long userId, LocalDate joinDate) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
 
         user.updateJoinDate(joinDate);
@@ -361,8 +361,8 @@ public class UserServiceImpl implements UserService {
 
     // 소셜 로그인용 입사일 등록 API
     @Override
-    public UpdateJoinDateResponse registerJoinDate(String userId, LocalDate joinDate) {
-        User user = userRepository.findById(Long.valueOf(userId))
+    public UpdateJoinDateResponse registerJoinDate(Long userId, LocalDate joinDate) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
 
         // 이미 입사일이 등록되어 있다면 예외 발생
@@ -380,8 +380,8 @@ public class UserServiceImpl implements UserService {
 
     // 알림 기능
     @Override
-    public void updateFcmToken(String userId, String fcmToken) {
-        User user = userRepository.findById(Long.valueOf(userId))
+    public void updateFcmToken(Long userId, String fcmToken) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(ErrorStatus.USER_NOT_FOUND));
 
         user.setFcmToken(fcmToken);

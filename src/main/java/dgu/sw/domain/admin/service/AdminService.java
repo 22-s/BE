@@ -15,18 +15,18 @@ import java.util.List;
 
 public interface AdminService {
     AdminLoginResponse login(AdminLoginRequest request);
-    List<AdminUserResponse> getAllUsers(String userId);
-    List<AdminMannerResponse> getAllManners(String userId);
-    void deleteManner(Long mannerId, String userId);
-    void saveManner(AdminMannerRequest request, String userId);
-    void updateManner(Long mannerId, AdminMannerRequest request, String userId);
-    List<AdminQuizResponse> getAllQuizzes(String userId);
-    void saveQuiz(AdminQuizRequest request, String userId);
-    void updateQuiz(Long quizId, AdminQuizRequest request, String userId);
-    void deleteQuiz(Long quizId, String userId);
-    List<AdminVocaResponse> getAllVocas(String userId);
-    void saveVoca(AdminVocaRequest request, String userId);
-    void updateVoca(Long vocaId, AdminVocaRequest request, String userId);
-    void deleteVoca(Long vocaId, String userId);
-    List<AdminFeedbackResponse> getAllFeedbacks(String userId);
+    List<AdminUserResponse> getAllUsers(Long userId);
+    List<AdminMannerResponse> getAllManners(Long userId);
+    void deleteManner(Long mannerId, Long userId);
+    void saveManner(AdminMannerRequest request, Long userId);
+    void updateManner(Long mannerId, AdminMannerRequest request, Long userId);
+    List<AdminQuizResponse> getAllQuizzes(Long userId);
+    void saveQuiz(AdminQuizRequest request, Long userId);
+    void updateQuiz(Long quizId, AdminQuizRequest request, Long userId);
+    void deleteQuiz(Long quizId, Long userId);
+    List<AdminVocaResponse> getAllVocas(Long userId);
+    void saveVoca(AdminVocaRequest request, Long userId);
+    void updateVoca(Long vocaId, AdminVocaRequest request, Long userId);
+    void deleteVoca(Long vocaId, Long userId);
+    List<AdminFeedbackResponse> getAllFeedbacks(Long userId);
 }

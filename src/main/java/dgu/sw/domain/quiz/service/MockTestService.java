@@ -8,7 +8,7 @@ import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.CreateMockTestRespons
 import java.util.List;
 
 public interface MockTestService {
-    CreateMockTestResponse startMockTest(String userId);
+    CreateMockTestResponse startMockTest(Long userId);
     SubmitMockTestResponse submitMockTest(Long mockTestId, SubmitMockTestRequest request);
-    List<MockTestResultResponse> getAllMockTestResults(String userId);
+    List<MockTestResultResponse> getAllMockTestResults(Long userId);
 }
