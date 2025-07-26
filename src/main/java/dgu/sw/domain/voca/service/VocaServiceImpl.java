@@ -1,16 +1,15 @@
 package dgu.sw.domain.voca.service;
 
+import dgu.sw.domain.user.entity.User;
+import dgu.sw.domain.user.repository.UserRepository;
 import dgu.sw.domain.voca.converter.VocaConverter;
-import dgu.sw.domain.voca.dto.VocaDTO.VocaResponse.VocaListResponse;
 import dgu.sw.domain.voca.dto.VocaDTO.VocaResponse.VocaFavoriteResponse;
+import dgu.sw.domain.voca.dto.VocaDTO.VocaResponse.VocaListResponse;
 import dgu.sw.domain.voca.entity.FavoriteVoca;
 import dgu.sw.domain.voca.entity.Voca;
 import dgu.sw.domain.voca.repository.FavoriteVocaRepository;
 import dgu.sw.domain.voca.repository.VocaRepository;
-import dgu.sw.domain.user.entity.User;
-import dgu.sw.domain.user.repository.UserRepository;
 import dgu.sw.global.exception.VocaException;
-import dgu.sw.global.exception.UserException;
 import dgu.sw.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,7 @@ public class VocaServiceImpl implements VocaService {
     private final UserRepository userRepository;
 
     @Override
-    public List<VocaListResponse> getVocaList(String userId, String category) {
+    public List<VocaListResponse> getVocaList(Long userId, String category) {
         // 카테고리별 업무 용어 조회
         List<Voca> vocas = vocaRepository.findByCategory(category);
 
@@ -37,7 +36,7 @@ public class VocaServiceImpl implements VocaService {
 
         // 로그인 여부에 따라 즐겨찾기 처리
         List<Long> favoritedVocaIds = (userId != null)
-                ? favoriteVocaRepository.findByUser(userRepository.findByUserId(Long.valueOf(userId))).stream()
+                ? favoriteVocaRepository.findByUser(userRepository.findByUserId(userId)).stream()
                 .map(favorite -> favorite.getVoca().getVocaId())
                 .collect(Collectors.toList())
                 : List.of();
@@ -50,7 +49,7 @@ public class VocaServiceImpl implements VocaService {
     }
 
     @Override
-    public List<VocaListResponse> searchVoca(String userId, String keyword) {
+    public List<VocaListResponse> searchVoca(Long userId, String keyword) {
         List<Voca> vocas = vocaRepository.findByTermContainingOrDescriptionContaining(keyword, keyword);
 
         if (vocas.isEmpty()) {
@@ -59,7 +58,7 @@ public class VocaServiceImpl implements VocaService {
 
         // 로그인 여부에 따라 즐겨찾기 처리
         List<Long> favoritedVocaIds = (userId != null)
-                ? favoriteVocaRepository.findByUser(userRepository.findByUserId(Long.valueOf(userId))).stream()
+                ? favoriteVocaRepository.findByUser(userRepository.findByUserId(userId)).stream()
                 .map(favorite -> favorite.getVoca().getVocaId())
                 .collect(Collectors.toList())
                 : List.of();
@@ -72,8 +71,8 @@ public class VocaServiceImpl implements VocaService {
     }
 
     @Override
-    public void addFavorite(String userId, Long vocaId) {
-        User user = userRepository.findByUserId(Long.valueOf(userId));
+    public void addFavorite(Long userId, Long vocaId) {
+        User user = userRepository.findByUserId(userId);
         Voca voca = vocaRepository.findById(vocaId)
                 .orElseThrow(() -> new VocaException(ErrorStatus.VOCA_NOT_FOUND));
 
@@ -86,8 +85,8 @@ public class VocaServiceImpl implements VocaService {
     }
 
     @Override
-    public void removeFavorite(String userId, Long vocaId) {
-        User user = userRepository.findByUserId(Long.valueOf(userId));
+    public void removeFavorite(Long userId, Long vocaId) {
+        User user = userRepository.findByUserId(userId);
         Voca voca = vocaRepository.findById(vocaId)
                 .orElseThrow(() -> new VocaException(ErrorStatus.VOCA_NOT_FOUND));
 
@@ -98,8 +97,8 @@ public class VocaServiceImpl implements VocaService {
     }
 
     @Override
-    public List<VocaFavoriteResponse> getFavorites(String userId) {
-        User user = userRepository.findByUserId(Long.valueOf(userId));
+    public List<VocaFavoriteResponse> getFavorites(Long userId) {
+        User user = userRepository.findByUserId(userId);
         List<FavoriteVoca> favorites = favoriteVocaRepository.findByUser(user);
         return favorites.stream()
                 .map(favorite -> VocaConverter.toVocaFavoriteResponse(favorite.getVoca()))
