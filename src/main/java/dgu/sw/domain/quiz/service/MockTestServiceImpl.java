@@ -34,8 +34,8 @@ public class MockTestServiceImpl implements MockTestService {
 
     @Override
     @Transactional
-    public CreateMockTestResponse startMockTest(String userId) {
-        User user = userRepository.findByUserId(Long.valueOf(userId));
+    public CreateMockTestResponse startMockTest(Long userId) {
+        User user = userRepository.findByUserId(userId);
         
         //퀴즈 리스트 생성
         List<Quiz> randomQuizzes = randomQuizListGenerator.generateQuizList();
@@ -114,8 +114,8 @@ public class MockTestServiceImpl implements MockTestService {
     }
 
     @Override
-    public List<MockTestResultResponse> getAllMockTestResults(String userId) {
-        Long uid = Long.valueOf(userId);
+    public List<MockTestResultResponse> getAllMockTestResults(Long userId) {
+        Long uid = userId;
 
         // 사용자의 모든 완료된 모의고사 조회 (정렬 포함)
         List<MockTest> mockTests = mockTestRepository

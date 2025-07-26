@@ -1,15 +1,15 @@
 package dgu.sw.domain.quiz.controller;
 
-import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.MockTestResultResponse;
-import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.SubmitMockTestResponse;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestRequest.SubmitMockTestRequest;
 import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.CreateMockTestResponse;
+import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.MockTestResultResponse;
+import dgu.sw.domain.quiz.dto.MockTestDTO.MockTestResponse.SubmitMockTestResponse;
 import dgu.sw.domain.quiz.service.MockTestService;
 import dgu.sw.global.ApiResponse;
+import dgu.sw.global.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,8 +24,8 @@ public class MockTestController {
 
     @PostMapping("/start")
     @Operation(summary = "모의고사 시작", description = "랜덤한 10개의 퀴즈로 모의고사를 시작합니다.")
-    public ApiResponse<CreateMockTestResponse> startMockTest(Authentication authentication) {
-        CreateMockTestResponse response = mockTestService.startMockTest(authentication.getName());
+    public ApiResponse<CreateMockTestResponse> startMockTest(@LoginUser Long userId) {
+        CreateMockTestResponse response = mockTestService.startMockTest(userId);
         return ApiResponse.onSuccess(response);
     }
 
@@ -40,8 +40,8 @@ public class MockTestController {
 
     @GetMapping("/result/all")
     @Operation(summary = "전체 모의고사 결과 조회", description = "해당 사용자가 완료한 모든 모의고사 결과를 반환합니다.")
-    public ApiResponse<List<MockTestResultResponse>> getAllMockTestResults(Authentication authentication) {
-        List<MockTestResultResponse> response = mockTestService.getAllMockTestResults(authentication.getName());
+    public ApiResponse<List<MockTestResultResponse>> getAllMockTestResults(@LoginUser Long userId) {
+        List<MockTestResultResponse> response = mockTestService.getAllMockTestResults(userId);
         return ApiResponse.onSuccess(response);
     }
 }
