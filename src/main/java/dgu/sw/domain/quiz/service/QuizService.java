@@ -12,13 +12,13 @@ import dgu.sw.domain.quiz.dto.QuizDTO.QuizResponse.QuizSearchResponse;
 import java.util.List;
 
 public interface QuizService {
-    List<QuizListResponse> getQuizList(String userId, int category);
-    QuizDetailResponse getQuizDetail(String userId, Long quizId);
-    QuizResultResponse submitQuizAnswer(String userId, Long quizId, SubmitQuizRequest request);
-    void addQuizToReview(String userId, Long quizId);
-    void removeQuizFromReview(String userId, Long quizId);
-    List<QuizSearchResponse> searchQuizzes(String userId, String keyword);
-    List<QuizReviewResponse> getReviewList(String userId);
-    QuizMainPageResponse getQuizMainPageData(String userId);
-    List<YesterdayQuizResponse> getYesterdaySolvedQuizzes(String userId);
+    List<QuizListResponse> getQuizList(Long userId, int category);
+    QuizDetailResponse getQuizDetail(Long userId, Long quizId);
+    QuizResultResponse submitQuizAnswer(Long userId, Long quizId, SubmitQuizRequest request);
+    void addQuizToReview(Long userId, Long quizId);
+    void removeQuizFromReview(Long userId, Long quizId);
+    List<QuizSearchResponse> searchQuizzes(Long userId, String keyword);
+    List<QuizReviewResponse> getReviewList(Long userId);
+    QuizMainPageResponse getQuizMainPageData(Long userId);
+    List<YesterdayQuizResponse> getYesterdaySolvedQuizzes(Long userId);
 }
