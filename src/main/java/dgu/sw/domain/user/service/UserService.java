@@ -31,15 +31,15 @@ public interface UserService {
     // 비밀번호 변경, 확인
     void resetPassword(PasswordResetRequest request);
 
-    MyPageResponse getMyPage(String userId);
+    MyPageResponse getMyPage(Long userId);
 
-    UpdateJoinDateResponse updateJoinDate(String userId, LocalDate joinDate);
+    UpdateJoinDateResponse updateJoinDate(Long userId, LocalDate joinDate);
 
     void withdraw(HttpServletRequest request);
 
-    UpdateJoinDateResponse registerJoinDate(String userId, LocalDate joinDate);
+    UpdateJoinDateResponse registerJoinDate(Long userId, LocalDate joinDate);
     // 클라이언트 입장에서 응답은 같으니 Register용을 따로 만들지 않고 Update를 사용!
 
     // 알림 기능
-    void updateFcmToken(String userId, String fcmToken);
+    void updateFcmToken(Long userId, String fcmToken);
 }
