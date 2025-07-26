@@ -38,7 +38,12 @@ public enum ErrorStatus implements BaseErrorCode {
     JOIN_DATE_ALREADY_REGISTERED(HttpStatus.BAD_REQUEST, "USER4012", "이미 입사일이 등록된 사용자입니다."),
     SOCIAL_USER_CANNOT_CHANGE_PASSWORD(HttpStatus.FORBIDDEN, "USER4013", "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다."),
     LOGGED_OUT_TOKEN(HttpStatus.UNAUTHORIZED, "USER4013", "이미 로그아웃된 토큰입니다."),
-    FORBIDDEN_ACCESS(HttpStatus.UNAUTHORIZED, "USER4014", "관리자 권한이 없습니다."),
+
+    // 관리자 관련 에러
+    ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "ADMIN4001", "존재하지 않는 관리자입니다."),
+    ADMIN_INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "ADMIN4002", "관리자 이메일 또는 비밀번호가 올바르지 않습니다."),
+    ADMIN_FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "ADMIN4003", "관리자 권한이 없습니다."),
+    ADMIN_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "ADMIN4004", "인증되지 않은 관리자 요청입니다."),
 
     // 업무 용어 관련 에러
     VOCA_NOT_FOUND(HttpStatus.NOT_FOUND, "VOCA4041", "해당 업무 용어를 찾을 수 없습니다."),
