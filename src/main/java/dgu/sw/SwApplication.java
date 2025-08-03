@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.EnableScheduling; // 스케줄링 관련 코드 추가
+import java.util.TimeZone;
 
 @SpringBootApplication
 @EnableJpaAuditing
@@ -14,6 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling; // 스케줄�
 public class SwApplication {
 
 	public static void main(String[] args) {
+		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
 		SpringApplication.run(SwApplication.class, args);
 	}
 
