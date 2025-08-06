@@ -2,10 +2,6 @@ spring:
   jackson:
     time-zone: Asia/Seoul # 한국 시간으로 변경
 
-  redis:
-    ssl:
-      enabled: true
-
   jpa:
     hibernate:
       ddl-auto: none
