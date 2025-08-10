@@ -96,7 +96,7 @@ public class QuizServiceImpl implements QuizService {
             case 2:
                 return "명함 공유 매너";
             case 3:
-                return "CS 지식";
+                return "IT 지식";
             case 4:
                 return "직장인 글쓰기 Tip";
             case 5:
