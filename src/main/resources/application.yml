@@ -4,8 +4,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
-    database: mariadb
+      ddl-auto: update
     properties:
       hibernate:
         show_sql: true
